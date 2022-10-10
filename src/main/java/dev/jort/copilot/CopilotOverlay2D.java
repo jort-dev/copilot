@@ -2,11 +2,6 @@ package dev.jort.copilot;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Player;
-import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -21,10 +16,13 @@ public class CopilotOverlay2D extends OverlayPanel {
 
     private final Client client;
     @Inject
-    Players players;
+    Tracker tracker;
 
     @Inject
     WillowsDraynor willowsDraynor;
+
+    @Inject
+    CopilotNotificationOverlay notificationOverlay;
 
     @Inject
     public CopilotOverlay2D(Client client) {
@@ -43,6 +41,15 @@ public class CopilotOverlay2D extends OverlayPanel {
                 .left(willowsDraynor.getHint())
                 .preferredSize(new Dimension(600, 100))
                 .build());
+
+        String s = willowsDraynor.isShouldInteract() ? "Interaction needed" : "Wait";
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left(s)
+                .build());
+
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Overlay enabled: " + notificationOverlay.isEnabled())
+//                .build());
 
         return super.render(graphics);
     }

@@ -14,14 +14,23 @@ import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
-public class Players {
+public class Tracker {
 
     @Inject
     Client client;
 
+    //animation
     private long lastAnimationTime = 0;
+
+    //walking
     private long lastWalkingTime = 0;
     private LocalPoint lastPlayerLocation;
+
+    //menu item
+    private String lastClickedMenuOption = "";
+    private int lastClickedId = -1;
+    private long lastMenuClickTime = 0;
+
 
     private boolean isAnimatingNow() {
         return getAnimation() > -1;
@@ -48,7 +57,7 @@ public class Players {
     }
 
     public boolean isWalking() {
-        return isWalking(1000);
+        return isWalking(200);
     }
 
     public boolean isWalking(int ms) {
@@ -79,6 +88,26 @@ public class Players {
         if (event.getMenuOption().equals("Walk here")) {
             lastWalkingTime = System.currentTimeMillis();
         }
+        lastMenuClickTime = System.currentTimeMillis();
+        lastClickedMenuOption = event.getMenuOption();
+        lastClickedId = event.getId();
     }
+
+    public String getLastClickedMenuOption() {
+        return lastClickedMenuOption;
+    }
+
+    public void setLastClickedMenuOption(String lastClickedMenuOption) {
+        this.lastClickedMenuOption = lastClickedMenuOption;
+    }
+
+    public int getLastClickedId() {
+        return lastClickedId;
+    }
+
+    public void setLastClickedId(int lastClickedId) {
+        this.lastClickedId = lastClickedId;
+    }
+
 
 }

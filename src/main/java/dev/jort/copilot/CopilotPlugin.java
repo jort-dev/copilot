@@ -6,19 +6,20 @@ import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.task.Schedule;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Copilot"
+        name = "Copilot",
+        description = "Shows where to click next."
 )
 public class CopilotPlugin extends Plugin {
     @Inject
@@ -32,7 +33,7 @@ public class CopilotPlugin extends Plugin {
     @Inject
     Inventory inventory;
     @Inject
-    Players players;
+    Tracker tracker;
 
     @Inject
     private OverlayManager overlayManager;
@@ -47,12 +48,22 @@ public class CopilotPlugin extends Plugin {
     CopilotWidgetOverlay widgetOverlay;
 
     @Inject
+    CopilotNotificationOverlay notificationOverlay;
+
+    @Inject
     private Chat chat;
 
     @Inject
     WillowsDraynor willowsDraynor;
 
 
+    @Schedule(period = 3, unit = ChronoUnit.SECONDS)
+    public void schedule() {
+        if (!client.getGameState().equals(GameState.LOGGED_IN)) {
+            log.info("Waiting to be logged in");
+            return;
+        }
+    }
 
     @Override
     protected void startUp() throws Exception {
@@ -60,6 +71,7 @@ public class CopilotPlugin extends Plugin {
         overlayManager.add(overlay2d);
         overlayManager.add(overlay3d);
         overlayManager.add(widgetOverlay);
+        overlayManager.add(notificationOverlay);
     }
 
     @Override
@@ -72,7 +84,11 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
-            chat.send("Started!");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(Util.colorString("Jort's ", "ff00ff"));
+            stringBuilder.append(Util.colorString("Copilot ", "0000ff"));
+            stringBuilder.append(Util.colorString("has ", "ffff00"));
+            stringBuilder.append(Util.colorString("started!", "ff0000"));
         }
     }
 
@@ -88,7 +104,7 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick event) {
-        players.onGameTick(event);
+        tracker.onGameTick(event);
         willowsDraynor.loop();
     }
 
@@ -99,7 +115,8 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
-        players.onMenuOptionClicked(event);
+        tracker.onMenuOptionClicked(event);
+        chat.send("Clicked menu item: " + event.getMenuOption() + " on " + event.getId());
     }
 
     @Subscribe

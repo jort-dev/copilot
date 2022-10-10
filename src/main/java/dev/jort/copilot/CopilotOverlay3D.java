@@ -36,6 +36,8 @@ public class CopilotOverlay3D extends Overlay {
             return null;
         }
 
+
+        color = Color.CYAN;
         //draw the outline
         Point mousePosition = client.getMouseCanvasPosition();
         if (box.contains(mousePosition.getX(), mousePosition.getY())) {
@@ -58,18 +60,10 @@ public class CopilotOverlay3D extends Overlay {
     }
 
     public void removeGameObjectToHighlight() {
-        if (gameObjectToHighlight == null) {
-            return;
-        }
         gameObjectToHighlight = null;
-        log.info("Removed game object to draw");
     }
 
     public void setGameObjectToHighlight(GameObject gameObjectToHighlight) {
-        if (this.gameObjectToHighlight != null && this.gameObjectToHighlight.equals(gameObjectToHighlight)) {
-            return;
-        }
         this.gameObjectToHighlight = gameObjectToHighlight;
-        log.info("Updated game object to draw to : " + gameObjectToHighlight.getId());
     }
 }

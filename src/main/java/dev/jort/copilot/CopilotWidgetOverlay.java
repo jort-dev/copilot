@@ -33,7 +33,6 @@ public class CopilotWidgetOverlay extends Overlay {
             return null;
         }
         if (widgetToHighlight.isHidden()){
-            log.warn("Widget is not visible");
             return null;
         }
         Rectangle bounds = widgetToHighlight.getBounds();

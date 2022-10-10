@@ -14,7 +14,7 @@ public abstract class Script {
     Client client;
 
     @Inject
-    Players players;
+    Tracker tracker;
 
     @Inject
     GameObjects gameObjects;

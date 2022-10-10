@@ -8,6 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Singleton
 @Slf4j
@@ -22,34 +23,30 @@ public class GameObjects {
         gameObjects.add(gameObject);
     }
 
-    public void remove(GameObject gameObject){
+    public void remove(GameObject gameObject) {
         gameObjects.remove(gameObject);
     }
 
-    public GameObject closest(int ...ids) {
+    public GameObject closest(int... ids) {
         if (gameObjects.isEmpty()) {
             return null;
         }
-        GameObject closest = gameObjects.get(0); //todo: this one gets returned
+        GameObject closest = null;
         WorldPoint myLocation = client.getLocalPlayer().getWorldLocation();
         for (GameObject gameObject : gameObjects) {
-            for (int id : ids){
+            for (int id : ids) {
                 if (gameObject.getId() == id) {
                     double distance = myLocation.distanceTo(gameObject.getWorldLocation());
+                    if (closest == null) {
+                        closest = gameObject;
+                        continue;
+                    }
                     if (distance < myLocation.distanceTo(closest.getWorldLocation())) {
                         closest = gameObject;
                     }
                 }
             }
         }
-        log.info("The closest is " + closest.getId());
-        log.info("The closest is " + closest.getWorldLocation());
-        for (int i : ids){
-            log.info("out of " + i);
-        }
-
         return closest;
     }
-
-
 }
