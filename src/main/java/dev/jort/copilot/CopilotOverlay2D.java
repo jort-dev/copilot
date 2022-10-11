@@ -47,9 +47,9 @@ public class CopilotOverlay2D extends OverlayPanel {
                 .left(s)
                 .build());
 
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Overlay enabled: " + notificationOverlay.isEnabled())
-//                .build());
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Last clicked ID: " + tracker.getLastClickedId())
+                .build());
 
         return super.render(graphics);
     }

@@ -1,10 +1,13 @@
 package dev.jort.copilot;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 @Slf4j
@@ -18,7 +21,7 @@ public class WillowsDraynor extends Script {
     @Inject
     Ids ids;
 
-    int idToClick = 0; //todo: check if last clicked thing matches and update overlay accordingly
+    List<Integer> idsToClick = new ArrayList<>();
 
 
     @Override
@@ -28,13 +31,14 @@ public class WillowsDraynor extends Script {
             if (bank.isOpen()) {
                 setHint("Deposit inventory");
                 overlay3D.removeGameObjectToHighlight();
-                widgetOverlay.setWidgetToHighlight(client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY));
-
+                Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
+                widgetOverlay.setWidgetToHighlight(widgetToClick);
+                setIdsToClick(widgetToClick.getId(), ids.WILLOW_LOGS);
             } else {
                 setHint("Open bank");
                 overlay3D.setGameObjectToHighlight(gameObjects.closest(ids.BANK_BOOTH));
                 widgetOverlay.removeWidgetToHighlight();
-                idToClick = ids.BANK_BOOTH;
+                setIdsToClick(ids.BANKERS_IDS);
             }
         } else {
             if (tracker.isAnimating()) {
@@ -45,17 +49,30 @@ public class WillowsDraynor extends Script {
                 setHint("Click tree");
                 overlay3D.setGameObjectToHighlight(gameObjects.closest(ids.WILLOW_IDS));
                 widgetOverlay.removeWidgetToHighlight();
+                setIdsToClick(ids.WILLOW_IDS);
             }
         }
 
         if ((tracker.isWalking() || tracker.isAnimating())) {
             setShouldInteract(false);
+            clearIdsToClick();
             widgetOverlay.removeWidgetToHighlight();
             overlay3D.removeGameObjectToHighlight();
         } else {
             setShouldInteract(true);
         }
 
+    }
+
+    public void clearIdsToClick(){
+        idsToClick.clear();
+    }
+
+    public void setIdsToClick(int...ids){
+        idsToClick.clear();
+        for (int id : ids){
+            idsToClick.add(id);
+        }
     }
 
     public boolean isShouldInteract() {

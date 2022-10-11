@@ -11,6 +11,7 @@ import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.StringJoiner;
 
 @Slf4j
 @Singleton
@@ -85,12 +86,29 @@ public class Tracker {
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
+        StringJoiner stringJoiner = new StringJoiner(", ");
+        int widgetid = -1;
+        if (event.getWidget() != null) {
+            widgetid = event.getWidget().getId();
+        }
+        stringJoiner.add("Menu item clicked: id=" + event.getId())
+                .add(event.getMenuOption())
+                .add(event.getMenuTarget())
+                .add("itemid=" + event.getItemId())
+                .add("widgetid=" + widgetid);
+        log.info(stringJoiner.toString());
         if (event.getMenuOption().equals("Walk here")) {
             lastWalkingTime = System.currentTimeMillis();
         }
         lastMenuClickTime = System.currentTimeMillis();
         lastClickedMenuOption = event.getMenuOption();
         lastClickedId = event.getId();
+        if (lastClickedId == -1){
+            lastClickedId = event.getWidget().getId();
+        }
+        if (lastClickedId == -1){
+            lastClickedId = event.getItemId();
+        }
     }
 
     public String getLastClickedMenuOption() {

@@ -1,14 +1,13 @@
 package dev.jort.copilot;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 @Singleton
@@ -16,21 +15,27 @@ public class Ids {
 
     public final int BANK_BOOTH = 10355;
 
-    public int[] WILLOW_IDS;
+    public final int[] WILLOW_IDS;
+    public final int[] BANKER_IDS;
+    public final int[] BANKERS_IDS;
+
+    public final int WILLOW_LOGS = ItemID.WILLOW_LOGS;
 
     public Ids() {
-        determineWillowIds();
+        WILLOW_IDS = determineIds(ObjectID.class, "WILLOW", "STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG");
+        BANKER_IDS = determineIds(NpcID.class, "BANKER", "TUTOR");
+        BANKERS_IDS = Util.concatArrays(BANKER_IDS,BANK_BOOTH);
+        log.info("Hacked: " + Util.arrayToString(BANKERS_IDS));
     }
 
-    public void determineWillowIds() {
+    public int[] determineIds(Class source, String contains, String... notContains) {
         final ArrayList<Integer> ids = new ArrayList<>();
-        List<String> illegalFields = Arrays.asList("STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG");
 
-        for (Field field : ObjectID.class.getFields()) {
-            if(!field.getName().contains("WILLOW")){
+        for (Field field : source.getFields()) {
+            if (!field.getName().contains(contains)) {
                 continue;
             }
-            if (Util.containsAny(field.getName(), illegalFields)) {
+            if (Util.containsAny(field.getName(), notContains)) {
                 continue;
             }
 
@@ -43,6 +48,9 @@ public class Ids {
             }
             ids.add(value);
         }
-        WILLOW_IDS = ids.stream().mapToInt(i -> i).toArray();
+        int[] result = ids.stream().mapToInt(i -> i).toArray();
+        log.info("Determined IDs for " + contains + ": " + Util.arrayToString(result));
+        return result;
     }
+
 }

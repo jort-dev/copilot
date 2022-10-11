@@ -89,6 +89,7 @@ public class CopilotPlugin extends Plugin {
             stringBuilder.append(Util.colorString("Copilot ", "0000ff"));
             stringBuilder.append(Util.colorString("has ", "ffff00"));
             stringBuilder.append(Util.colorString("started!", "ff0000"));
+            chat.send(stringBuilder.toString());
         }
     }
 

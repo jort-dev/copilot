@@ -10,7 +10,8 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = '1.9.0'
+//if wrong injectors fail and client says its outdated
+def runeLiteVersion = 'latest.release'
 
 dependencies {
 	implementation 'org.jetbrains:annotations:20.1.0'
