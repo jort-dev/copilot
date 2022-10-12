@@ -1,7 +1,9 @@
 package dev.jort.copilot;
 
+import dev.jort.copilot.scripts.WillowsDraynor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
@@ -34,22 +36,26 @@ public class CopilotOverlay2D extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Jort's Copilot")
+                .right("Jort's Copilot")
+                .rightFont(FontManager.getRunescapeBoldFont())
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
-                .left(willowsDraynor.getHint())
-                .preferredSize(new Dimension(600, 100))
-                .build());
-
-        String s = willowsDraynor.isShouldInteract() ? "Interaction needed" : "Wait";
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left(s)
+                .left("Action needed:")
+                .right(willowsDraynor.getAction().getHint())
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Last clicked ID: " + tracker.getLastClickedId())
+                .left("Last clicked ID:")
+                .right("" + tracker.getLastClickedId())
                 .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Matches action:")
+                .right("" + willowsDraynor.getAction().match(tracker.getLastClickedId()))
+                .build());
+
+        panelComponent.setPreferredSize(new Dimension(900, 100));
 
         return super.render(graphics);
     }

@@ -4,9 +4,11 @@ import com.google.inject.Provides;
 
 import javax.inject.Inject;
 
+import dev.jort.copilot.scripts.WillowsDraynor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -24,6 +26,9 @@ import java.time.temporal.ChronoUnit;
 public class CopilotPlugin extends Plugin {
     @Inject
     private Client client;
+
+    @Inject
+    ClientThread clientThread;
 
     @Inject
     private CopilotConfig config;
@@ -57,12 +62,8 @@ public class CopilotPlugin extends Plugin {
     WillowsDraynor willowsDraynor;
 
 
-    @Schedule(period = 3, unit = ChronoUnit.SECONDS)
+    @Schedule(period = 1, unit = ChronoUnit.SECONDS)
     public void schedule() {
-        if (!client.getGameState().equals(GameState.LOGGED_IN)) {
-            log.info("Waiting to be logged in");
-            return;
-        }
     }
 
     @Override
@@ -78,6 +79,8 @@ public class CopilotPlugin extends Plugin {
     protected void shutDown() throws Exception {
         overlayManager.remove(overlay2d);
         overlayManager.remove(overlay3d);
+        overlayManager.remove(widgetOverlay);
+        overlayManager.remove(notificationOverlay);
         log.info("Copilot stopped!");
     }
 
@@ -85,11 +88,12 @@ public class CopilotPlugin extends Plugin {
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(Util.colorString("Jort's ", "ff00ff"));
+            stringBuilder.append(Util.colorString("Jort's ", "ff00f"));
             stringBuilder.append(Util.colorString("Copilot ", "0000ff"));
             stringBuilder.append(Util.colorString("has ", "ffff00"));
             stringBuilder.append(Util.colorString("started!", "ff0000"));
             chat.send(stringBuilder.toString());
+
         }
     }
 
@@ -101,6 +105,23 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onGameObjectDespawned(GameObjectDespawned event) {
         gameObjects.remove(event.getGameObject());
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage event){
+        if(!event.getType().equals(ChatMessageType.PUBLICCHAT)){
+            return;
+        }
+        log.info("Received message: " + event.getMessage());
+
+        try{
+            int id = Integer.parseInt(event.getMessage());
+            log.info("Playing sound with ID " + id);
+            clientThread.invoke(() -> client.playSoundEffect(id));
+        }
+        catch (Exception e){
+            log.info("No number found");
+        }
     }
 
     @Subscribe
@@ -117,7 +138,6 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
         tracker.onMenuOptionClicked(event);
-        chat.send("Clicked menu item: " + event.getMenuOption() + " on " + event.getId());
     }
 
     @Subscribe

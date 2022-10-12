@@ -16,6 +16,6 @@ public class Chat {
 
     public void send(String message) {
         log.info("Sending chat message: " + message);
-        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Copilot: " + message, null);
+        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", Util.colorString("Copilot: ", "0000ff") + message, null);
     }
 }

@@ -18,11 +18,13 @@ public class Inventory {
 
     private ItemContainer inventory;
 
-    private void load() {
+    private boolean load() {
         inventory = client.getItemContainer(InventoryID.INVENTORY);
         if (inventory == null) {
-            log.warn("Inventory is null.");
+            //seems to be null when client is started with empty inventory
+            return false;
         }
+        return true;
     }
 
     public void update() {
@@ -30,7 +32,9 @@ public class Inventory {
     }
 
     public int count(int... itemIds) {
-        load();
+        if(!load()){
+            return 0;
+        }
         int total = 0;
 
         for (int itemId : itemIds) {
@@ -44,16 +48,26 @@ public class Inventory {
         return count(itemIds) > 0;
     }
 
-    public int getFreeSlots() {
-        load();
+    public boolean containsOnly(int... itemIds) {
+        return count(itemIds) == getUsedSlots();
+    }
 
-        int freeSlots = 28;
+    public int getUsedSlots(){
+        if(!load()){
+            return 0;
+        }
+
+        int usedSlots = 0;
         for (Item item : inventory.getItems()) {
             if (item.getQuantity() > 0) {
-                freeSlots--;
+                usedSlots++;
             }
         }
-        return freeSlots;
+        return usedSlots;
+    }
+
+    public int getFreeSlots() {
+        return 28 - getUsedSlots();
     }
 
     public boolean isEmpty() {

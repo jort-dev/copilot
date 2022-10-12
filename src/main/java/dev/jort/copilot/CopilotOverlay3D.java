@@ -10,6 +10,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.List;
 
 @Singleton
 @Slf4j
@@ -17,7 +18,13 @@ public class CopilotOverlay3D extends Overlay {
 
     private final Client client;
 
-    private GameObject gameObjectToHighlight = null;
+    @Inject
+    GameObjects gameObjects;
+
+    private int[] gameObjectIdsToHighlight = new int[0];
+
+
+    private boolean onlyHighlightClosest = false;
 
     @Inject
     private CopilotOverlay3D(Client client) {
@@ -25,19 +32,20 @@ public class CopilotOverlay3D extends Overlay {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
     }
 
-    @Override
-    public Dimension render(Graphics2D graphics) {
-        Color color = Color.CYAN;
-        if (gameObjectToHighlight == null) {
-            return null;
+    public Client getClient() {
+        return client;
+    }
+
+    public void highlightGameObject(Graphics2D graphics, GameObject gameObject){
+        if (gameObject == null) {
+            return;
         }
-        Shape box = gameObjectToHighlight.getClickbox();
+        Shape box = gameObject.getClickbox();
         if (box == null) {
-            return null;
+            return;
         }
 
-
-        color = Color.CYAN;
+        Color color = Color.CYAN;
         //draw the outline
         Point mousePosition = client.getMouseCanvasPosition();
         if (box.contains(mousePosition.getX(), mousePosition.getY())) {
@@ -51,19 +59,42 @@ public class CopilotOverlay3D extends Overlay {
         //fill the outline
         graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), 20));
         graphics.fill(box);
+    }
 
+    @Override
+    public Dimension render(Graphics2D graphics) {
+        if (onlyHighlightClosest){
+            highlightGameObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
+            return null;
+        }
+
+        List<GameObject> gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), gameObjectIdsToHighlight));
+        for (GameObject gameObject : gameObjectList){
+            highlightGameObject(graphics, gameObject);
+        }
         return null;
     }
 
-    public GameObject getGameObjectToHighlight() {
-        return gameObjectToHighlight;
+    public boolean isOnlyHighlightClosest() {
+        return onlyHighlightClosest;
     }
 
-    public void removeGameObjectToHighlight() {
-        gameObjectToHighlight = null;
+    public void setOnlyHighlightClosest(boolean onlyHighlightClosest) {
+        this.onlyHighlightClosest = onlyHighlightClosest;
     }
 
-    public void setGameObjectToHighlight(GameObject gameObjectToHighlight) {
-        this.gameObjectToHighlight = gameObjectToHighlight;
+    public int[] getGameObjectIdsToHighlight() {
+        return gameObjectIdsToHighlight;
     }
+
+    public void clearGameObjectsToHightlight(){
+        gameObjectIdsToHighlight = new int[0];
+    }
+
+    public CopilotOverlay3D setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
+        this.gameObjectIdsToHighlight = gameObjectIdsToHighlight;
+        return this;
+    }
+
+
 }

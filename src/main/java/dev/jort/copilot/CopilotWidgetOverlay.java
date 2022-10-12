@@ -19,9 +19,14 @@ public class CopilotWidgetOverlay extends Overlay {
     @Inject
     Client client;
 
+    @Inject
+    Ids ids;
+
     private Widget widgetToHighlight;
 
-    public CopilotWidgetOverlay(){
+    private int[] itemIdsToHighlight;
+
+    public CopilotWidgetOverlay() {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
         setLayer(OverlayLayer.ALWAYS_ON_TOP); // otherwise drawn widgets are not shown
         setPriority(OverlayPriority.HIGHEST); // probably also needed for same reason
@@ -29,31 +34,74 @@ public class CopilotWidgetOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (widgetToHighlight == null) {
-            return null;
-        }
-        if (widgetToHighlight.isHidden()){
-            return null;
-        }
-        Rectangle bounds = widgetToHighlight.getBounds();
-        Color color = Color.CYAN;
+        renderWidget(graphics);
+        renderItem(graphics);
+        return null;
+    }
 
+    public void renderItem(Graphics2D graphics) {
+        if (itemIdsToHighlight == null) {
+            return;
+        }
+        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+        if (inventoryWidget == null || inventoryWidget.isHidden()) {
+            inventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        }
+        if (inventoryWidget == null || inventoryWidget.isHidden()) {
+            return;
+        }
+
+        if (inventoryWidget.getDynamicChildren() == null) {
+            return;
+        }
+
+        for (Widget itemWidget : inventoryWidget.getDynamicChildren()) {
+            for (int itemId : itemIdsToHighlight) {
+                if (itemId == itemWidget.getItemId()) {
+                    highlightWidget(graphics, itemWidget);
+                }
+            }
+        }
+    }
+
+    private void highlightWidget(Graphics2D graphics, Widget widget) {
+        Rectangle bounds = widget.getBounds();
+        Color color = Color.CYAN;
         graphics.setColor(color);
         graphics.draw(bounds);
         graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), 20));
         graphics.fill(bounds);
-        return null;
     }
 
-    public Widget getWidgetToHighlight() {
-        return widgetToHighlight;
+    private void renderWidget(Graphics2D graphics) {
+        if (widgetToHighlight == null) {
+            return;
+        }
+        if (widgetToHighlight.isHidden()) {
+            return;
+        }
+        highlightWidget(graphics, widgetToHighlight);
     }
 
     public void setWidgetToHighlight(Widget widgetToHighlight) {
         this.widgetToHighlight = widgetToHighlight;
     }
 
-    public void removeWidgetToHighlight(){
+    public void clearHighlightedWidgets() {
         widgetToHighlight = null;
     }
+
+    public void setItemIdsToHighlight(int... itemIdsToHighlight) {
+        this.itemIdsToHighlight = itemIdsToHighlight;
+    }
+
+    public void clearHighlightedItems() {
+        itemIdsToHighlight = new int[0];
+    }
+
+    public void clearAll() {
+        clearHighlightedItems();
+        clearHighlightedWidgets();
+    }
+
 }

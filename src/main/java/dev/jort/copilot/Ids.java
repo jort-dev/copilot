@@ -8,6 +8,7 @@ import net.runelite.api.ObjectID;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Slf4j
 @Singleton
@@ -20,12 +21,13 @@ public class Ids {
     public final int[] BANKERS_IDS;
 
     public final int WILLOW_LOGS = ItemID.WILLOW_LOGS;
+    public final int BANK_CLOSE = 786434; //this is just the bank root container
 
     public Ids() {
         WILLOW_IDS = determineIds(ObjectID.class, "WILLOW", "STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG");
         BANKER_IDS = determineIds(NpcID.class, "BANKER", "TUTOR");
-        BANKERS_IDS = Util.concatArrays(BANKER_IDS,BANK_BOOTH);
-        log.info("Hacked: " + Util.arrayToString(BANKERS_IDS));
+        BANKERS_IDS = Util.concatArrays(BANKER_IDS, BANK_BOOTH);
+        log.info("Hacked: " + Arrays.toString(BANKERS_IDS));
     }
 
     public int[] determineIds(Class source, String contains, String... notContains) {
@@ -49,7 +51,7 @@ public class Ids {
             ids.add(value);
         }
         int[] result = ids.stream().mapToInt(i -> i).toArray();
-        log.info("Determined IDs for " + contains + ": " + Util.arrayToString(result));
+        log.info("Determined IDs for " + contains + ": " + Arrays.toString(result));
         return result;
     }
 

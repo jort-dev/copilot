@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 @Singleton
 @Slf4j
@@ -48,5 +50,19 @@ public class GameObjects {
             }
         }
         return closest;
+    }
+
+    public List<GameObject> filter(Predicate<GameObject> p){
+        List<GameObject> result = new ArrayList<>();
+        for (GameObject gameObject : gameObjects){
+            if (gameObject == null){
+                continue;
+            }
+            if (!p.test(gameObject)){
+                continue;
+            }
+            result.add(gameObject);
+        }
+        return result;
     }
 }

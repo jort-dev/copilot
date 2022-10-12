@@ -30,6 +30,7 @@ public class Tracker {
     //menu item
     private String lastClickedMenuOption = "";
     private int lastClickedId = -1;
+
     private long lastMenuClickTime = 0;
 
 
@@ -91,11 +92,12 @@ public class Tracker {
         if (event.getWidget() != null) {
             widgetid = event.getWidget().getId();
         }
-        stringJoiner.add("Menu item clicked: id=" + event.getId())
-                .add(event.getMenuOption())
-                .add(event.getMenuTarget())
+        stringJoiner.add("Menu item clicked: ")
+                .add("id=" + event.getId())
                 .add("itemid=" + event.getItemId())
-                .add("widgetid=" + widgetid);
+                .add("widgetid=" + widgetid)
+                .add("target=" + event.getMenuTarget())
+                .add("option=" + event.getMenuOption());
         log.info(stringJoiner.toString());
         if (event.getMenuOption().equals("Walk here")) {
             lastWalkingTime = System.currentTimeMillis();
@@ -103,11 +105,13 @@ public class Tracker {
         lastMenuClickTime = System.currentTimeMillis();
         lastClickedMenuOption = event.getMenuOption();
         lastClickedId = event.getId();
-        if (lastClickedId == -1){
-            lastClickedId = event.getWidget().getId();
+        if (lastClickedId < 10) {
+            lastClickedId = event.getItemId(); //each item is also a widget, prioritize the item id
         }
-        if (lastClickedId == -1){
-            lastClickedId = event.getItemId();
+        if (lastClickedId < 10) {
+            if (event.getWidget() != null) {
+                lastClickedId = event.getWidget().getId();
+            }
         }
     }
 
@@ -115,16 +119,12 @@ public class Tracker {
         return lastClickedMenuOption;
     }
 
-    public void setLastClickedMenuOption(String lastClickedMenuOption) {
-        this.lastClickedMenuOption = lastClickedMenuOption;
-    }
-
     public int getLastClickedId() {
         return lastClickedId;
     }
 
-    public void setLastClickedId(int lastClickedId) {
-        this.lastClickedId = lastClickedId;
+    public long getLastMenuClickTime() {
+        return lastMenuClickTime;
     }
 
 
