@@ -15,11 +15,14 @@ public class Sound {
     @Inject
     Client client;
 
+    @Inject
+    CopilotConfig config;
+
     public void missedTick() {
         Preferences preferences = client.getPreferences();
         int previousVolume = preferences.getSoundEffectVolume();
 
-        int volume = SoundEffectVolume.HIGH;
+        int volume = config.tickVolume();
         preferences.setSoundEffectVolume(volume);
         int soundEffect = SoundEffectID.GE_INCREMENT_PLOP;
         client.playSoundEffect(soundEffect, volume);
