@@ -36,26 +36,12 @@ public class CopilotOverlay2D extends OverlayPanel {
     @Override
     public Dimension render(Graphics2D graphics) {
         panelComponent.getChildren().add(LineComponent.builder()
-                .right("Jort's Copilot")
-                .rightFont(FontManager.getRunescapeBoldFont())
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Action needed:")
+                .left("Jort's Copilot: ")
+                .leftFont(FontManager.getRunescapeBoldFont())
                 .right(willowsDraynor.getAction().getHint())
                 .build());
 
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Last clicked ID:")
-                .right("" + tracker.getLastClickedId())
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Matches action:")
-                .right("" + willowsDraynor.getAction().match(tracker.getLastClickedId()))
-                .build());
-
-        panelComponent.setPreferredSize(new Dimension(900, 100));
+        panelComponent.setPreferredSize(new Dimension(700, 100));
 
         return super.render(graphics);
     }
