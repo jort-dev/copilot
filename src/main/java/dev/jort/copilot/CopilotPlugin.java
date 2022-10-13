@@ -158,10 +158,10 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onConfigChanged(ConfigChanged configChanged) {
         log.info("Config changed of " + configChanged.getGroup() + ":::" + configChanged);
-        if (!configChanged.getGroup().equals("Copilot")) {
+        if (!configChanged.getGroup().equals("copilot")) {
             return;
         }
-
+        // because we disable it when no script is running, enable it when we may have enabled a script
         setOverlaysEnabled(true);
     }
 
