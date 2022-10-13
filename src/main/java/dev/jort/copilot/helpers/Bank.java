@@ -1,4 +1,4 @@
-package dev.jort.copilot;
+package dev.jort.copilot.helpers;
 
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;

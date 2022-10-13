@@ -1,6 +1,9 @@
+/*
+General script for activities where you harvest resources from a GameObject, and bank them nearby.
+ */
 package dev.jort.copilot.scripts;
 
-import dev.jort.copilot.Action;
+import dev.jort.copilot.other.Action;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.widgets.Widget;
@@ -13,9 +16,13 @@ public class ResourceBankScript extends Script {
     int[] resourceItemIds;
     int[] resourceObjectIds;
 
-    private boolean interactionNeeded = false;
-
-    //we cant do this in the constructor: otherwise @Inject is not fired there yet
+    /**
+     * Required: initialize the script.
+     * We cant do this in the constructor: @Inject is not fired there yet
+     * @param bankObjectIds The ids of the objects we can click to bank.
+     * @param resourceItemIds The item ids the resource gives.
+     * @param resourceObjectIds The ids of the resource objects to harvest.
+     */
     public void initialize(int[] bankObjectIds, int[] resourceItemIds, int[] resourceObjectIds) {
         this.bankObjectIds = bankObjectIds;
         this.resourceItemIds = resourceItemIds;
@@ -91,20 +98,18 @@ public class ResourceBankScript extends Script {
     public void determineOverlay() {
         boolean walkingToCorrectGoal = tracker.isWalking() && action.match(tracker.getLastClickedId());
         if (action.equals(waitAction) || walkingToCorrectGoal) {
-            setInteractionNeeded(false);
+            enableAlert(false);
         } else {
-            setInteractionNeeded(true);
+            enableAlert(true);
         }
     }
 
-    public void setInteractionNeeded(boolean interactionNeeded) {
-        if (this.interactionNeeded) {
-            //if first time switching from no-interaction to interaction-needed, sound alert
+    public void enableAlert(boolean enable) {
+        if (enable) {
             sound.missedTick();
         }
-        this.interactionNeeded = interactionNeeded;
-        notificationOverlay.setEnabled(interactionNeeded);
-        if (!interactionNeeded) {
+        notificationOverlay.setEnabled(enable);
+        if (!enable) {
             widgetOverlay.clear();
             overlay3D.clear();
         }

@@ -1,5 +1,6 @@
-package dev.jort.copilot;
+package dev.jort.copilot.helpers;
 
+import dev.jort.copilot.CopilotConfig;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Preferences;

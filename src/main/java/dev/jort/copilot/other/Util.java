@@ -1,4 +1,4 @@
-package dev.jort.copilot;
+package dev.jort.copilot.other;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,6 +1,8 @@
 package dev.jort.copilot;
 
 import com.google.inject.Provides;
+import dev.jort.copilot.helpers.*;
+import dev.jort.copilot.other.Util;
 import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.scripts.FishingBarbarian;
 import dev.jort.copilot.scripts.Script;
@@ -102,7 +104,8 @@ public class CopilotPlugin extends Plugin {
         }
 
         //initialize scripts which require arguments
-        yewsWoodcuttingGuild.initialize(ids.BANK_CHEST_IDS, new int[]{ids.YEW_LOGS}, ids.YEW_IDS);
+        yewsWoodcuttingGuild.initialize(ids.BANK_CHEST_IDS, new int[]{ids.YEW_LOGS}, ids.YEW_TREE_IDS);
+        willowsDraynor.initialize(new int[]{ids.BANK_BOOTH}, new int[]{ids.WILLOW_LOGS}, ids.WILLOW_TREE_IDS);
     }
 
     @Override

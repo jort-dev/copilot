@@ -1,6 +1,7 @@
 package dev.jort.copilot.scripts;
 
-import dev.jort.copilot.*;
+import dev.jort.copilot.helpers.*;
+import dev.jort.copilot.other.Action;
 import dev.jort.copilot.overlays.GameObjectOverlay;
 import dev.jort.copilot.overlays.InfoOverlay;
 import dev.jort.copilot.overlays.NotificationOverlay;

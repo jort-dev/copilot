@@ -1,7 +1,7 @@
 package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
-import dev.jort.copilot.Ids;
+import dev.jort.copilot.helpers.Ids;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Point;

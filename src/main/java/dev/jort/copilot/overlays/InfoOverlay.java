@@ -1,8 +1,6 @@
 package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotPlugin;
-import dev.jort.copilot.Tracker;
-import dev.jort.copilot.scripts.WillowsDraynor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.ui.FontManager;

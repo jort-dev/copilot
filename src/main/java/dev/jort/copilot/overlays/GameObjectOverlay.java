@@ -1,8 +1,8 @@
 package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
-import dev.jort.copilot.GameObjects;
-import dev.jort.copilot.Util;
+import dev.jort.copilot.helpers.GameObjects;
+import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
@@ -28,6 +28,8 @@ public class GameObjectOverlay extends Overlay implements CopilotOverlay {
     CopilotConfig config;
 
     private int[] gameObjectIdsToHighlight = new int[0];
+
+    private int[] npcIdsToHighlight = new int[0];
 
 
     private boolean onlyHighlightClosest = false;
