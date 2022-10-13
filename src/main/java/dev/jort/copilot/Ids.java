@@ -14,20 +14,24 @@ import java.util.Arrays;
 @Singleton
 public class Ids {
 
+    public final int[] BANK_CHEST_IDS;
     public final int BANK_BOOTH = 10355;
 
     public final int[] WILLOW_IDS;
+    public final int[] YEW_IDS;
     public final int[] BANKER_IDS;
     public final int[] BANKERS_IDS;
 
     public final int WILLOW_LOGS = ItemID.WILLOW_LOGS;
+    public final int YEW_LOGS = ItemID.YEW_LOGS;
     public final int BANK_CLOSE = 786434; //this is just the bank root container
 
     public Ids() {
         WILLOW_IDS = determineIds(ObjectID.class, "WILLOW", "STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG");
         BANKER_IDS = determineIds(NpcID.class, "BANKER", "TUTOR");
+        YEW_IDS = determineIds(ObjectID.class, "YEW", "STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG", "STRONG");
         BANKERS_IDS = Util.concatArrays(BANKER_IDS, BANK_BOOTH);
-        log.info("Hacked: " + Arrays.toString(BANKERS_IDS));
+        BANK_CHEST_IDS = determineIds(ObjectID.class, "BANK_CHEST");
     }
 
     public int[] determineIds(Class source, String contains, String... notContains) {

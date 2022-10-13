@@ -6,6 +6,10 @@ https://user-images.githubusercontent.com/115373370/195444530-a0a17efc-7d8c-4574
 
 # Supported activities
 * Woodcutting - Willow - Draynor Village
+* Woodcutting - Yew - Woodcutting Guild
+
+# Ideas
+* Different sounds for banking vs afking
 
 # Coming
 * Tempoross

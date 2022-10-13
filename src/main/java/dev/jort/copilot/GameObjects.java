@@ -22,6 +22,9 @@ public class GameObjects {
     private final ArrayList<GameObject> gameObjects = new ArrayList<>();
 
     public void add(GameObject gameObject) {
+        if (gameObjects.contains(gameObject)){
+            return;
+        }
         gameObjects.add(gameObject);
     }
 
@@ -37,28 +40,31 @@ public class GameObjects {
         WorldPoint myLocation = client.getLocalPlayer().getWorldLocation();
         for (GameObject gameObject : gameObjects) {
             for (int id : ids) {
-                if (gameObject.getId() == id) {
-                    double distance = myLocation.distanceTo(gameObject.getWorldLocation());
-                    if (closest == null) {
-                        closest = gameObject;
-                        continue;
-                    }
-                    if (distance < myLocation.distanceTo(closest.getWorldLocation())) {
-                        closest = gameObject;
-                    }
+                if (id != gameObject.getId()) {
+                    continue;
+                }
+                if (closest == null) {
+                    closest = gameObject;
+                    continue;
+                }
+
+
+                double distance = myLocation.distanceTo(gameObject.getWorldLocation());
+                if (distance < myLocation.distanceTo(closest.getWorldLocation())) {
+                    closest = gameObject;
                 }
             }
         }
         return closest;
     }
 
-    public List<GameObject> filter(Predicate<GameObject> p){
+    public List<GameObject> filter(Predicate<GameObject> p) {
         List<GameObject> result = new ArrayList<>();
-        for (GameObject gameObject : gameObjects){
-            if (gameObject == null){
+        for (GameObject gameObject : gameObjects) {
+            if (gameObject == null) {
                 continue;
             }
-            if (!p.test(gameObject)){
+            if (!p.test(gameObject)) {
                 continue;
             }
             result.add(gameObject);

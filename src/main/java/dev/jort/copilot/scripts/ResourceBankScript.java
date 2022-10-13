@@ -1,18 +1,15 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.Action;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
-import javax.inject.Singleton;
-
-@Singleton
-@Slf4j
-public class WillowsDraynor extends Script {
-
+public class ResourceBankScript extends Script{
     private boolean interactionNeeded = false;
 
+    public ResourceBankScript(){
+
+    }
 
     @Override
     public void loop() {
@@ -31,10 +28,10 @@ public class WillowsDraynor extends Script {
                         .setHint("Deposit inventory")
                         .setWidgetIds(widgetToClick.getId());
 
-                if (inventory.containsOnly(ids.WILLOW_LOGS)) {
-                    //if only willow in inventory: we can also press a willow log to deposit all
-                    widgetOverlay.setItemIdsToHighlight(ids.WILLOW_LOGS);
-                    action.setItemIds(ids.WILLOW_LOGS);
+                if (inventory.containsOnly(ids.YEW_LOGS)) {
+                    //if only yew in inventory: we can also press a yew log to deposit all
+                    widgetOverlay.setItemIdsToHighlight(ids.YEW_LOGS);
+                    action.setItemIds(ids.YEW_LOGS);
                 }
                 return;
             }
@@ -42,21 +39,21 @@ public class WillowsDraynor extends Script {
 
         if (inventory.isFull()) {
             //open bank
-            overlay3D.setGameObjectIdsToHighlight(ids.BANK_BOOTH).setOnlyHighlightClosest(false);
+            overlay3D.setGameObjectIdsToHighlight(ids.BANK_CHEST_IDS).setOnlyHighlightClosest(false);
             widgetOverlay.clearAll();
             action = new Action()
                     .setHint("Open bank")
                     //dont highlight banker npcs, pathing is bad
-                    .setObjectIds(ids.BANK_BOOTH);
+                    .setObjectIds(ids.BANK_CHEST_IDS);
             return;
         }
 
         if (!tracker.isAnimating()) {
             //click tree
-            overlay3D.setGameObjectIdsToHighlight(ids.WILLOW_IDS).setOnlyHighlightClosest(true);
+            overlay3D.setGameObjectIdsToHighlight(ids.YEW_IDS).setOnlyHighlightClosest(true);
             action = new Action()
                     .setHint("Click tree")
-                    .setObjectIds(ids.WILLOW_IDS);
+                    .setObjectIds(ids.YEW_IDS);
 
             if (bank.isOpen()) {
                 //if in resized mode or tree is behind bank interface, you have to close the bank first

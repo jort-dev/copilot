@@ -1,5 +1,7 @@
-package dev.jort.copilot;
+package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.CopilotPlugin;
+import dev.jort.copilot.Tracker;
 import dev.jort.copilot.scripts.WillowsDraynor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -14,9 +16,14 @@ import java.awt.*;
 
 @Slf4j
 @Singleton
-public class CopilotOverlay2D extends OverlayPanel {
+public class InfoOverlay extends OverlayPanel {
 
-    private final Client client;
+    Client client;
+
+    @Inject
+    CopilotPlugin main;
+
+
     @Inject
     Tracker tracker;
 
@@ -24,10 +31,10 @@ public class CopilotOverlay2D extends OverlayPanel {
     WillowsDraynor willowsDraynor;
 
     @Inject
-    CopilotNotificationOverlay notificationOverlay;
+    NotificationOverlay notificationOverlay;
 
     @Inject
-    public CopilotOverlay2D(Client client) {
+    public InfoOverlay(Client client) {
         this.client = client;
         setPosition(OverlayPosition.TOP_LEFT);
         setResizable(true);
@@ -35,13 +42,17 @@ public class CopilotOverlay2D extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        String text = "Initializing";
+        if (main.getRunningScript() != null) {
+            text = main.getRunningScript().getAction().getHint();
+        }
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Jort's Copilot: ")
+                .left("Jort's Copilot:")
                 .leftFont(FontManager.getRunescapeBoldFont())
-                .right(willowsDraynor.getAction().getHint())
+                .right(text)
                 .build());
 
-        panelComponent.setPreferredSize(new Dimension(700, 100));
+        panelComponent.setPreferredSize(new Dimension(300, 100));
 
         return super.render(graphics);
     }

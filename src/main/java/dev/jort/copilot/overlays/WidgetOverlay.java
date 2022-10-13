@@ -1,5 +1,6 @@
-package dev.jort.copilot;
+package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.Ids;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
@@ -15,7 +16,7 @@ import java.awt.*;
 
 @Slf4j
 @Singleton
-public class CopilotWidgetOverlay extends Overlay {
+public class WidgetOverlay extends Overlay {
     @Inject
     Client client;
 
@@ -26,7 +27,7 @@ public class CopilotWidgetOverlay extends Overlay {
 
     private int[] itemIdsToHighlight;
 
-    public CopilotWidgetOverlay() {
+    public WidgetOverlay() {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
         setLayer(OverlayLayer.ALWAYS_ON_TOP); // otherwise drawn widgets are not shown
         setPriority(OverlayPriority.HIGHEST); // probably also needed for same reason

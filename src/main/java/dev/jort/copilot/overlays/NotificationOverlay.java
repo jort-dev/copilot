@@ -1,5 +1,6 @@
-package dev.jort.copilot;
+package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.CopilotConfig;
 import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -10,15 +11,18 @@ import javax.inject.Singleton;
 import java.awt.*;
 
 @Singleton
-public class CopilotNotificationOverlay extends Overlay {
+public class NotificationOverlay extends Overlay {
 
 
     @Inject
     Client client;
 
+    @Inject
+    CopilotConfig config;
+
     private boolean enabled = false;
 
-    public CopilotNotificationOverlay() {
+    public NotificationOverlay() {
 
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
@@ -29,8 +33,7 @@ public class CopilotNotificationOverlay extends Overlay {
         if(!enabled){
             return null;
         }
-        Color color = new Color(1.0f, 0.0f, 0.0f, 0.1f);
-        graphics.setColor(color);
+        graphics.setColor(config.overlayColor());
         graphics.fill(new Rectangle(client.getCanvas().getSize()));
         return null;
     }

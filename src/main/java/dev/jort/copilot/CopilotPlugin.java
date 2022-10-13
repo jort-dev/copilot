@@ -4,7 +4,14 @@ import com.google.inject.Provides;
 
 import javax.inject.Inject;
 
+import dev.jort.copilot.overlays.GameObjectOverlay;
+import dev.jort.copilot.overlays.InfoOverlay;
+import dev.jort.copilot.overlays.NotificationOverlay;
+import dev.jort.copilot.overlays.WidgetOverlay;
+import dev.jort.copilot.scripts.FishingBarbarian;
+import dev.jort.copilot.scripts.Script;
 import dev.jort.copilot.scripts.WillowsDraynor;
+import dev.jort.copilot.scripts.YewsWoodcuttingGuild;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -44,22 +51,30 @@ public class CopilotPlugin extends Plugin {
     private OverlayManager overlayManager;
 
     @Inject
-    private CopilotOverlay2D overlay2d;
+    private InfoOverlay overlay2d;
 
     @Inject
-    public CopilotOverlay3D overlay3d;
+    public GameObjectOverlay overlay3d;
 
     @Inject
-    CopilotWidgetOverlay widgetOverlay;
+    WidgetOverlay widgetOverlay;
 
     @Inject
-    CopilotNotificationOverlay notificationOverlay;
+    NotificationOverlay notificationOverlay;
 
     @Inject
     private Chat chat;
 
     @Inject
     WillowsDraynor willowsDraynor;
+
+    @Inject
+    FishingBarbarian fishingBarbarian;
+
+    @Inject
+    YewsWoodcuttingGuild yewsWoodcuttingGuild;
+
+    Script runningScript = null;
 
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
@@ -108,18 +123,17 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onChatMessage(ChatMessage event){
-        if(!event.getType().equals(ChatMessageType.PUBLICCHAT)){
+    public void onChatMessage(ChatMessage event) {
+        if (!event.getType().equals(ChatMessageType.PUBLICCHAT)) {
             return;
         }
         log.info("Received message: " + event.getMessage());
 
-        try{
+        try {
             int id = Integer.parseInt(event.getMessage());
             log.info("Playing sound with ID " + id);
             clientThread.invoke(() -> client.playSoundEffect(id));
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.info("No number found");
         }
     }
@@ -127,7 +141,17 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick event) {
         tracker.onGameTick(event);
-        willowsDraynor.loop();
+        if (config.willowsDraynor()) {
+            willowsDraynor.loop();
+            runningScript = willowsDraynor;
+        } else if (config.fishingBarbarian()) {
+            fishingBarbarian.loop();
+            runningScript = fishingBarbarian;
+        } else if (config.yewsGuild()) {
+            yewsWoodcuttingGuild.loop();
+            runningScript = yewsWoodcuttingGuild;
+        }
+
     }
 
     @Provides
@@ -145,6 +169,10 @@ public class CopilotPlugin extends Plugin {
         if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
             inventory.update();
         }
+    }
+
+    public Script getRunningScript(){
+        return runningScript;
     }
 
 }

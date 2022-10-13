@@ -1,6 +1,10 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.*;
+import dev.jort.copilot.overlays.GameObjectOverlay;
+import dev.jort.copilot.overlays.InfoOverlay;
+import dev.jort.copilot.overlays.NotificationOverlay;
+import dev.jort.copilot.overlays.WidgetOverlay;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 
@@ -11,6 +15,15 @@ public abstract class Script {
 
     @Inject
     Client client;
+
+    @Inject
+    NotificationOverlay notificationOverlay;
+
+    @Inject
+    Sound sound;
+
+    @Inject
+    Ids ids;
 
     @Inject
     Tracker tracker;
@@ -25,17 +38,25 @@ public abstract class Script {
     Inventory inventory;
 
     @Inject
-    CopilotOverlay3D overlay3D;
+    GameObjectOverlay overlay3D;
 
     @Inject
-    CopilotOverlay2D overlay2D;
+    InfoOverlay overlay2D;
 
     @Inject
-    CopilotWidgetOverlay widgetOverlay;
+    WidgetOverlay widgetOverlay;
 
     @Inject
     Bank bank;
 
-    abstract void loop();
+    Action waitAction = new Action().setHint("Wait");
+
+    Action action = waitAction;
+
+    public Action getAction() {
+        return action;
+    }
+
+    public abstract void loop();
 
 }

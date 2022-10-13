@@ -1,5 +1,7 @@
-package dev.jort.copilot;
+package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.GameObjects;
+import dev.jort.copilot.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
@@ -14,7 +16,7 @@ import java.util.List;
 
 @Singleton
 @Slf4j
-public class CopilotOverlay3D extends Overlay {
+public class GameObjectOverlay extends Overlay {
 
     private final Client client;
 
@@ -27,7 +29,7 @@ public class CopilotOverlay3D extends Overlay {
     private boolean onlyHighlightClosest = false;
 
     @Inject
-    private CopilotOverlay3D(Client client) {
+    private GameObjectOverlay(Client client) {
         this.client = client;
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
     }
@@ -91,7 +93,7 @@ public class CopilotOverlay3D extends Overlay {
         gameObjectIdsToHighlight = new int[0];
     }
 
-    public CopilotOverlay3D setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
+    public GameObjectOverlay setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
         this.gameObjectIdsToHighlight = gameObjectIdsToHighlight;
         return this;
     }
