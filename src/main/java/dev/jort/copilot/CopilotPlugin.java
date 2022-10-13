@@ -65,7 +65,7 @@ public class CopilotPlugin extends Plugin {
     @Inject
     private InfoOverlay overlay2d;
     @Inject
-    public GameObjectOverlay overlay3d;
+    public EntityOverlay overlay3d;
     @Inject
     WidgetOverlay widgetOverlay;
     @Inject

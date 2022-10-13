@@ -4,8 +4,7 @@ import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.helpers.GameObjects;
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
+import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -17,7 +16,7 @@ import java.util.List;
 
 @Singleton
 @Slf4j
-public class GameObjectOverlay extends Overlay implements CopilotOverlay {
+public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     private final Client client;
 
@@ -36,7 +35,7 @@ public class GameObjectOverlay extends Overlay implements CopilotOverlay {
     private boolean enabled = false;
 
     @Inject
-    private GameObjectOverlay(Client client) {
+    private EntityOverlay(Client client) {
         this.client = client;
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
     }
@@ -49,26 +48,37 @@ public class GameObjectOverlay extends Overlay implements CopilotOverlay {
         if (gameObject == null) {
             return;
         }
-        Shape box = gameObject.getClickbox();
-        if (box == null) {
+        renderShape(graphics, gameObject.getClickbox());
+    }
+
+    public void highlightNpc(Graphics2D graphics, NPC npc) {
+        if (npc == null) {
             return;
         }
+        Perspective.getClickbox(client, npc.getModel(), npc.getOrientation(), npc.getLocalLocation().getX(), npc.getLocalLocation().getY(), 0);
+        Perspective.getClickbox(client, npc.getModel(), npc.getOrientation(), npc.getLocalLocation().getX(), npc.getLocalLocation().getY(), 0);
+        renderShape(graphics, npc.getCanvasTilePoly());
+    }
 
+    public void renderShape(Graphics2D graphics, Shape shape) {
+        if (shape == null) {
+            return;
+        }
         Color color = config.highlightColor();
 
         //darker color when hovering over object
         Point mousePosition = client.getMouseCanvasPosition();
-        if (box.contains(mousePosition.getX(), mousePosition.getY())) {
+        if (shape.contains(mousePosition.getX(), mousePosition.getY())) {
             color = color.darker();
         }
         graphics.setColor(color);
 
         //draw outline
-        graphics.draw(box);
+        graphics.draw(shape);
 
         //fill outline
         graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), config.highlightOpacity));
-        graphics.fill(box);
+        graphics.fill(shape);
     }
 
     @Override
@@ -79,6 +89,7 @@ public class GameObjectOverlay extends Overlay implements CopilotOverlay {
         if (onlyHighlightClosest) {
             highlightGameObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
             return null;
+
         }
 
         List<GameObject> gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), gameObjectIdsToHighlight));
@@ -103,7 +114,13 @@ public class GameObjectOverlay extends Overlay implements CopilotOverlay {
     @Override
     public void clear() {
         gameObjectIdsToHighlight = new int[0];
+        npcIdsToHighlight = new int[0];
     }
+
+    public void setNpcIdsToHighlight(int... npcIdsToHighlight) {
+        this.npcIdsToHighlight = npcIdsToHighlight;
+    }
+
 
     @Override
     public void enable() {
@@ -115,14 +132,14 @@ public class GameObjectOverlay extends Overlay implements CopilotOverlay {
         enabled = false;
     }
 
-    public GameObjectOverlay setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
+    public EntityOverlay setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
         this.gameObjectIdsToHighlight = gameObjectIdsToHighlight;
         return this;
     }
 
     @Override
-    public void setEnabled(boolean enable){
-        if (enable){
+    public void setEnabled(boolean enable) {
+        if (enable) {
             enable();
             return;
         }

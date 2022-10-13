@@ -22,10 +22,20 @@ public class Ids {
     public final int[] YEW_TREE_IDS;
     public final int[] BANKER_IDS;
     public final int[] BANKERS_IDS;
+    public final int[] BURNT_FISH_IDS;
+    public final int[] COOKED_FISH_IDS;
 
     public final int WILLOW_LOGS = ItemID.WILLOW_LOGS;
     public final int YEW_LOGS = ItemID.YEW_LOGS;
     public final int BANK_CLOSE = 786434; //this is just the bank root container
+    public final int SALMON = ItemID.SALMON;
+    public final int TROUT = ItemID.TROUT;
+
+    public final int RAW_SALMON = ItemID.RAW_SALMON;
+    public final int RAW_TROUT = ItemID.RAW_TROUT;
+    public final int BARBARIAN_FIRE = ObjectID.FIRE_43475;
+
+
 
     public Ids() {
         WILLOW_TREE_IDS = determineIds(ObjectID.class, "WILLOW", "STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG");
@@ -33,6 +43,8 @@ public class Ids {
         YEW_TREE_IDS = determineIds(ObjectID.class, "YEW", "STUMP", "DISEASED", "DEAD", "BIRDHOUSE", "BAG", "STRONG");
         BANKERS_IDS = Util.concatArrays(BANKER_IDS, BANK_BOOTH);
         BANK_CHEST_IDS = determineIds(ObjectID.class, "BANK_CHEST");
+        BURNT_FISH_IDS = determineIds(ItemID.class, "BURNT");
+        COOKED_FISH_IDS = Util.concatArrays(BURNT_FISH_IDS, SALMON, TROUT);
     }
 
     public int[] determineIds(Class source, String contains, String... notContains) {

@@ -32,6 +32,8 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
 
     private int[] itemIdsToHighlight;
 
+    private boolean highlightOneItemOnly = false;
+
     private boolean enabled = false;
 
     public WidgetOverlay() {
@@ -70,6 +72,9 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
             for (int itemId : itemIdsToHighlight) {
                 if (itemId == itemWidget.getItemId()) {
                     highlightWidget(graphics, itemWidget);
+                    if(highlightOneItemOnly){
+                        return;
+                    }
                 }
             }
         }
@@ -113,6 +118,10 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
 
     public void clearHighlightedItems() {
         itemIdsToHighlight = new int[0];
+    }
+
+    public void setHighlightOneItemOnly(boolean oneItemOnly){
+        this.highlightOneItemOnly = oneItemOnly;
     }
 
     @Override

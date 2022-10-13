@@ -41,7 +41,7 @@ public class ResourceBankScript extends Script {
         if (bank.isOpen()) {
             //deposit inventory
             if (!inventory.isEmpty()) {
-                overlay3D.clear();
+                entityOverlay.clear();
                 Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
                 widgetOverlay.setWidgetToHighlight(widgetToClick);
                 action = new Action()
@@ -59,7 +59,7 @@ public class ResourceBankScript extends Script {
 
         if (inventory.isFull()) {
             //open bank
-            overlay3D.setGameObjectIdsToHighlight(bankObjectIds).setOnlyHighlightClosest(false);
+            entityOverlay.setGameObjectIdsToHighlight(bankObjectIds).setOnlyHighlightClosest(false);
             widgetOverlay.clear();
             action = new Action()
                     .setHint("Open bank")
@@ -70,7 +70,7 @@ public class ResourceBankScript extends Script {
 
         if (!tracker.isAnimating()) {
             //click resource
-            overlay3D.setGameObjectIdsToHighlight(resourceObjectIds).setOnlyHighlightClosest(true);
+            entityOverlay.setGameObjectIdsToHighlight(resourceObjectIds).setOnlyHighlightClosest(true);
             action = new Action()
                     .setHint("Click resource")
                     .setObjectIds(resourceObjectIds);
@@ -90,7 +90,7 @@ public class ResourceBankScript extends Script {
             return;
         }
 
-        overlay3D.clear();
+        entityOverlay.clear();
         widgetOverlay.clear();
         action = waitAction;
     }
@@ -111,7 +111,7 @@ public class ResourceBankScript extends Script {
         notificationOverlay.setEnabled(enable);
         if (!enable) {
             widgetOverlay.clear();
-            overlay3D.clear();
+            entityOverlay.clear();
         }
     }
 }
