@@ -1,5 +1,6 @@
 package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.GameObjects;
 import dev.jort.copilot.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -16,17 +17,21 @@ import java.util.List;
 
 @Singleton
 @Slf4j
-public class GameObjectOverlay extends Overlay {
+public class GameObjectOverlay extends Overlay implements CopilotOverlay {
 
     private final Client client;
 
     @Inject
     GameObjects gameObjects;
 
+    @Inject
+    CopilotConfig config;
+
     private int[] gameObjectIdsToHighlight = new int[0];
 
 
     private boolean onlyHighlightClosest = false;
+    private boolean enabled = false;
 
     @Inject
     private GameObjectOverlay(Client client) {
@@ -38,7 +43,7 @@ public class GameObjectOverlay extends Overlay {
         return client;
     }
 
-    public void highlightGameObject(Graphics2D graphics, GameObject gameObject){
+    public void highlightGameObject(Graphics2D graphics, GameObject gameObject) {
         if (gameObject == null) {
             return;
         }
@@ -47,31 +52,35 @@ public class GameObjectOverlay extends Overlay {
             return;
         }
 
-        Color color = Color.CYAN;
-        //draw the outline
+        Color color = config.highlightColor();
+
+        //darker color when hovering over object
         Point mousePosition = client.getMouseCanvasPosition();
         if (box.contains(mousePosition.getX(), mousePosition.getY())) {
-            //darken outline when mouse is inside
-            graphics.setColor(color.darker());
-        } else {
-            graphics.setColor(color);
+            color = color.darker();
         }
+        graphics.setColor(color);
+
+        //draw outline
         graphics.draw(box);
 
-        //fill the outline
-        graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), 20));
+        //fill outline
+        graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), config.highlightOpacity));
         graphics.fill(box);
     }
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (onlyHighlightClosest){
+        if (!enabled) {
+            return null;
+        }
+        if (onlyHighlightClosest) {
             highlightGameObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
             return null;
         }
 
         List<GameObject> gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), gameObjectIdsToHighlight));
-        for (GameObject gameObject : gameObjectList){
+        for (GameObject gameObject : gameObjectList) {
             highlightGameObject(graphics, gameObject);
         }
         return null;
@@ -89,8 +98,19 @@ public class GameObjectOverlay extends Overlay {
         return gameObjectIdsToHighlight;
     }
 
-    public void clearGameObjectsToHightlight(){
+    @Override
+    public void clear() {
         gameObjectIdsToHighlight = new int[0];
+    }
+
+    @Override
+    public void enable() {
+        enabled = true;
+    }
+
+    @Override
+    public void disable() {
+        enabled = false;
     }
 
     public GameObjectOverlay setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
@@ -98,5 +118,12 @@ public class GameObjectOverlay extends Overlay {
         return this;
     }
 
-
+    @Override
+    public void setEnabled(boolean enable){
+        if (enable){
+            enable();
+            return;
+        }
+        disable();
+    }
 }

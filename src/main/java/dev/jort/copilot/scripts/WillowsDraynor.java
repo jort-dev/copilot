@@ -24,7 +24,7 @@ public class WillowsDraynor extends Script {
         if (bank.isOpen()) {
             //deposit inventory
             if (!inventory.isEmpty()) {
-                overlay3D.clearGameObjectsToHightlight();
+                overlay3D.clear();
                 Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
                 widgetOverlay.setWidgetToHighlight(widgetToClick);
                 action = new Action()
@@ -43,7 +43,7 @@ public class WillowsDraynor extends Script {
         if (inventory.isFull()) {
             //open bank
             overlay3D.setGameObjectIdsToHighlight(ids.BANK_BOOTH).setOnlyHighlightClosest(false);
-            widgetOverlay.clearAll();
+            widgetOverlay.clear();
             action = new Action()
                     .setHint("Open bank")
                     //dont highlight banker npcs, pathing is bad
@@ -68,13 +68,13 @@ public class WillowsDraynor extends Script {
                     action.setWidgetIds(ids.BANK_CLOSE, closeButtonWidget.getId());
                 }
             } else {
-                widgetOverlay.clearAll();
+                widgetOverlay.clear();
             }
             return;
         }
 
-        overlay3D.clearGameObjectsToHightlight();
-        widgetOverlay.clearAll();
+        overlay3D.clear();
+        widgetOverlay.clear();
         action = waitAction;
     }
 
@@ -99,8 +99,8 @@ public class WillowsDraynor extends Script {
         this.interactionNeeded = interactionNeeded;
         notificationOverlay.setEnabled(interactionNeeded);
         if (!interactionNeeded) {
-            widgetOverlay.clearAll();
-            overlay3D.clearGameObjectsToHightlight();
+            widgetOverlay.clear();
+            overlay3D.clear();
         }
     }
 }

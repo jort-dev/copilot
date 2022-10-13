@@ -1,29 +1,31 @@
 package dev.jort.copilot;
 
 import com.google.inject.Provides;
-
-import javax.inject.Inject;
-
-import dev.jort.copilot.overlays.GameObjectOverlay;
-import dev.jort.copilot.overlays.InfoOverlay;
-import dev.jort.copilot.overlays.NotificationOverlay;
-import dev.jort.copilot.overlays.WidgetOverlay;
+import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.scripts.FishingBarbarian;
 import dev.jort.copilot.scripts.Script;
 import dev.jort.copilot.scripts.WillowsDraynor;
 import dev.jort.copilot.scripts.YewsWoodcuttingGuild;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.InventoryID;
 import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.task.Schedule;
+import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @PluginDescriptor(
@@ -31,46 +33,49 @@ import java.time.temporal.ChronoUnit;
         description = "Shows where to click next."
 )
 public class CopilotPlugin extends Plugin {
+
+
+    // DEFAULT
     @Inject
     private Client client;
-
     @Inject
     ClientThread clientThread;
-
     @Inject
     private CopilotConfig config;
 
+
+    // CUSTOM HELPER OBJECTS
     @Inject
     private GameObjects gameObjects;
     @Inject
     Inventory inventory;
     @Inject
     Tracker tracker;
-
-    @Inject
-    private OverlayManager overlayManager;
-
-    @Inject
-    private InfoOverlay overlay2d;
-
-    @Inject
-    public GameObjectOverlay overlay3d;
-
-    @Inject
-    WidgetOverlay widgetOverlay;
-
-    @Inject
-    NotificationOverlay notificationOverlay;
-
     @Inject
     private Chat chat;
+    @Inject
+    Ids ids;
 
+
+    //OVERLAYS
+    @Inject
+    private OverlayManager overlayManager;
+    @Inject
+    private InfoOverlay overlay2d;
+    @Inject
+    public GameObjectOverlay overlay3d;
+    @Inject
+    WidgetOverlay widgetOverlay;
+    @Inject
+    NotificationOverlay notificationOverlay;
+    List<CopilotOverlay> overlays = new ArrayList<>();
+
+
+    //SCRIPTS
     @Inject
     WillowsDraynor willowsDraynor;
-
     @Inject
     FishingBarbarian fishingBarbarian;
-
     @Inject
     YewsWoodcuttingGuild yewsWoodcuttingGuild;
 
@@ -79,25 +84,37 @@ public class CopilotPlugin extends Plugin {
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
     public void schedule() {
+        //thread which fires each period
     }
 
     @Override
     protected void startUp() throws Exception {
         log.info("Copilot started!");
-        overlayManager.add(overlay2d);
-        overlayManager.add(overlay3d);
-        overlayManager.add(widgetOverlay);
-        overlayManager.add(notificationOverlay);
+
+        //initialize overlays
+        overlays.add(overlay2d);
+        overlays.add(overlay3d);
+        overlays.add(widgetOverlay);
+        overlays.add(notificationOverlay);
+        for (CopilotOverlay overlay : overlays) {
+            overlayManager.add((Overlay) overlay);
+            overlay.enable();
+        }
+
+        //initialize scripts which require arguments
+        yewsWoodcuttingGuild.initialize(ids.BANK_CHEST_IDS, new int[]{ids.YEW_LOGS}, ids.YEW_IDS);
     }
 
     @Override
     protected void shutDown() throws Exception {
-        overlayManager.remove(overlay2d);
-        overlayManager.remove(overlay3d);
-        overlayManager.remove(widgetOverlay);
-        overlayManager.remove(notificationOverlay);
+        for (CopilotOverlay overlay : overlays) {
+            overlayManager.remove((Overlay) overlay);
+        }
         log.info("Copilot stopped!");
     }
+
+
+    //API SUBSCRIPTIONS (only work in this class)
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
@@ -139,6 +156,26 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onConfigChanged(ConfigChanged configChanged) {
+        log.info("Config changed of " + configChanged.getGroup() + ":::" + configChanged);
+        if (!configChanged.getGroup().equals("Copilot")) {
+            return;
+        }
+
+        setOverlaysEnabled(true);
+    }
+
+    public void setOverlaysEnabled(boolean enable) {
+        for (CopilotOverlay overlay : overlays) {
+            if (enable) {
+                overlay.enable();
+            } else {
+                overlay.disable();
+            }
+        }
+    }
+
+    @Subscribe
     public void onGameTick(GameTick event) {
         tracker.onGameTick(event);
         if (config.willowsDraynor()) {
@@ -150,13 +187,9 @@ public class CopilotPlugin extends Plugin {
         } else if (config.yewsGuild()) {
             yewsWoodcuttingGuild.loop();
             runningScript = yewsWoodcuttingGuild;
+        } else {
+            setOverlaysEnabled(false);
         }
-
-    }
-
-    @Provides
-    CopilotConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(CopilotConfig.class);
     }
 
     @Subscribe
@@ -171,7 +204,16 @@ public class CopilotPlugin extends Plugin {
         }
     }
 
-    public Script getRunningScript(){
+
+    //OTHER
+
+    @Provides
+    CopilotConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(CopilotConfig.class);
+    }
+
+
+    public Script getRunningScript() {
         return runningScript;
     }
 

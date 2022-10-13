@@ -11,7 +11,7 @@ import javax.inject.Singleton;
 import java.awt.*;
 
 @Singleton
-public class NotificationOverlay extends Overlay {
+public class NotificationOverlay extends Overlay implements CopilotOverlay {
 
 
     @Inject
@@ -20,10 +20,9 @@ public class NotificationOverlay extends Overlay {
     @Inject
     CopilotConfig config;
 
-    private boolean enabled = false;
+    private boolean enabled;
 
     public NotificationOverlay() {
-
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
     }
@@ -38,12 +37,28 @@ public class NotificationOverlay extends Overlay {
         return null;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+
+    @Override
+    public void enable() {
+        enabled = true;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    @Override
+    public void disable(){
+        enabled = false;
     }
 
+    @Override
+    public void clear() {
+        disable();
+    }
+
+    @Override
+    public void setEnabled(boolean enable){
+        if (enable){
+            enable();
+            return;
+        }
+        disable();
+    }
 }

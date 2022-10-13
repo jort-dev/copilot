@@ -16,22 +16,14 @@ import java.awt.*;
 
 @Slf4j
 @Singleton
-public class InfoOverlay extends OverlayPanel {
+public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
 
     Client client;
 
     @Inject
     CopilotPlugin main;
 
-
-    @Inject
-    Tracker tracker;
-
-    @Inject
-    WillowsDraynor willowsDraynor;
-
-    @Inject
-    NotificationOverlay notificationOverlay;
+    private boolean enabled = true;
 
     @Inject
     public InfoOverlay(Client client) {
@@ -42,6 +34,9 @@ public class InfoOverlay extends OverlayPanel {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (!enabled){
+            return null;
+        }
         String text = "Initializing";
         if (main.getRunningScript() != null) {
             text = main.getRunningScript().getAction().getHint();
@@ -55,6 +50,30 @@ public class InfoOverlay extends OverlayPanel {
         panelComponent.setPreferredSize(new Dimension(300, 100));
 
         return super.render(graphics);
+    }
+
+    @Override
+    public void clear() {
+//        disable();
+    }
+
+    @Override
+    public void enable() {
+        enabled = true;
+    }
+
+    @Override
+    public void disable() {
+        enabled = false;
+    }
+
+    @Override
+    public void setEnabled(boolean enable){
+        if (enable){
+            enable();
+            return;
+        }
+        disable();
     }
 
 }

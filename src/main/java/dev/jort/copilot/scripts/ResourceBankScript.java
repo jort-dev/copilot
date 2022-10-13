@@ -1,15 +1,28 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.Action;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
-public class ResourceBankScript extends Script{
+@ToString
+@Slf4j
+public class ResourceBankScript extends Script {
+    int[] bankObjectIds;
+    int[] resourceItemIds;
+    int[] resourceObjectIds;
+
     private boolean interactionNeeded = false;
 
-    public ResourceBankScript(){
-
+    //we cant do this in the constructor: otherwise @Inject is not fired there yet
+    public void initialize(int[] bankObjectIds, int[] resourceItemIds, int[] resourceObjectIds) {
+        this.bankObjectIds = bankObjectIds;
+        this.resourceItemIds = resourceItemIds;
+        this.resourceObjectIds = resourceObjectIds;
+        log.info("Initialized " + this);
     }
+
 
     @Override
     public void loop() {
@@ -21,17 +34,17 @@ public class ResourceBankScript extends Script{
         if (bank.isOpen()) {
             //deposit inventory
             if (!inventory.isEmpty()) {
-                overlay3D.clearGameObjectsToHightlight();
+                overlay3D.clear();
                 Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
                 widgetOverlay.setWidgetToHighlight(widgetToClick);
                 action = new Action()
                         .setHint("Deposit inventory")
                         .setWidgetIds(widgetToClick.getId());
 
-                if (inventory.containsOnly(ids.YEW_LOGS)) {
-                    //if only yew in inventory: we can also press a yew log to deposit all
-                    widgetOverlay.setItemIdsToHighlight(ids.YEW_LOGS);
-                    action.setItemIds(ids.YEW_LOGS);
+                if (inventory.containsOnly(resourceItemIds) && resourceItemIds.length == 1) {
+                    //if only one type of resource in inventory: we can also press the resource to deposit all
+                    widgetOverlay.setItemIdsToHighlight(resourceItemIds);
+                    action.setItemIds(resourceItemIds);
                 }
                 return;
             }
@@ -39,25 +52,25 @@ public class ResourceBankScript extends Script{
 
         if (inventory.isFull()) {
             //open bank
-            overlay3D.setGameObjectIdsToHighlight(ids.BANK_CHEST_IDS).setOnlyHighlightClosest(false);
-            widgetOverlay.clearAll();
+            overlay3D.setGameObjectIdsToHighlight(bankObjectIds).setOnlyHighlightClosest(false);
+            widgetOverlay.clear();
             action = new Action()
                     .setHint("Open bank")
                     //dont highlight banker npcs, pathing is bad
-                    .setObjectIds(ids.BANK_CHEST_IDS);
+                    .setObjectIds(bankObjectIds);
             return;
         }
 
         if (!tracker.isAnimating()) {
-            //click tree
-            overlay3D.setGameObjectIdsToHighlight(ids.YEW_IDS).setOnlyHighlightClosest(true);
+            //click resource
+            overlay3D.setGameObjectIdsToHighlight(resourceObjectIds).setOnlyHighlightClosest(true);
             action = new Action()
-                    .setHint("Click tree")
-                    .setObjectIds(ids.YEW_IDS);
+                    .setHint("Click resource")
+                    .setObjectIds(resourceObjectIds);
 
             if (bank.isOpen()) {
-                //if in resized mode or tree is behind bank interface, you have to close the bank first
-                action.setHint("Close bank or click tree");
+                //if in resized mode or resource is behind bank interface, you have to close the bank first
+                action.setHint("Close bank or click resource");
                 Widget bankBarWidget = client.getWidget(12, 2);
                 if (bankBarWidget != null) {
                     Widget closeButtonWidget = bankBarWidget.getChild(11);
@@ -65,13 +78,13 @@ public class ResourceBankScript extends Script{
                     action.setWidgetIds(ids.BANK_CLOSE, closeButtonWidget.getId());
                 }
             } else {
-                widgetOverlay.clearAll();
+                widgetOverlay.clear();
             }
             return;
         }
 
-        overlay3D.clearGameObjectsToHightlight();
-        widgetOverlay.clearAll();
+        overlay3D.clear();
+        widgetOverlay.clear();
         action = waitAction;
     }
 
@@ -84,10 +97,6 @@ public class ResourceBankScript extends Script{
         }
     }
 
-    public boolean isInteractionNeeded() {
-        return interactionNeeded;
-    }
-
     public void setInteractionNeeded(boolean interactionNeeded) {
         if (this.interactionNeeded) {
             //if first time switching from no-interaction to interaction-needed, sound alert
@@ -96,8 +105,8 @@ public class ResourceBankScript extends Script{
         this.interactionNeeded = interactionNeeded;
         notificationOverlay.setEnabled(interactionNeeded);
         if (!interactionNeeded) {
-            widgetOverlay.clearAll();
-            overlay3D.clearGameObjectsToHightlight();
+            widgetOverlay.clear();
+            overlay3D.clear();
         }
     }
 }

@@ -1,8 +1,10 @@
 package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.Ids;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.ui.overlay.Overlay;
@@ -16,16 +18,21 @@ import java.awt.*;
 
 @Slf4j
 @Singleton
-public class WidgetOverlay extends Overlay {
+public class WidgetOverlay extends Overlay implements CopilotOverlay {
     @Inject
     Client client;
 
     @Inject
     Ids ids;
 
+    @Inject
+    CopilotConfig config;
+
     private Widget widgetToHighlight;
 
     private int[] itemIdsToHighlight;
+
+    private boolean enabled = false;
 
     public WidgetOverlay() {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
@@ -35,6 +42,9 @@ public class WidgetOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (!enabled) {
+            return null;
+        }
         renderWidget(graphics);
         renderItem(graphics);
         return null;
@@ -66,12 +76,17 @@ public class WidgetOverlay extends Overlay {
     }
 
     private void highlightWidget(Graphics2D graphics, Widget widget) {
-        Rectangle bounds = widget.getBounds();
-        Color color = Color.CYAN;
+        Rectangle box = widget.getBounds();
+        Color color = config.highlightColor();
+        //darker color when hovering over object
+        Point mousePosition = client.getMouseCanvasPosition();
+        if (box.contains(mousePosition.getX(), mousePosition.getY())) {
+            color = color.darker();
+        }
         graphics.setColor(color);
-        graphics.draw(bounds);
-        graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), 20));
-        graphics.fill(bounds);
+        graphics.draw(box);
+        graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), config.highlightOpacity));
+        graphics.fill(box);
     }
 
     private void renderWidget(Graphics2D graphics) {
@@ -100,9 +115,29 @@ public class WidgetOverlay extends Overlay {
         itemIdsToHighlight = new int[0];
     }
 
-    public void clearAll() {
+    @Override
+    public void clear() {
         clearHighlightedItems();
         clearHighlightedWidgets();
     }
 
+
+    @Override
+    public void enable() {
+        enabled = true;
+    }
+
+    @Override
+    public void disable() {
+        enabled = false;
+    }
+
+    @Override
+    public void setEnabled(boolean enable) {
+        if (enable) {
+            enable();
+            return;
+        }
+        disable();
+    }
 }

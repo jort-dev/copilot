@@ -8,19 +8,21 @@ import java.awt.*;
 @ConfigGroup("copilot")
 public interface CopilotConfig extends Config {
 
+    @ConfigSection(
+            name = "Settings",
+            description = "Set which activity you want assistance with. Only one selected item works.",
+            position = 0
+    )
     String settingsSection = "Settings";
-    String activitiesSection = "Activities";
-
-    int VOLUME_MAX = SoundEffectVolume.HIGH;
 
 
     @Range(
-            max = VOLUME_MAX
+            max = SoundEffectVolume.HIGH
     )
     @ConfigItem(
             keyName = "alertVolume",
             name = "Alert volume",
-            description = "Configures the volume the alerts.",
+            description = "Configures the volume the alerts. Off=0, loudest=127",
             section = settingsSection,
             position = 1
     )
@@ -40,12 +42,31 @@ public interface CopilotConfig extends Config {
         return new Color(1.0f, 0.0f, 0.0f, 0.1f);
     }
 
+    @Alpha
+    @ConfigItem(
+            keyName = "highlightColor",
+            name = "Highlight color",
+            description = "Set the color of the highlight for items to click.",
+            section = settingsSection,
+            position = 3
+    )
+    default Color highlightColor() {
+        return new Color(0.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    @ConfigSection(
+            name = "Activities",
+            description = "Set which activity you want assistance with. Only one selected item works.",
+            position = 4
+    )
+    String activitiesSection = "Activities";
+
     @ConfigItem(
             keyName = "willowsDraynor",
             name = "Willows @ Draynor bank",
             description = "Chop down and bank willows next to the bank in Draynor Village.",
             section = activitiesSection,
-            position = 3
+            position = 5
 
     )
     default boolean willowsDraynor() {
@@ -57,7 +78,7 @@ public interface CopilotConfig extends Config {
             name = "Fishing & Cooking @ Barbarians",
             description = "Fish trout and salmon at Barbarian Village, cook it and then drop it.",
             section = activitiesSection,
-            position = 4
+            position = 6
     )
     default boolean fishingBarbarian() {
         return false;
@@ -68,9 +89,13 @@ public interface CopilotConfig extends Config {
             name = "Yews @ Woodcutting Guild",
             description = "Chop down and bank yew trees at the Woodcutting Guild",
             section = activitiesSection,
-            position = 4
+            position = 7
     )
     default boolean yewsGuild() {
         return false;
     }
+
+
+    //user unchangeable config
+    int highlightOpacity = 20; //0-100
 }
