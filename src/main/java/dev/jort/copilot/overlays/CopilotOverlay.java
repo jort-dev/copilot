@@ -1,5 +1,7 @@
 package dev.jort.copilot.overlays;
 
+import javax.inject.Inject;
+
 public interface CopilotOverlay {
 
     void clear();

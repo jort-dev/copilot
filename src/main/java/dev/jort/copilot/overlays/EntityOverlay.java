@@ -26,7 +26,11 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     @Inject
     CopilotConfig config;
 
+    @Inject
+    CopilotOverlayUtil overlayUtil;
+
     private int[] gameObjectIdsToHighlight = new int[0];
+
 
     private int[] npcIdsToHighlight = new int[0];
 
@@ -48,7 +52,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         if (gameObject == null) {
             return;
         }
-        renderShape(graphics, gameObject.getClickbox());
+        overlayUtil.highlightShape(graphics, gameObject.getClickbox());
     }
 
     public void highlightNpc(Graphics2D graphics, NPC npc) {
@@ -57,28 +61,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         }
         Perspective.getClickbox(client, npc.getModel(), npc.getOrientation(), npc.getLocalLocation().getX(), npc.getLocalLocation().getY(), 0);
         Perspective.getClickbox(client, npc.getModel(), npc.getOrientation(), npc.getLocalLocation().getX(), npc.getLocalLocation().getY(), 0);
-        renderShape(graphics, npc.getCanvasTilePoly());
-    }
-
-    public void renderShape(Graphics2D graphics, Shape shape) {
-        if (shape == null) {
-            return;
-        }
-        Color color = config.highlightColor();
-
-        //darker color when hovering over object
-        Point mousePosition = client.getMouseCanvasPosition();
-        if (shape.contains(mousePosition.getX(), mousePosition.getY())) {
-            color = color.darker();
-        }
-        graphics.setColor(color);
-
-        //draw outline
-        graphics.draw(shape);
-
-        //fill outline
-        graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), config.highlightOpacity));
-        graphics.fill(shape);
+        overlayUtil.highlightShape(graphics, npc.getCanvasTilePoly());
     }
 
     @Override

@@ -7,10 +7,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
+import net.runelite.client.ui.overlay.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,6 +24,9 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
 
     @Inject
     CopilotConfig config;
+
+    @Inject
+    CopilotOverlayUtil overlayUtil;
 
     private Widget widgetToHighlight;
 
@@ -71,7 +71,7 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
         for (Widget itemWidget : inventoryWidget.getDynamicChildren()) {
             for (int itemId : itemIdsToHighlight) {
                 if (itemId == itemWidget.getItemId()) {
-                    highlightWidget(graphics, itemWidget);
+                    overlayUtil.highlightShape(graphics, itemWidget.getBounds());
                     if(highlightOneItemOnly){
                         return;
                     }
@@ -80,19 +80,6 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
         }
     }
 
-    private void highlightWidget(Graphics2D graphics, Widget widget) {
-        Rectangle box = widget.getBounds();
-        Color color = config.highlightColor();
-        //darker color when hovering over object
-        Point mousePosition = client.getMouseCanvasPosition();
-        if (box.contains(mousePosition.getX(), mousePosition.getY())) {
-            color = color.darker();
-        }
-        graphics.setColor(color);
-        graphics.draw(box);
-        graphics.setColor(new Color(color.getRed(), color.getBlue(), color.getGreen(), config.highlightOpacity));
-        graphics.fill(box);
-    }
 
     private void renderWidget(Graphics2D graphics) {
         if (widgetToHighlight == null) {
@@ -101,7 +88,7 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
         if (widgetToHighlight.isHidden()) {
             return;
         }
-        highlightWidget(graphics, widgetToHighlight);
+        overlayUtil.highlightShape(graphics, widgetToHighlight.getBounds());
     }
 
     public void setWidgetToHighlight(Widget widgetToHighlight) {

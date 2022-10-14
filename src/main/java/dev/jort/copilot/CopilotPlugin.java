@@ -57,6 +57,10 @@ public class CopilotPlugin extends Plugin {
     private Chat chat;
     @Inject
     Ids ids;
+    @Inject
+    Alert alert;
+    @Inject
+    Npcs npcs;
 
 
     //OVERLAYS
@@ -128,7 +132,6 @@ public class CopilotPlugin extends Plugin {
             stringBuilder.append(Util.colorString("has ", "ffff00"));
             stringBuilder.append(Util.colorString("started!", "ff0000"));
             chat.send(stringBuilder.toString());
-
         }
     }
 
@@ -143,6 +146,16 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onNpcSpawned(NpcSpawned event) {
+        npcs.add(event.getNpc());
+    }
+
+    @Subscribe
+    public void onNpcDespawned(NpcDespawned event) {
+        npcs.remove(event.getNpc());
+    }
+
+    @Subscribe
     public void onChatMessage(ChatMessage event) {
         if (!event.getType().equals(ChatMessageType.PUBLICCHAT)) {
             return;
@@ -152,9 +165,8 @@ public class CopilotPlugin extends Plugin {
         try {
             int id = Integer.parseInt(event.getMessage());
             log.info("Playing sound with ID " + id);
-            clientThread.invoke(() -> client.playSoundEffect(id));
-        } catch (Exception e) {
-            log.info("No number found");
+            alert.playSound(id);
+        } catch (Exception ignored) {
         }
     }
 

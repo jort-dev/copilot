@@ -1,5 +1,6 @@
 package dev.jort.copilot;
 
+import net.runelite.api.SoundEffectID;
 import net.runelite.api.SoundEffectVolume;
 import net.runelite.client.config.*;
 
@@ -26,9 +27,43 @@ public interface CopilotConfig extends Config {
             section = settingsSection,
             position = 1
     )
-    default int tickVolume() {
+    default int alertVolume() {
         return SoundEffectVolume.LOW;
     }
+
+    @ConfigItem(
+            keyName = "soundId",
+            name = "Alert sound ID",
+            description = "Configures the sound to play for alerts. For inspiration: search 'sound id osrs'.",
+            section = settingsSection,
+            position = 2
+    )
+    default int soundId() {
+        return SoundEffectID.GE_INCREMENT_PLOP;
+    }
+
+    @ConfigItem(
+            keyName = "alertDelay",
+            name = "Alert delay",
+            description = "Configure after how many milliseconds of inactivity the alert go off.",
+            section = settingsSection,
+            position = 3
+    )
+    default int alertDelayMs() {
+        return 1000;
+    }
+
+    @ConfigItem(
+            keyName = "amountOfAlerts",
+            name = "Amount of alerts",
+            description = "Configure after how many times the alert sound is played.",
+            section = settingsSection,
+            position = 4
+    )
+    default int amountOfSoundAlerts() {
+        return 3;
+    }
+
 
     @Alpha
     @ConfigItem(
@@ -36,7 +71,7 @@ public interface CopilotConfig extends Config {
             name = "Notification color",
             description = "Set the notification overlay color",
             section = settingsSection,
-            position = 2
+            position = 5
     )
     default Color overlayColor() {
         return new Color(1.0f, 0.0f, 0.0f, 0.1f);
@@ -48,7 +83,7 @@ public interface CopilotConfig extends Config {
             name = "Highlight color",
             description = "Set the color of the highlight for items to click.",
             section = settingsSection,
-            position = 3
+            position = 6
     )
     default Color highlightColor() {
         return new Color(0.0f, 1.0f, 1.0f, 1.0f);
@@ -57,7 +92,7 @@ public interface CopilotConfig extends Config {
     @ConfigSection(
             name = "Activities",
             description = "Set which activity you want assistance with. Only one selected item works.",
-            position = 4
+            position = 7
     )
     String activitiesSection = "Activities";
 
@@ -66,7 +101,7 @@ public interface CopilotConfig extends Config {
             name = "Willows @ Draynor bank",
             description = "Chop down and bank willows next to the bank in Draynor Village.",
             section = activitiesSection,
-            position = 5
+            position = 8
 
     )
     default boolean willowsDraynor() {
@@ -78,7 +113,7 @@ public interface CopilotConfig extends Config {
             name = "Fishing & Cooking @ Barbarians",
             description = "Fish trout and salmon at Barbarian Village, cook it and then drop it.",
             section = activitiesSection,
-            position = 6
+            position = 9
     )
     default boolean fishingBarbarian() {
         return false;
@@ -89,13 +124,9 @@ public interface CopilotConfig extends Config {
             name = "Yews @ Woodcutting Guild",
             description = "Chop down and bank yew trees at the Woodcutting Guild",
             section = activitiesSection,
-            position = 7
+            position = 10
     )
     default boolean yewsGuild() {
         return false;
     }
-
-
-    //user unchangeable config
-    int highlightOpacity = 20; //0-100
 }

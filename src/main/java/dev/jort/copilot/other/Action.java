@@ -1,5 +1,10 @@
 package dev.jort.copilot.other;
+/*
+Utility for scripts to indicate the IDs to click when alert is active.
+ */
 
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -9,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @ToString
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Action {
 
     private String hint = "Action";

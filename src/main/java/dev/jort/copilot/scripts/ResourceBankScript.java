@@ -33,11 +33,11 @@ public class ResourceBankScript extends Script {
 
     @Override
     public void loop() {
-        determineAction();
-        determineOverlay();
+         determineAction();
+        determineIfAlertIsNeeded();
     }
 
-    public void determineAction() {
+    public Action determineAction() {
         if (bank.isOpen()) {
             //deposit inventory
             if (!inventory.isEmpty()) {
@@ -53,7 +53,7 @@ public class ResourceBankScript extends Script {
                     widgetOverlay.setItemIdsToHighlight(resourceItemIds);
                     action.setItemIds(resourceItemIds);
                 }
-                return;
+                return action;
             }
         }
 
@@ -65,7 +65,7 @@ public class ResourceBankScript extends Script {
                     .setHint("Open bank")
                     //dont highlight banker npcs, pathing is bad
                     .setObjectIds(bankObjectIds);
-            return;
+            return action;
         }
 
         if (!tracker.isAnimating()) {
@@ -87,31 +87,20 @@ public class ResourceBankScript extends Script {
             } else {
                 widgetOverlay.clear();
             }
-            return;
+            return action;
         }
 
         entityOverlay.clear();
         widgetOverlay.clear();
         action = waitAction;
+        return action;
     }
 
-    public void determineOverlay() {
+    public void determineIfAlertIsNeeded() {
         boolean walkingToCorrectGoal = tracker.isWalking() && action.match(tracker.getLastClickedId());
-        if (action.equals(waitAction) || walkingToCorrectGoal) {
-            enableAlert(false);
-        } else {
-            enableAlert(true);
-        }
-    }
+        boolean isWaiting = action.equals(waitAction);
+        boolean isAlertNeeded = !isWaiting && !walkingToCorrectGoal;
 
-    public void enableAlert(boolean enable) {
-        if (enable) {
-            sound.missedTick();
-        }
-        notificationOverlay.setEnabled(enable);
-        if (!enable) {
-            widgetOverlay.clear();
-            entityOverlay.clear();
-        }
+        alert.handleAlert(isAlertNeeded);
     }
 }

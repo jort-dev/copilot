@@ -20,7 +20,7 @@ public abstract class Script {
 
     //UTILITIES
     @Inject
-    Sound sound;
+    Alert alert;
     @Inject
     Ids ids;
     @Inject
