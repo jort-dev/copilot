@@ -5,7 +5,6 @@ import dev.jort.copilot.helpers.GameObjects;
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.Point;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
@@ -48,11 +47,11 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         return client;
     }
 
-    public void highlightGameObject(Graphics2D graphics, GameObject gameObject) {
-        if (gameObject == null) {
+    public void highlightTileObject(Graphics2D graphics, TileObject tileObject) {
+        if (tileObject == null) {
             return;
         }
-        overlayUtil.highlightShape(graphics, gameObject.getClickbox());
+        overlayUtil.highlightShape(graphics, tileObject.getClickbox());
     }
 
     public void highlightNpc(Graphics2D graphics, NPC npc) {
@@ -70,14 +69,14 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
             return null;
         }
         if (onlyHighlightClosest) {
-            highlightGameObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
+            highlightTileObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
             return null;
 
         }
 
         List<GameObject> gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), gameObjectIdsToHighlight));
         for (GameObject gameObject : gameObjectList) {
-            highlightGameObject(graphics, gameObject);
+            highlightTileObject(graphics, gameObject);
         }
         return null;
     }

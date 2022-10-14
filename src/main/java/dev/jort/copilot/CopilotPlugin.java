@@ -124,8 +124,9 @@ public class CopilotPlugin extends Plugin {
     //API SUBSCRIPTIONS (only work in this class)
 
     @Subscribe
-    public void onGameStateChanged(GameStateChanged gameStateChanged) {
-        if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
+    public void onGameStateChanged(GameStateChanged event) {
+        gameObjects.onGameStateChanged(event);
+        if (event.getGameState() == GameState.LOGGED_IN) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Util.colorString("Jort's ", "ff00f"));
             stringBuilder.append(Util.colorString("Copilot ", "0000ff"));
@@ -137,12 +138,12 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned event) {
-        gameObjects.add(event.getGameObject());
+        gameObjects.onGameObjectSpawned(event);
     }
 
     @Subscribe
     public void onGameObjectDespawned(GameObjectDespawned event) {
-        gameObjects.remove(event.getGameObject());
+        gameObjects.onGameObjectDespawned(event);
     }
 
     @Subscribe
