@@ -28,7 +28,7 @@ public interface CopilotConfig extends Config {
             position = 1
     )
     default int alertVolume() {
-        return SoundEffectVolume.LOW;
+        return SoundEffectVolume.HIGH;
     }
 
     @ConfigItem(
@@ -39,7 +39,7 @@ public interface CopilotConfig extends Config {
             position = 2
     )
     default int soundId() {
-        return SoundEffectID.GE_INCREMENT_PLOP;
+        return 1959;
     }
 
     @ConfigItem(
@@ -86,7 +86,7 @@ public interface CopilotConfig extends Config {
             position = 6
     )
     default Color highlightColor() {
-        return new Color(0.0f, 1.0f, 1.0f, 1.0f);
+        return new Color(0.0f, 1.0f, 1.0f, 0.2f);
     }
 
     @ConfigSection(

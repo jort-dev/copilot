@@ -4,6 +4,7 @@ General script for activities where you harvest resources from a GameObject, and
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.other.Action;
+import dev.jort.copilot.other.Script;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.widgets.Widget;
@@ -43,10 +44,12 @@ public class ResourceBankScript extends Script {
             if (!inventory.isEmpty()) {
                 entityOverlay.clear();
                 Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
-                widgetOverlay.setWidgetToHighlight(widgetToClick);
-                action = new Action()
-                        .setHint("Deposit inventory")
-                        .setWidgetIds(widgetToClick.getId());
+                if (widgetToClick != null){
+                    widgetOverlay.setWidgetToHighlight(widgetToClick);
+                    action = new Action()
+                            .setHint("Deposit inventory")
+                            .setWidgetIds(widgetToClick.getId());
+                }
 
                 if (inventory.containsOnly(resourceItemIds) && resourceItemIds.length == 1) {
                     //if only one type of resource in inventory: we can also press the resource to deposit all
@@ -81,8 +84,10 @@ public class ResourceBankScript extends Script {
                 Widget bankBarWidget = client.getWidget(12, 2);
                 if (bankBarWidget != null) {
                     Widget closeButtonWidget = bankBarWidget.getChild(11);
+                    if (closeButtonWidget != null){
+                        action.setWidgetIds(ids.BANK_CLOSE, closeButtonWidget.getId());
+                    }
                     widgetOverlay.setWidgetToHighlight(closeButtonWidget);
-                    action.setWidgetIds(ids.BANK_CLOSE, closeButtonWidget.getId());
                 }
             } else {
                 widgetOverlay.clear();
@@ -97,7 +102,7 @@ public class ResourceBankScript extends Script {
     }
 
     public void determineIfAlertIsNeeded() {
-        boolean walkingToCorrectGoal = tracker.isWalking() && action.match(tracker.getLastClickedId());
+        boolean walkingToCorrectGoal = tracker.isWalking() && action.matchId(tracker.getLastClickedId());
         boolean isWaiting = action.equals(waitAction);
         boolean isAlertNeeded = !isWaiting && !walkingToCorrectGoal;
 

@@ -22,18 +22,23 @@ public class Action {
     private int[] objectIds = new int[0];
     private int[] itemIds = new int[0];
     private int[] widgetIds = new int[0];
+    private String[] actions = new String[0];
 
-    public boolean match(int id) {
-        return match(id, npcIds) || match(id, objectIds) || match(id, itemIds) || match(id, widgetIds);
+    public boolean matchId(int id) {
+        return matchId(id, npcIds) || matchId(id, objectIds) || matchId(id, itemIds) || matchId(id, widgetIds);
     }
 
-    private boolean match(int idToMatch, int... ids) {
-        for (int id : ids) {
-            if (id == idToMatch) {
+    public boolean matchAction(String action){
+        for (String a : actions){
+            if (a.equals(action)){
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean matchId(int idToMatch, int... ids) {
+        return Util.arrayContains(idToMatch, ids);
     }
 
 
@@ -42,7 +47,7 @@ public class Action {
         return this;
     }
 
-    //lombok does not seem to support varargs unfortunately, so typed out manually because its clean
+    //lombok does not seem to support varargs unfortunately, so typed out manually
     public Action setNpcIds(int... npcIds) {
         this.npcIds = npcIds;
         return this;
@@ -50,6 +55,11 @@ public class Action {
 
     public Action setObjectIds(int... objectIds) {
         this.objectIds = objectIds;
+        return this;
+    }
+
+    public Action setActions(String...actions){
+        this.actions = actions;
         return this;
     }
 

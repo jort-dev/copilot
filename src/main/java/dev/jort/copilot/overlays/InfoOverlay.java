@@ -3,6 +3,7 @@ package dev.jort.copilot.overlays;
 import dev.jort.copilot.CopilotPlugin;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -32,7 +33,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!enabled){
+        if (!enabled) {
             return null;
         }
         String text = "Initializing";
@@ -40,12 +41,14 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
             text = main.getRunningScript().getAction().getHint();
         }
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Jort's Copilot:")
+                .left("Jort's Copilot")
                 .leftFont(FontManager.getRunescapeBoldFont())
-                .right(text)
+                .build());
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left(text)
                 .build());
 
-        panelComponent.setPreferredSize(new Dimension(300, 100));
+        panelComponent.setPreferredSize(new Dimension(200, 100));
 
         return super.render(graphics);
     }
@@ -66,8 +69,8 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     }
 
     @Override
-    public void setEnabled(boolean enable){
-        if (enable){
+    public void setEnabled(boolean enable) {
+        if (enable) {
             enable();
             return;
         }

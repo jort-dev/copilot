@@ -2,16 +2,14 @@ package dev.jort.copilot;
 
 import com.google.inject.Provides;
 import dev.jort.copilot.helpers.*;
-import dev.jort.copilot.other.Util;
 import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.scripts.FishingBarbarian;
-import dev.jort.copilot.scripts.Script;
+import dev.jort.copilot.other.Script;
 import dev.jort.copilot.scripts.WillowsDraynor;
 import dev.jort.copilot.scripts.YewsWoodcuttingGuild;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
@@ -126,14 +124,7 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onGameStateChanged(GameStateChanged event) {
         gameObjects.onGameStateChanged(event);
-        if (event.getGameState() == GameState.LOGGED_IN) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(Util.colorString("Jort's ", "ff00f"));
-            stringBuilder.append(Util.colorString("Copilot ", "0000ff"));
-            stringBuilder.append(Util.colorString("has ", "ffff00"));
-            stringBuilder.append(Util.colorString("started!", "ff0000"));
-            chat.send(stringBuilder.toString());
-        }
+        npcs.onGameStateChanged(event);
     }
 
     @Subscribe
@@ -172,9 +163,9 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onConfigChanged(ConfigChanged configChanged) {
-        log.info("Config changed of " + configChanged.getGroup() + ":::" + configChanged);
-        if (!configChanged.getGroup().equals("copilot")) {
+    public void onConfigChanged(ConfigChanged event) {
+        log.info("Config changed of " + event.getGroup() + ":::" + event);
+        if (!event.getGroup().equals("copilot")) {
             return;
         }
         // because we disable it when no script is running, enable it when we may have enabled a script

@@ -2,6 +2,7 @@ package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.helpers.GameObjects;
+import dev.jort.copilot.helpers.Npcs;
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -21,6 +22,9 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     @Inject
     GameObjects gameObjects;
+
+    @Inject
+    Npcs npcs;
 
     @Inject
     CopilotConfig config;
@@ -54,13 +58,13 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         overlayUtil.highlightShape(graphics, tileObject.getClickbox());
     }
 
-    public void highlightNpc(Graphics2D graphics, NPC npc) {
-        if (npc == null) {
+    public void highlightActor(Graphics2D graphics, Actor actor) {
+        if (actor == null) {
             return;
         }
-        Perspective.getClickbox(client, npc.getModel(), npc.getOrientation(), npc.getLocalLocation().getX(), npc.getLocalLocation().getY(), 0);
-        Perspective.getClickbox(client, npc.getModel(), npc.getOrientation(), npc.getLocalLocation().getX(), npc.getLocalLocation().getY(), 0);
-        overlayUtil.highlightShape(graphics, npc.getCanvasTilePoly());
+        Perspective.getClickbox(client, actor.getModel(), actor.getOrientation(), actor.getLocalLocation().getX(), actor.getLocalLocation().getY(), 0);
+        Perspective.getClickbox(client, actor.getModel(), actor.getOrientation(), actor.getLocalLocation().getX(), actor.getLocalLocation().getY(), 0);
+        overlayUtil.highlightShape(graphics, actor.getCanvasTilePoly());
     }
 
     @Override
@@ -70,6 +74,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         }
         if (onlyHighlightClosest) {
             highlightTileObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
+            highlightActor(graphics, npcs.closest(npcIdsToHighlight));
             return null;
 
         }
@@ -78,6 +83,12 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         for (GameObject gameObject : gameObjectList) {
             highlightTileObject(graphics, gameObject);
         }
+
+        List<NPC> npcList = npcs.filter(npc -> Util.arrayContains(npc.getId(), npcIdsToHighlight));
+        for (NPC npc : npcList) {
+            highlightActor(graphics, npc);
+        }
+
         return null;
     }
 

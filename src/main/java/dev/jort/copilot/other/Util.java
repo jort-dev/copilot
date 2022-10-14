@@ -26,9 +26,7 @@ public class Util {
     }
 
     public static String colorString(String s, String hex) {
-        //color string
-        String result = "<col=" + hex + ">" + s + "</col>";
-        return result;
+        return "<col=" + hex + ">" + s + "</col>";
     }
 
     public static String listToString(List<? extends Object> items) {

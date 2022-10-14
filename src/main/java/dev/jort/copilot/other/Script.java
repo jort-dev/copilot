@@ -1,4 +1,4 @@
-package dev.jort.copilot.scripts;
+package dev.jort.copilot.other;
 
 import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.other.Action;
@@ -15,40 +15,40 @@ import javax.inject.Inject;
 public abstract class Script {
 
     @Inject
-    Client client;
+    public Client client;
 
 
     //UTILITIES
     @Inject
-    Alert alert;
+    public Alert alert;
     @Inject
-    Ids ids;
+    public Ids ids;
     @Inject
-    Tracker tracker;
+    public Tracker tracker;
     @Inject
-    GameObjects gameObjects;
+    public GameObjects gameObjects;
     @Inject
-    Chat chat;
+    public Chat Action;
     @Inject
-    Inventory inventory;
+    public Inventory inventory;
     @Inject
-    Bank bank;
+    public Bank bank;
 
 
     //OVERLAYS
     @Inject
-    EntityOverlay entityOverlay;
+    public EntityOverlay entityOverlay;
     @Inject
-    NotificationOverlay notificationOverlay;
+    public NotificationOverlay notificationOverlay;
     @Inject
-    InfoOverlay infoOverlay;
+    public InfoOverlay infoOverlay;
     @Inject
-    WidgetOverlay widgetOverlay;
+    public WidgetOverlay widgetOverlay;
 
 
     //ACTIONS
-    Action waitAction = new Action().setHint("Wait");
-    Action action = waitAction;
+    public Action waitAction = new Action().setHint("Wait");
+    public Action action = waitAction;
 
     public Action getAction() {
         return action;

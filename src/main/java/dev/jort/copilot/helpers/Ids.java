@@ -24,6 +24,8 @@ public class Ids {
     public final int[] BANKERS_IDS;
     public final int[] BURNT_FISH_IDS;
     public final int[] COOKED_FISH_IDS;
+    public final int[] ROD_FISHING_SPOT_IDS;
+    public final int[] RAW_FISH_IDS;
 
     public final int WILLOW_LOGS = ItemID.WILLOW_LOGS;
     public final int YEW_LOGS = ItemID.YEW_LOGS;
@@ -45,6 +47,8 @@ public class Ids {
         BANK_CHEST_IDS = determineIds(ObjectID.class, "BANK_CHEST");
         BURNT_FISH_IDS = determineIds(ItemID.class, "BURNT");
         COOKED_FISH_IDS = Util.concatArrays(BURNT_FISH_IDS, SALMON, TROUT);
+        RAW_FISH_IDS = Util.concatArrays(new int[]{RAW_SALMON}, RAW_TROUT);
+        ROD_FISHING_SPOT_IDS = determineIds(NpcID.class, "ROD_FISHING_SPOT");
     }
 
     public int[] determineIds(Class source, String contains, String... notContains) {
