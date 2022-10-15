@@ -99,7 +99,6 @@ public class ResourceBankScript extends Script {
         boolean walkingToCorrectGoal = tracker.isWalking() && idHolder.matchId(tracker.getLastClickedId());
         boolean isWaiting = idHolder.equals(waitIdHolder);
         boolean isAlertNeeded = !isWaiting && !walkingToCorrectGoal;
-
         alert.handleAlert(isAlertNeeded);
     }
 }

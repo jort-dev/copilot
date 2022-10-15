@@ -48,6 +48,8 @@ public class Alert {
         //always disable visual overlay when no alert is needed
         if (!interactionNeeded) {
             notificationOverlay.disable();
+            entityOverlay.clear();
+            widgetOverlay.clear();
             soundAlertsPlayed = 0;
             alertStartTime = -2;
             return;
