@@ -18,6 +18,9 @@ public class Alert {
     Client client;
 
     @Inject
+    Inventory inventory;
+
+    @Inject
     CopilotConfig config;
 
     @Inject
@@ -30,27 +33,28 @@ public class Alert {
     EntityOverlay entityOverlay;
 
     int soundAlertsPlayed = 0;
-    boolean previousAlertNeeded = false;
+    boolean previousInteractionNeeded = false;
     long alertStartTime = -1;
 
 
-    public void handleAlert(boolean alertNeeded) {
+    public void handleAlert(boolean interactionNeeded) {
         //if this is the first time alerting, needed for the alert delay
-        if (!previousAlertNeeded) {
+        if (!previousInteractionNeeded) {
             alertStartTime = System.currentTimeMillis();
         }
-        previousAlertNeeded = alertNeeded;
+        previousInteractionNeeded = interactionNeeded;
+
 
         //always disable visual overlay when no alert is needed
-        if (!alertNeeded) {
+        if (!interactionNeeded) {
             notificationOverlay.disable();
             soundAlertsPlayed = 0;
             alertStartTime = -2;
             return;
         }
 
-        //ignore if we are awaiting the alert delay
-        if (System.currentTimeMillis() - alertStartTime < config.alertDelayMs()) {
+        //ignore if interacted recently
+        if (Math.max(client.getMouseLastPressedMillis(), alertStartTime) + config.alertDelayMs() > System.currentTimeMillis()) {
             return;
         }
 
@@ -63,15 +67,27 @@ public class Alert {
         }
 
         //play sound alert
-        playAlertSound();
+        if (inventory.isFull()) {
+            playAlternativeAlertSound();
+        } else {
+            playAlertSound();
+        }
         soundAlertsPlayed++;
     }
 
     public void playAlertSound() {
-        playSound(config.soundId());
+        playSound(config.mainSoundId());
     }
 
-    public void playSound(int id){
+    public void playAlternativeAlertSound() {
+        if (config.alternativeSoundId() == 0) { //set to 0 disables it
+            playAlertSound();
+            return;
+        }
+        playSound(config.alternativeSoundId());
+    }
+
+    public void playSound(int id) {
         Preferences preferences = client.getPreferences();
         int previousVolume = preferences.getSoundEffectVolume();
         int volume = config.alertVolume();

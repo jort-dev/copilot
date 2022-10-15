@@ -10,7 +10,7 @@ https://user-images.githubusercontent.com/115373370/195444530-a0a17efc-7d8c-4574
 * Fishing & Cooking - Trout & Salmon - Barbarian Village
 
 # Features
-Configuration options:
+Configuration options:  
 ![Settings configuration](/img/settings.png "Copilot configuration options.")
 
 

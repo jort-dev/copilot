@@ -1,6 +1,6 @@
 package dev.jort.copilot.scripts;
 
-import dev.jort.copilot.other.Action;
+import dev.jort.copilot.other.IdHolder;
 import dev.jort.copilot.other.Script;
 import net.runelite.api.widgets.Widget;
 
@@ -24,7 +24,7 @@ public class FishingBarbarian extends Script {
 
     public void handleAction() {
         if (tracker.isAnimating()) {
-            action = waitAction;
+            idHolder = waitIdHolder;
             widgetOverlay.clear();
             entityOverlay.clear();
             return;
@@ -35,8 +35,8 @@ public class FishingBarbarian extends Script {
             entityOverlay.clear();
             widgetOverlay.setItemIdsToHighlight(ids.COOKED_FISH_IDS);
             widgetOverlay.setHighlightOneItemOnly(false);
-            action = new Action()
-                    .setHint("Drop fish")
+            idHolder = new IdHolder()
+                    .setName("Drop fish")
                     .setItemIds(ids.COOKED_FISH_IDS);
             return;
         }
@@ -48,8 +48,8 @@ public class FishingBarbarian extends Script {
                 entityOverlay.clear();
                 Widget widgetToHighlight = getMakeWidget();
                 if (widgetToHighlight != null) {
-                    action = new Action()
-                            .setHint("Cook fish")
+                    idHolder = new IdHolder()
+                            .setName("Cook fish")
                             .setWidgetIds(widgetToHighlight.getId());
                     widgetOverlay.setWidgetToHighlight(widgetToHighlight);
                 }
@@ -57,8 +57,8 @@ public class FishingBarbarian extends Script {
             }
 
             //else click the fire to summon it
-            action = new Action()
-                    .setHint("Click fire")
+            idHolder = new IdHolder()
+                    .setName("Click fire")
                     .setObjectIds(ids.BARBARIAN_FIRE);
             widgetOverlay.clear();
             entityOverlay.setGameObjectIdsToHighlight(ids.BARBARIAN_FIRE);
@@ -66,8 +66,8 @@ public class FishingBarbarian extends Script {
         }
 
         //click fishing spot
-        action = new Action()
-                .setHint("Click fishing spot")
+        idHolder = new IdHolder()
+                .setName("Click fishing spot")
                 .setObjectIds(ids.ROD_FISHING_SPOT_IDS)
                 .setActions("Lure");
 
@@ -77,12 +77,12 @@ public class FishingBarbarian extends Script {
     }
 
     public void determineIfAlertIsNeeded() {
-        boolean lastClickedIdMatches = action.matchId(tracker.getLastClickedId());
-        boolean lastClickedActionMatches = action.matchAction(tracker.getLastClickedMenuOption());
+        boolean lastClickedIdMatches = idHolder.matchId(tracker.getLastClickedId());
+        boolean lastClickedActionMatches = idHolder.matchAction(tracker.getLastClickedMenuOption());
         boolean lastActionCorrect = lastClickedIdMatches || lastClickedActionMatches;
 
         boolean walkingToCorrectGoal = tracker.isWalking() && lastActionCorrect;
-        boolean isWaiting = action.equals(waitAction);
+        boolean isWaiting = idHolder.equals(waitIdHolder);
         boolean isAlertNeeded = !isWaiting && !walkingToCorrectGoal;
         alert.handleAlert(isAlertNeeded);
     }

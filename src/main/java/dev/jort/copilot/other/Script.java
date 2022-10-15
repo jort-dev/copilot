@@ -1,7 +1,6 @@
 package dev.jort.copilot.other;
 
 import dev.jort.copilot.helpers.*;
-import dev.jort.copilot.other.Action;
 import dev.jort.copilot.overlays.EntityOverlay;
 import dev.jort.copilot.overlays.InfoOverlay;
 import dev.jort.copilot.overlays.NotificationOverlay;
@@ -28,7 +27,7 @@ public abstract class Script {
     @Inject
     public GameObjects gameObjects;
     @Inject
-    public Chat Action;
+    public Chat chat;
     @Inject
     public Inventory inventory;
     @Inject
@@ -47,11 +46,11 @@ public abstract class Script {
 
 
     //ACTIONS
-    public Action waitAction = new Action().setHint("Wait");
-    public Action action = waitAction;
+    public IdHolder waitIdHolder = new IdHolder().setName("Wait");
+    public IdHolder idHolder = waitIdHolder;
 
-    public Action getAction() {
-        return action;
+    public IdHolder getAction() {
+        return idHolder;
     }
 
     public abstract void loop();

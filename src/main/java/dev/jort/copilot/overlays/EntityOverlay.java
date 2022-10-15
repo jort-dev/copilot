@@ -62,8 +62,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         if (actor == null) {
             return;
         }
-        Perspective.getClickbox(client, actor.getModel(), actor.getOrientation(), actor.getLocalLocation().getX(), actor.getLocalLocation().getY(), 0);
-        Perspective.getClickbox(client, actor.getModel(), actor.getOrientation(), actor.getLocalLocation().getX(), actor.getLocalLocation().getY(), 0);
+//        Perspective.getClickbox(client, actor.getModel(), actor.getOrientation(), actor.getLocalLocation().getX(), actor.getLocalLocation().getY(), 0);
         overlayUtil.highlightShape(graphics, actor.getCanvasTilePoly());
     }
 

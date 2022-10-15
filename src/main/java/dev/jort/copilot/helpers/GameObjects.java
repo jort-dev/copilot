@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
+import net.runelite.api.Perspective;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -12,6 +13,7 @@ import net.runelite.api.events.GameStateChanged;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -28,7 +30,17 @@ public class GameObjects {
         if (gameObjects.contains(gameObject)) {
             return;
         }
-        gameObjects.add(gameObject);
+
+        String[] actions = client.getObjectDefinition(gameObject.getId()).getActions();
+
+
+        for (String action : actions) {
+            if (action != null) {
+                //dont add gameobject which are not interactable, to prevent fake bank booths for example
+                gameObjects.add(gameObject);
+                return;
+            }
+        }
     }
 
     public void remove(GameObject gameObject) {
@@ -37,6 +49,9 @@ public class GameObjects {
 
     public GameObject closest(int... ids) {
         if (gameObjects.isEmpty()) {
+            return null;
+        }
+        if (ids == null) { // seems to happen at startup in render
             return null;
         }
         GameObject closest = null;
@@ -69,7 +84,7 @@ public class GameObjects {
     }
 
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
-        if(gameStateChanged.getGameState().equals(GameState.LOADING)){
+        if (gameStateChanged.getGameState().equals(GameState.LOADING)) {
             gameObjects.clear();
         }
     }

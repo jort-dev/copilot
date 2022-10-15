@@ -3,7 +3,6 @@ package dev.jort.copilot.overlays;
 import dev.jort.copilot.CopilotPlugin;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -38,7 +37,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         }
         String text = "Initializing";
         if (main.getRunningScript() != null) {
-            text = main.getRunningScript().getAction().getHint();
+            text = main.getRunningScript().getAction().getName();
         }
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Jort's Copilot")
@@ -47,6 +46,17 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         panelComponent.getChildren().add(LineComponent.builder()
                 .left(text)
                 .build());
+
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Mouse millis: ")
+//                .right(client.getMouseLastPressedMillis() + "")
+//                .build());
+//
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Millis: ")
+//                .right(System.currentTimeMillis() + "")
+//                .build());
+
 
         panelComponent.setPreferredSize(new Dimension(200, 100));
 

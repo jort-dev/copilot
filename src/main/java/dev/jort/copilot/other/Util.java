@@ -17,6 +17,9 @@ public class Util {
     }
 
     public static boolean arrayContains(int numberToCheck, int... numbers) {
+        if(numbers == null){
+            return false;
+        }
         for (int number : numbers) {
             if (number == numberToCheck) {
                 return true;
@@ -36,5 +39,9 @@ public class Util {
 
     public static int[] concatArrays(int[] arr1, int... arr2) {
         return Stream.concat(Arrays.stream(arr1).boxed(), Arrays.stream(arr2).boxed()).mapToInt(i -> i).toArray();
+    }
+
+    public static String capitalize(String str){
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 }

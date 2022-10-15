@@ -6,10 +6,12 @@ import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.scripts.FishingBarbarian;
 import dev.jort.copilot.other.Script;
 import dev.jort.copilot.scripts.WillowsDraynor;
+import dev.jort.copilot.scripts.Woodcutting;
 import dev.jort.copilot.scripts.YewsWoodcuttingGuild;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
@@ -25,6 +27,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -82,6 +85,8 @@ public class CopilotPlugin extends Plugin {
     FishingBarbarian fishingBarbarian;
     @Inject
     YewsWoodcuttingGuild yewsWoodcuttingGuild;
+    @Inject
+    Woodcutting woodcutting;
 
     Script runningScript = null;
 
@@ -106,8 +111,9 @@ public class CopilotPlugin extends Plugin {
         }
 
         //initialize scripts which require arguments
-        yewsWoodcuttingGuild.initialize(ids.BANK_CHEST_IDS, new int[]{ids.YEW_LOGS}, ids.YEW_TREE_IDS);
-        willowsDraynor.initialize(new int[]{ids.BANK_BOOTH}, new int[]{ids.WILLOW_LOGS}, ids.WILLOW_TREE_IDS);
+//        yewsWoodcuttingGuild.initialize(ids.BANK_CHEST_IDS, new int[]{ids.YEW_LOGS}, ids.YEW_TREE_IDS);
+//        willowsDraynor.initialize(new int[]{ids.BANK_BOOTH}, new int[]{ids.WILLOW_LOGS}, ids.WILLOW_TREE_IDS);
+        woodcutting.initialize();
     }
 
     @Override
@@ -185,15 +191,15 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick event) {
         tracker.onGameTick(event);
-        if (config.willowsDraynor()) {
-            willowsDraynor.loop();
-            runningScript = willowsDraynor;
+        if (!client.getGameState().equals(GameState.LOGGED_IN)) {
+            return;
+        }
+        if (config.woodcutting()) {
+            woodcutting.loop();
+            runningScript = woodcutting;
         } else if (config.fishingBarbarian()) {
             fishingBarbarian.loop();
             runningScript = fishingBarbarian;
-        } else if (config.yewsGuild()) {
-            yewsWoodcuttingGuild.loop();
-            runningScript = yewsWoodcuttingGuild;
         } else {
             setOverlaysEnabled(false);
         }
@@ -202,6 +208,7 @@ public class CopilotPlugin extends Plugin {
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
         tracker.onMenuOptionClicked(event);
+        woodcutting.onMenuOptionClicked(event);
     }
 
     @Subscribe

@@ -35,6 +35,9 @@ public class Inventory {
         if(!load()){
             return 0;
         }
+        if(itemIds == null){ //sometimes happens at boot or something
+            return 0;
+        }
         int total = 0;
 
         for (int itemId : itemIds) {

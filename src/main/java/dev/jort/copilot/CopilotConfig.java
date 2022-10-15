@@ -1,6 +1,5 @@
 package dev.jort.copilot;
 
-import net.runelite.api.SoundEffectID;
 import net.runelite.api.SoundEffectVolume;
 import net.runelite.client.config.*;
 
@@ -11,11 +10,10 @@ public interface CopilotConfig extends Config {
 
     @ConfigSection(
             name = "Settings",
-            description = "Set which activity you want assistance with. Only one selected item works.",
+            description = "Configure settings which apply to all helpers.",
             position = 0
     )
     String settingsSection = "Settings";
-
 
     @Range(
             max = SoundEffectVolume.HIGH
@@ -32,13 +30,24 @@ public interface CopilotConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "soundId",
+            keyName = "mainSoundId",
             name = "Alert sound ID",
             description = "Configures the sound to play for alerts. For inspiration: search 'sound id osrs'.",
             section = settingsSection,
             position = 2
     )
-    default int soundId() {
+    default int mainSoundId() {
+        return 3929;
+    }
+
+    @ConfigItem(
+            keyName = "alternativeSoundId",
+            name = "Alt alert sound ID",
+            description = "Configures the sound to play when the inventory is full. Set to 0 to disable.",
+            section = settingsSection,
+            position = 3
+    )
+    default int alternativeSoundId() {
         return 1959;
     }
 
@@ -47,7 +56,7 @@ public interface CopilotConfig extends Config {
             name = "Alert delay",
             description = "Configure after how many milliseconds of inactivity the alert go off.",
             section = settingsSection,
-            position = 3
+            position = 4
     )
     default int alertDelayMs() {
         return 1000;
@@ -61,7 +70,7 @@ public interface CopilotConfig extends Config {
             position = 4
     )
     default int amountOfSoundAlerts() {
-        return 3;
+        return 5;
     }
 
 
@@ -71,7 +80,7 @@ public interface CopilotConfig extends Config {
             name = "Notification color",
             description = "Set the notification overlay color",
             section = settingsSection,
-            position = 5
+            position = 6
     )
     default Color overlayColor() {
         return new Color(1.0f, 0.0f, 0.0f, 0.1f);
@@ -83,7 +92,7 @@ public interface CopilotConfig extends Config {
             name = "Highlight color",
             description = "Set the color of the highlight for items to click.",
             section = settingsSection,
-            position = 6
+            position = 7
     )
     default Color highlightColor() {
         return new Color(0.0f, 1.0f, 1.0f, 0.2f);
@@ -92,41 +101,30 @@ public interface CopilotConfig extends Config {
     @ConfigSection(
             name = "Activities",
             description = "Set which activity you want assistance with. Only one selected item works.",
-            position = 7
+            position = 8
     )
     String activitiesSection = "Activities";
 
     @ConfigItem(
-            keyName = "willowsDraynor",
-            name = "Willows @ Draynor bank",
-            description = "Chop down and bank willows next to the bank in Draynor Village.",
+            keyName = "woodcuttingGeneral",
+            name = "Woodcutting",
+            description = "Highlights trees, logs and banks.",
             section = activitiesSection,
-            position = 8
+            position = 9
 
     )
-    default boolean willowsDraynor() {
+    default boolean woodcutting() {
         return false;
     }
 
     @ConfigItem(
             keyName = "fishingBarbarianVillage",
-            name = "Fishing & Cooking @ Barbarians",
+            name = "Fishing and Cooking at Barbarians",
             description = "Fish trout and salmon at Barbarian Village, cook it and then drop it.",
-            section = activitiesSection,
-            position = 9
-    )
-    default boolean fishingBarbarian() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "yewsWoodcuttingGuild",
-            name = "Yews @ Woodcutting Guild",
-            description = "Chop down and bank yew trees at the Woodcutting Guild",
             section = activitiesSection,
             position = 10
     )
-    default boolean yewsGuild() {
+    default boolean fishingBarbarian() {
         return false;
     }
 }

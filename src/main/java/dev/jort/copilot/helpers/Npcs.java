@@ -34,7 +34,6 @@ public class Npcs {
     }
 
     public NPC closest(int... ids) {
-
         if (npcs.isEmpty()) {
             return null;
         }

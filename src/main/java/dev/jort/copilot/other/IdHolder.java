@@ -1,36 +1,44 @@
 package dev.jort.copilot.other;
 /*
 Utility for scripts to indicate the IDs to click when alert is active.
+I also use this as a resource set in for example the woodcutting helper.
  */
 
 
+import dev.jort.copilot.helpers.Ids;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ObjectID;
 
 @Slf4j
 @Getter
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Action {
+public class IdHolder {
 
-    private String hint = "Action";
+    private String name = "Action";
     private int[] npcIds = new int[0];
     private int[] objectIds = new int[0];
     private int[] itemIds = new int[0];
     private int[] widgetIds = new int[0];
     private String[] actions = new String[0];
 
+    public IdHolder(String... contains) {
+        setObjectIds(Ids.determineIds(ObjectID.class, contains));
+        setName(Util.capitalize(contains[0].toLowerCase()));
+    }
+
     public boolean matchId(int id) {
         return matchId(id, npcIds) || matchId(id, objectIds) || matchId(id, itemIds) || matchId(id, widgetIds);
     }
 
-    public boolean matchAction(String action){
-        for (String a : actions){
-            if (a.equals(action)){
+    public boolean matchAction(String action) {
+        for (String a : actions) {
+            if (a.equals(action)) {
                 return true;
             }
         }
@@ -42,33 +50,33 @@ public class Action {
     }
 
 
-    public Action setHint(String hint) {
-        this.hint = hint;
+    public IdHolder setName(String name) {
+        this.name = name;
         return this;
     }
 
     //lombok does not seem to support varargs unfortunately, so typed out manually
-    public Action setNpcIds(int... npcIds) {
+    public IdHolder setNpcIds(int... npcIds) {
         this.npcIds = npcIds;
         return this;
     }
 
-    public Action setObjectIds(int... objectIds) {
+    public IdHolder setObjectIds(int... objectIds) {
         this.objectIds = objectIds;
         return this;
     }
 
-    public Action setActions(String...actions){
+    public IdHolder setActions(String... actions) {
         this.actions = actions;
         return this;
     }
 
-    public Action setItemIds(int... itemIds) {
+    public IdHolder setItemIds(int... itemIds) {
         this.itemIds = itemIds;
         return this;
     }
 
-    public Action setWidgetIds(int... widgetIds) {
+    public IdHolder setWidgetIds(int... widgetIds) {
         this.widgetIds = widgetIds;
         return this;
     }
