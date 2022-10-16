@@ -32,6 +32,8 @@ public abstract class Script {
     public Inventory inventory;
     @Inject
     public Bank bank;
+    @Inject
+    public Widgets widgets;
 
 
     //OVERLAYS
@@ -46,13 +48,46 @@ public abstract class Script {
 
 
     //ACTIONS
-    public IdHolder waitIdHolder = new IdHolder().setName("Wait");
-    public IdHolder idHolder = waitIdHolder;
+    public IdHolder waitAction = new IdHolder().setName("Wait");
+    public IdHolder action = waitAction;
 
     public IdHolder getAction() {
-        return idHolder;
+        return action;
     }
 
-    public abstract void loop();
+    private boolean setupRan = false;
+    private boolean running = true;
+    private boolean exitRan = false;
+
+    //call this function when running the script (each gametick for example)
+    public void loop() {
+        if (!running) {
+            if (!exitRan) {
+                onExit();
+                exitRan = true;
+            }
+            log.warn("Calling loop in stopped script!");
+            return;
+        }
+        if (!setupRan) {
+            onStart();
+            setupRan = true;
+            return;
+        }
+        onLoop();
+    }
+
+    public void onStart() {
+    }
+
+    public void onExit() {
+    }
+
+    public void setEnabled(boolean enable) {
+        running = enable;
+    }
+
+    //dont call this function!
+    public abstract void onLoop();
 
 }

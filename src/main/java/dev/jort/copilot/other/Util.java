@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/*
+General functions also usable without the RuneLite API.
+ */
 public class Util {
 
     public static boolean containsAny(String string, String... stringsToCheck) {

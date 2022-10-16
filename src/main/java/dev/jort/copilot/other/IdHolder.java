@@ -20,7 +20,7 @@ import net.runelite.api.ObjectID;
 @EqualsAndHashCode
 public class IdHolder {
 
-    private String name = "Action";
+    private String name = "NoName";
     private int[] npcIds = new int[0];
     private int[] objectIds = new int[0];
     private int[] itemIds = new int[0];

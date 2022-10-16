@@ -2,7 +2,6 @@ package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
 import net.runelite.api.Client;
-import net.runelite.api.Player;
 import net.runelite.api.Point;
 
 import javax.inject.Inject;

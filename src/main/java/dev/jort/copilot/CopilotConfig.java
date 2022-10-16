@@ -127,4 +127,15 @@ public interface CopilotConfig extends Config {
     default boolean fishingBarbarian() {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "crafting",
+            name = "Crafting at bank",
+            description = "Withdraw resource from bank, craft into product with a tool, deposit product.",
+            section = activitiesSection,
+            position = 11
+    )
+    default boolean crafting() {
+        return false;
+    }
 }

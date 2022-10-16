@@ -2,10 +2,13 @@ package dev.jort.copilot.helpers;
 
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
+import net.runelite.api.widgets.Widget;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,7 +26,6 @@ public class Ids {
     public final int[] ROD_FISHING_SPOT_IDS;
     public final int[] RAW_FISH_IDS;
 
-    public final int BANK_CLOSE = 786434; //this is just the bank root container
     public final int SALMON = ItemID.SALMON;
     public final int TROUT = ItemID.TROUT;
 
@@ -31,9 +33,11 @@ public class Ids {
     public final int RAW_TROUT = ItemID.RAW_TROUT;
     public final int BARBARIAN_FIRE = ObjectID.FIRE_43475;
 
+    @Inject
+    Client client;
 
     public Ids() {
-        BANK_OBJECT_IDS = determineIds(ObjectID.class, "BANK_CHEST", "BANK_BOOTH");
+        BANK_OBJECT_IDS = determineIds(ObjectID.class, "BANK_CHEST", "BANK_BOOTH", "BANK_CHESTWRECK");
 
         BURNT_FISH_IDS = determineIds(ItemID.class, "BURNT");
         COOKED_FISH_IDS = Util.concatArrays(BURNT_FISH_IDS, SALMON, TROUT);
@@ -70,5 +74,4 @@ public class Ids {
         log.info("Determined IDs for " + Arrays.toString(contains) + ": " + Arrays.toString(result));
         return result;
     }
-
 }

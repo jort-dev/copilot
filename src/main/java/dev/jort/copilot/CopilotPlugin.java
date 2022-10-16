@@ -5,9 +5,8 @@ import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.scripts.FishingBarbarian;
 import dev.jort.copilot.other.Script;
-import dev.jort.copilot.scripts.WillowsDraynor;
+import dev.jort.copilot.scripts.InventoryMakeScript;
 import dev.jort.copilot.scripts.Woodcutting;
-import dev.jort.copilot.scripts.YewsWoodcuttingGuild;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -27,7 +26,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -80,13 +78,12 @@ public class CopilotPlugin extends Plugin {
 
     //SCRIPTS
     @Inject
-    WillowsDraynor willowsDraynor;
-    @Inject
     FishingBarbarian fishingBarbarian;
     @Inject
-    YewsWoodcuttingGuild yewsWoodcuttingGuild;
-    @Inject
     Woodcutting woodcutting;
+
+    @Inject
+    InventoryMakeScript crafting;
 
     Script runningScript = null;
 
@@ -200,7 +197,12 @@ public class CopilotPlugin extends Plugin {
         } else if (config.fishingBarbarian()) {
             fishingBarbarian.loop();
             runningScript = fishingBarbarian;
-        } else {
+        }
+        else if(config.crafting()){
+            crafting.loop();
+            runningScript = crafting;
+        }
+        else {
             setOverlaysEnabled(false);
         }
     }

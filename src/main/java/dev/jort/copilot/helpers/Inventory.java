@@ -5,7 +5,6 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.events.ItemContainerChanged;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,8 +46,17 @@ public class Inventory {
         return total;
     }
 
-    public boolean contains(int... itemIds) {
+    public boolean containsAny(int... itemIds) {
         return count(itemIds) > 0;
+    }
+
+    public boolean containsAll(int... itemIds){
+        for (int itemId : itemIds){
+            if (!containsAny(itemId)){
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean containsOnly(int... itemIds) {

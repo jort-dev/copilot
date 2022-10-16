@@ -4,7 +4,6 @@ import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.helpers.Ids;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.ui.overlay.*;
@@ -36,6 +35,8 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
 
     private boolean enabled = false;
 
+    private boolean highlightInventoryContainer = true; //bank has different inventory container
+
     public WidgetOverlay() {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
         setLayer(OverlayLayer.ALWAYS_ON_TOP); // otherwise drawn widgets are not shown
@@ -52,27 +53,46 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
         return null;
     }
 
+    private boolean containerWidgetValid(Widget widget){
+        return widget != null && !widget.isHidden();
+    }
+
+    public Widget getContainerWidget() {
+        if (highlightInventoryContainer){
+            Widget inventoryContainerWidget = client.getWidget(WidgetInfo.INVENTORY);
+            if (!containerWidgetValid(inventoryContainerWidget)) {
+                inventoryContainerWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+            }
+            if(!containerWidgetValid(inventoryContainerWidget)){
+                inventoryContainerWidget = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
+            }
+            if(!containerWidgetValid(inventoryContainerWidget)){
+                inventoryContainerWidget = client.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER);
+            }
+            return inventoryContainerWidget; // may be null
+        }
+        Widget otherContainerWidget = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
+        return otherContainerWidget;
+    }
+
     public void renderItem(Graphics2D graphics) {
         if (itemIdsToHighlight == null) {
             return;
         }
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget == null || inventoryWidget.isHidden()) {
-            inventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-        }
-        if (inventoryWidget == null || inventoryWidget.isHidden()) {
+        Widget containerWidget = getContainerWidget();
+        if (containerWidget == null){
             return;
         }
 
-        if (inventoryWidget.getDynamicChildren() == null) {
+        if (containerWidget.getDynamicChildren() == null) {
             return;
         }
 
-        for (Widget itemWidget : inventoryWidget.getDynamicChildren()) {
+        for (Widget itemWidget : containerWidget.getDynamicChildren()) {
             for (int itemId : itemIdsToHighlight) {
                 if (itemId == itemWidget.getItemId()) {
                     overlayUtil.highlightShape(graphics, itemWidget.getBounds());
-                    if(highlightOneItemOnly){
+                    if (highlightOneItemOnly) {
                         return;
                     }
                 }
@@ -103,11 +123,15 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
         this.itemIdsToHighlight = itemIdsToHighlight;
     }
 
+    public void setUseInventoryContainer(boolean inventoryContainer) {
+        this.highlightInventoryContainer = inventoryContainer;
+    }
+
     public void clearHighlightedItems() {
         itemIdsToHighlight = new int[0];
     }
 
-    public void setHighlightOneItemOnly(boolean oneItemOnly){
+    public void setHighlightOneItemOnly(boolean oneItemOnly) {
         this.highlightOneItemOnly = oneItemOnly;
     }
 

@@ -15,6 +15,9 @@ import java.util.StringJoiner;
 
 @Slf4j
 @Singleton
+/*
+TODO: add hasreceivedxp(long ms)
+ */
 public class Tracker {
 
     @Inject
