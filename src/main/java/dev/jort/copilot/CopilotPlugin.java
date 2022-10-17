@@ -5,6 +5,7 @@ import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.scripts.FishingBarbarian;
 import dev.jort.copilot.other.Script;
+import dev.jort.copilot.scripts.Inactivity;
 import dev.jort.copilot.scripts.InventoryMakeScript;
 import dev.jort.copilot.scripts.Woodcutting;
 import lombok.extern.slf4j.Slf4j;
@@ -81,9 +82,10 @@ public class CopilotPlugin extends Plugin {
     FishingBarbarian fishingBarbarian;
     @Inject
     Woodcutting woodcutting;
-
     @Inject
     InventoryMakeScript crafting;
+    @Inject
+    Inactivity inactivity;
 
     Script runningScript = null;
 
@@ -201,6 +203,10 @@ public class CopilotPlugin extends Plugin {
         else if(config.crafting()){
             crafting.loop();
             runningScript = crafting;
+        }
+        else if(config.inactivityAlert()){
+            inactivity.loop();
+            runningScript = inactivity;
         }
         else {
             setOverlaysEnabled(false);

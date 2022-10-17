@@ -138,4 +138,15 @@ public interface CopilotConfig extends Config {
     default boolean crafting() {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "inactivityAlert",
+            name = "General inactivity alert",
+            description = "Alerts you when you have not animated or moved within the time.",
+            section = activitiesSection,
+            position = 12
+    )
+    default boolean inactivityAlert() {
+        return false;
+    }
 }

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="CopilotPluginTest" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="CopilotPluginTest" type="Application" factoryName="Application" singleton="false" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="dev.jort.copilot.CopilotPluginTest" />
     <module name="copilot.test" />
     <option name="PROGRAM_PARAMETERS" value="--developer-mode" />
