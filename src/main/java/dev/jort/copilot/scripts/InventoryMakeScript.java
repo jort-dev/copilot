@@ -38,6 +38,7 @@ public class InventoryMakeScript extends Script {
     public void determineAction(){
 
         if (bank.isOpen()) {
+            //deposit the crafted product
             if (inventory.containsAny(productIds)) {
                 action = new IdHolder()
                         .setName("Deposit product")
@@ -48,6 +49,7 @@ public class InventoryMakeScript extends Script {
                 widgetOverlay.setItemIdsToHighlight(productIds);
                 return;
             }
+            //withdraw tool if maybe accidentally banked
             if (!inventory.containsAny(toolIds)) {
                 action = new IdHolder()
                         .setName("Withdraw tool")
@@ -58,6 +60,7 @@ public class InventoryMakeScript extends Script {
                 widgetOverlay.setItemIdsToHighlight(toolIds);
                 return;
             }
+            //keep withdrawing resources until inventory is full
             if (!inventory.containsAny(resourceIds) || !inventory.isFull()) { // could have withdrawn only 10 for example
                 action = new IdHolder()
                         .setName("Withdraw resource")
@@ -68,10 +71,11 @@ public class InventoryMakeScript extends Script {
                 widgetOverlay.setItemIdsToHighlight(resourceIds);
                 return;
             }
-            //if code reach here: we have resource, tool and no product
+
+            //close the bank: : we have resource, tool and no product if code reaches here
             Widget closeBankWidget = widgets.getBankCloseWidget();
             action = new IdHolder()
-                    .setName("Close bank")
+                    .setName("Close bank - esc")
                     .setWidgetIds(closeBankWidget.getId());
             entityOverlay.clear();
             widgetOverlay.clearHighlightedItems();
@@ -79,6 +83,7 @@ public class InventoryMakeScript extends Script {
             return;
         }
 
+        //if we dont have resources or tool, we need to open bank (tool may be accidentally banked)
         if (!inventory.containsAll(toolAndResourceIds)) {
             action = new IdHolder()
                     .setName("Open bank")
@@ -90,12 +95,13 @@ public class InventoryMakeScript extends Script {
 
         //if code reaches here: we have full invent of resource and the tool
         if(!tracker.hasAnimated(2000)){
+            //if make menu is visible, click the product widget
             if(widgets.isMakeWidgetVisible()){
                 Widget makeWidgetContainer =  client.getWidget(270, 13);
-                Widget productWidget = widgets.findWidgetWithName(makeWidgetContainer, productName);
+                Widget productWidget = widgets.getWidgetWithText(makeWidgetContainer, productName);
                 if (productWidget != null){
                     action = new IdHolder()
-                            .setName("Click make widget")
+                            .setName("Click make widget - space")
                             .setWidgetIds(productWidget.getId());
                     widgetOverlay.setWidgetToHighlight(productWidget);
                     widgetOverlay.clearHighlightedItems();
@@ -103,13 +109,26 @@ public class InventoryMakeScript extends Script {
                 }
                 return;
             }
-            action = new IdHolder()
-                    .setName("Make product")
-                    .setItemIds(toolAndResourceIds);
-            widgetOverlay.setUseInventoryContainer(true);
-            widgetOverlay.setItemIdsToHighlight(toolIds);
-            entityOverlay.clear();
-            return;
+            //if nothing is selected or the resource is selected, click tool
+            if (!tracker.isItemSelected() || tracker.isItemSelected(resourceName)){
+                action = new IdHolder()
+                        .setName("Click tool")
+                        .setItemIds(toolIds);
+                widgetOverlay.setUseInventoryContainer(true);
+                widgetOverlay.setItemIdsToHighlight(toolIds);
+                entityOverlay.clear();
+                return;
+            }
+            //if tool is selected, click resource
+            if(tracker.isItemSelected(toolName)){
+                action = new IdHolder()
+                        .setName("Click resource")
+                        .setItemIds(resourceIds);
+                widgetOverlay.setUseInventoryContainer(true);
+                widgetOverlay.setItemIdsToHighlight(resourceIds);
+                entityOverlay.clear();
+                return;
+            }
         }
 
         action = waitAction;

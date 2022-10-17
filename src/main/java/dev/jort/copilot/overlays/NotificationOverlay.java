@@ -5,6 +5,7 @@ import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayPriority;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -24,7 +25,8 @@ public class NotificationOverlay extends Overlay implements CopilotOverlay {
 
     public NotificationOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
-        setLayer(OverlayLayer.ABOVE_SCENE);
+        setLayer(OverlayLayer.ABOVE_WIDGETS);
+        setPriority(OverlayPriority.MED);
     }
 
     @Override

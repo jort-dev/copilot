@@ -7,7 +7,9 @@ import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayPriority;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,6 +47,8 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     private EntityOverlay(Client client) {
         this.client = client;
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
+        setLayer(OverlayLayer.ALWAYS_ON_TOP); // otherwise drawn widgets are not shown
+        setPriority(OverlayPriority.HIGH); // probably also needed for same reason
     }
 
     public Client getClient() {

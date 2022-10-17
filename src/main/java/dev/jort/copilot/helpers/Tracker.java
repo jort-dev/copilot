@@ -32,6 +32,8 @@ public class Tracker {
 
     //menu item
     private String lastClickedMenuOption = "";
+
+    private String lastClickedMenuTarget = "";
     private int lastClickedId = -1;
 
     private long lastMenuClickTime = 0;
@@ -107,6 +109,7 @@ public class Tracker {
         }
         lastMenuClickTime = System.currentTimeMillis();
         lastClickedMenuOption = event.getMenuOption();
+        lastClickedMenuTarget = event.getMenuTarget();
         lastClickedId = event.getId();
         if (lastClickedId < 10) {
             lastClickedId = event.getItemId(); //each item is also a widget, prioritize the item id
@@ -128,6 +131,30 @@ public class Tracker {
 
     public long getLastMenuClickTime() {
         return lastMenuClickTime;
+    }
+
+    public String getLastClickedMenuTarget() {
+        return lastClickedMenuTarget;
+    }
+
+    public boolean isItemSelected() {
+        if (!lastClickedMenuOption.equals("Use")) {
+            return false;
+        }
+        if (lastClickedMenuTarget.contains("->")) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isItemSelected(String itemName){
+        if (!isItemSelected()){
+            return false;
+        }
+        if(!getLastClickedMenuTarget().toLowerCase().contains(itemName.toLowerCase())){
+            return false;
+        }
+        return true;
     }
 
 

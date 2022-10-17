@@ -14,6 +14,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -27,6 +28,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -61,6 +63,8 @@ public class CopilotPlugin extends Plugin {
     Alert alert;
     @Inject
     Npcs npcs;
+    @Inject
+    Widgets widgets;
 
 
     //OVERLAYS
@@ -92,7 +96,10 @@ public class CopilotPlugin extends Plugin {
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
     public void schedule() {
-        //thread which fires each period
+        if (!client.getGameState().equals(GameState.LOGGED_IN)) {
+            return;
+        }
+        //thread which fires each second
     }
 
     @Override
@@ -199,16 +206,13 @@ public class CopilotPlugin extends Plugin {
         } else if (config.fishingBarbarian()) {
             fishingBarbarian.loop();
             runningScript = fishingBarbarian;
-        }
-        else if(config.crafting()){
+        } else if (config.crafting()) {
             crafting.loop();
             runningScript = crafting;
-        }
-        else if(config.inactivityAlert()){
+        } else if (config.inactivityAlert()) {
             inactivity.loop();
             runningScript = inactivity;
-        }
-        else {
+        } else {
             setOverlaysEnabled(false);
         }
     }
