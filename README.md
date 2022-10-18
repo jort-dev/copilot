@@ -1,6 +1,7 @@
 <p align="center">
 <img src="img/logo.png"><br>
 <h1 align="center">Copilot</h1>
+<h5 align="center">by Jort</h5>
 </p>
 
 Shows the next thing you should click and alerts you about it.
@@ -10,7 +11,7 @@ Every single step is highlighted, so you can mindlessly click whilst doing somet
 https://user-images.githubusercontent.com/115373370/195444530-a0a17efc-7d8c-4574-b306-4a7f7c64e578.mp4
 
 # Supported activities
-## Woodcutting
+### Woodcutting
 General purpose for chopping trees and banking the logs.  
 * Select a tree and log type by clicking it.
 
