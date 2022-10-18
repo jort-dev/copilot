@@ -1,10 +1,10 @@
 <p align="center">
-<img src="./img/logo.png"><br>
+<img src="img/logo.png"><br>
 <h1 align="center">Copilot</h1>
 </p>
 
-Shows the next thing you should click.  
-Every single step is highlighted, so you can mindlessly grind whilst doing something else.
+Shows the next thing you should click and alerts you about it.
+Every single step is highlighted, so you can mindlessly click whilst doing something else.
 
 # Demo
 https://user-images.githubusercontent.com/115373370/195444530-a0a17efc-7d8c-4574-b306-4a7f7c64e578.mp4
@@ -12,13 +12,13 @@ https://user-images.githubusercontent.com/115373370/195444530-a0a17efc-7d8c-4574
 # Supported activities
 ## Woodcutting
 General purpose for chopping trees and banking the logs.  
-* select a tree and log type by clicking it
+* Select a tree and log type by clicking it.
 
 ### Crafting
 General purpose for bankstanding skills.  
-* enter your tool, for example: knife, glassblowing pipe
-* enter your resource, for example: yew logs, molten glass
-* enter your product, for example: yew longbow(u), lantern lens
+* Enter your tool. Examples: knife, glassblowing pipe
+* Enter your resource. Examples: yew logs, molten glass
+* Enter your product. Examples: yew longbow(u), lantern lens
 
 ### Fishing & Cooking
 Fishing trout and salmon at Barbarian Village, and cooking it.
@@ -42,6 +42,8 @@ You could for example set a single very loud alert, or 1000 soft ticks to keep r
 # Tips
 * Use the menu entry swapper plugin to make every action left-clickable.
 * Use the camera plugin to zoom out more and enable vertical camera.
+* Increase the render distance with the GPU plugin.
+* Enable Esc to close the current interface.
 
 # Planned features
 * Tempoross
