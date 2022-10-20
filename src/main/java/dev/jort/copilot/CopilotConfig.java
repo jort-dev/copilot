@@ -142,11 +142,30 @@ public interface CopilotConfig extends Config {
     @ConfigItem(
             keyName = "inactivityAlert",
             name = "General inactivity alert",
-            description = "Alerts you when you have not animated or moved within the time.",
+            description = "For unimplemented features you can't find above. Alerts you when you have not animated or moved within the set time, but does not show you what to click.",
             section = activitiesSection,
             position = 12
     )
     default boolean inactivityAlert() {
+        return false;
+    }
+
+    @ConfigSection(
+            name = "Testing features",
+            description = "Testing features. Multiple selections possible.",
+            position = 13
+    )
+    String testSection = "Test features";
+
+    @ConfigItem(
+            keyName = "bogged",
+            name = "Bogged",
+            description = "Pump it.",
+            section = testSection,
+            position = 14
+
+    )
+    default boolean bogged() {
         return false;
     }
 }

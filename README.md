@@ -1,6 +1,5 @@
 <p align="center">
 <img src="img/logo.png"><br>
-<h5 align="center">Jort's</h5>
 <h1 align="center">Copilot</h1>
 </p>
 
@@ -9,6 +8,11 @@ Every single step is highlighted, so you can mindlessly click whilst doing somet
 
 ## Demo
 https://user-images.githubusercontent.com/115373370/195444530-a0a17efc-7d8c-4574-b306-4a7f7c64e578.mp4
+
+## Running
+As long this plugin is not in the plugin hub:
+* Open the project in Intellij.
+* Run the CopilotPluginTest in the top right corner of the screen.
 
 ## Supported activities
 ### Woodcutting
@@ -25,9 +29,9 @@ General purpose for bankstanding skills.
 Fishing trout and salmon at Barbarian Village, and cooking it.
 
 ### General inactivity alert
-For unsupported activities.  
+Use this if the activity you want to do is not defined above, or if you only want the plugin to alert you when you are inactive.  
 Alerts you when you have not yet animated, moved or clicked something for set time.  
-Works for a lot of things, but does not show you what to click.
+It does not show you what to click.
 
 ## Features
 Configuration options:  
@@ -49,3 +53,13 @@ You could for example set a single very loud alert, or 1000 soft ticks to keep r
 ## Planned features
 * Tempoross
 * Giant's Foundry
+* Special attack reminder
+* Power skilling option
+* Hide widgets when entity interaction is needed
+* System notification option
+* Clicked checker
+
+## Bugs
+* Highlighted entities are rendered over inventory / bank.
+* Maples not working.
+* Sometimes despawned entities are highlighted. In closest function double check if it still exists.

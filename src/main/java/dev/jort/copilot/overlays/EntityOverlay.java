@@ -2,6 +2,7 @@ package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.helpers.GameObjects;
+import dev.jort.copilot.helpers.GroundObjects;
 import dev.jort.copilot.helpers.Npcs;
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,9 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     @Inject
     GameObjects gameObjects;
+
+    @Inject
+    GroundObjects groundObjects;
 
     @Inject
     Npcs npcs;
@@ -72,6 +76,13 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if(config.bogged()){
+            List<GroundObject> pumpIt = groundObjects.filter(groundObject -> groundObject.getId() == 13838);
+            for (GroundObject groundObject : pumpIt){
+                highlightTileObject(graphics, groundObject);
+            }
+        }
+
         if (!enabled) {
             return null;
         }

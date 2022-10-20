@@ -65,6 +65,8 @@ public class CopilotPlugin extends Plugin {
     Npcs npcs;
     @Inject
     Widgets widgets;
+    @Inject
+    GroundObjects groundObjects;
 
 
     //OVERLAYS
@@ -228,6 +230,16 @@ public class CopilotPlugin extends Plugin {
         if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
             inventory.update();
         }
+    }
+
+    @Subscribe
+    public void onGroundObjectSpawned(GroundObjectSpawned event){
+        groundObjects.add(event.getGroundObject());
+    }
+
+    @Subscribe
+    public void onGroundObjectDespawned(GroundObjectDespawned event){
+        groundObjects.remove(event.getGroundObject());
     }
 
 
