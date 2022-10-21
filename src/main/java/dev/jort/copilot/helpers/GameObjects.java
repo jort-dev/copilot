@@ -1,10 +1,7 @@
 package dev.jort.copilot.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.GameState;
-import net.runelite.api.Perspective;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -61,6 +58,12 @@ public class GameObjects {
                 if (id != gameObject.getId()) {
                     continue;
                 }
+
+                //sometimes happen but i dont know why
+                if(!doesGameObjectActuallyExist(gameObject)){
+                    continue;
+                }
+
                 if (closest == null) {
                     closest = gameObject;
                     continue;
@@ -81,6 +84,20 @@ public class GameObjects {
 
     public void onGameObjectDespawned(GameObjectDespawned event) {
         remove(event.getGameObject());
+    }
+
+    public boolean doesGameObjectActuallyExist(GameObject gameObject) {
+        if(gameObject == null){
+            return false;
+        }
+        Point sceneCoords = gameObject.getSceneMinLocation();
+        Tile tile = client.getScene().getTiles()[0][sceneCoords.getX()][sceneCoords.getY()];
+        for (GameObject go : tile.getGameObjects()){
+            if (gameObject.equals(go)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void onGameStateChanged(GameStateChanged gameStateChanged) {

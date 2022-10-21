@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ObjectID;
+import net.runelite.api.widgets.Widget;
 
 @Slf4j
 @Getter
@@ -24,7 +25,7 @@ public class IdHolder {
     private int[] npcIds = new int[0];
     private int[] objectIds = new int[0];
     private int[] itemIds = new int[0];
-    private int[] widgetIds = new int[0];
+    private Widget[] widgets = new Widget[0];
     private String[] actions = new String[0];
 
     public IdHolder(String... contains) {
@@ -33,7 +34,7 @@ public class IdHolder {
     }
 
     public boolean matchId(int id) {
-        return matchId(id, npcIds) || matchId(id, objectIds) || matchId(id, itemIds) || matchId(id, widgetIds);
+        return matchId(id, npcIds) || matchId(id, objectIds) || matchId(id, itemIds) || matchId(id, widgets);
     }
 
     public boolean matchAction(String action) {
@@ -47,6 +48,22 @@ public class IdHolder {
 
     private boolean matchId(int idToMatch, int... ids) {
         return Util.arrayContains(idToMatch, ids);
+    }
+
+    private boolean matchId(int idToMatch, Widget... widgets) {
+        if(widgets == null){
+            return false;
+        }
+        for(Widget widget : widgets){
+            if(widget == null){
+                continue;
+            }
+            if(widget.getId() != idToMatch){
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
 
@@ -76,8 +93,8 @@ public class IdHolder {
         return this;
     }
 
-    public IdHolder setWidgetIds(int... widgetIds) {
-        this.widgetIds = widgetIds;
+    public IdHolder setWidgets(Widget... widgets) {
+        this.widgets = widgets;
         return this;
     }
 }

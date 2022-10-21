@@ -3,18 +3,15 @@ package dev.jort.copilot;
 import com.google.inject.Provides;
 import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.overlays.*;
-import dev.jort.copilot.scripts.FishingBarbarian;
+import dev.jort.copilot.priority_scripts.SpecialAttack;
+import dev.jort.copilot.scripts.*;
 import dev.jort.copilot.other.Script;
-import dev.jort.copilot.scripts.Inactivity;
-import dev.jort.copilot.scripts.InventoryMakeScript;
-import dev.jort.copilot.scripts.Woodcutting;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -28,16 +25,15 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 @PluginDescriptor(
         name = "Copilot",
-        description = "Shows where to click next."
+        description = "Shows where to click next.",
+        tags = {"jort", "copilot", "pilot", "autopilot", "overlay"}
 )
 public class CopilotPlugin extends Plugin {
-
 
     // DEFAULT
     @Inject
@@ -79,9 +75,15 @@ public class CopilotPlugin extends Plugin {
     @Inject
     WidgetOverlay widgetOverlay;
     @Inject
+    CopilotOverlayUtil overlayUtil;
+    @Inject
     NotificationOverlay notificationOverlay;
     List<CopilotOverlay> overlays = new ArrayList<>();
 
+
+    //PRIORITY SCRIPTS
+    @Inject
+    SpecialAttack specialAttack;
 
     //SCRIPTS
     @Inject
@@ -89,9 +91,10 @@ public class CopilotPlugin extends Plugin {
     @Inject
     Woodcutting woodcutting;
     @Inject
-    InventoryMakeScript crafting;
+    Crafting crafting;
     @Inject
     Inactivity inactivity;
+
 
     Script runningScript = null;
 
@@ -117,11 +120,6 @@ public class CopilotPlugin extends Plugin {
             overlayManager.add((Overlay) overlay);
             overlay.enable();
         }
-
-        //initialize scripts which require arguments
-//        yewsWoodcuttingGuild.initialize(ids.BANK_CHEST_IDS, new int[]{ids.YEW_LOGS}, ids.YEW_TREE_IDS);
-//        willowsDraynor.initialize(new int[]{ids.BANK_BOOTH}, new int[]{ids.WILLOW_LOGS}, ids.WILLOW_TREE_IDS);
-        woodcutting.initialize();
     }
 
     @Override
@@ -129,6 +127,7 @@ public class CopilotPlugin extends Plugin {
         for (CopilotOverlay overlay : overlays) {
             overlayManager.remove((Overlay) overlay);
         }
+        widgets.hideWidgets(false);
         log.info("Copilot stopped!");
     }
 
@@ -166,8 +165,9 @@ public class CopilotPlugin extends Plugin {
         if (!event.getType().equals(ChatMessageType.PUBLICCHAT)) {
             return;
         }
-        log.info("Received message: " + event.getMessage());
-
+        if (!config.testSounds()) {
+            return;
+        }
         try {
             int id = Integer.parseInt(event.getMessage());
             log.info("Playing sound with ID " + id);
@@ -178,12 +178,10 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
-        log.info("Config changed of " + event.getGroup() + ":::" + event);
-        if (!event.getGroup().equals("copilot")) {
-            return;
-        }
         // because we disable it when no script is running, enable it when we may have enabled a script
         setOverlaysEnabled(true);
+        crafting.onConfigChanged(event);
+        widgets.hideWidgets(config.hideWidgets());
     }
 
     public void setOverlaysEnabled(boolean enable) {
@@ -202,20 +200,13 @@ public class CopilotPlugin extends Plugin {
         if (!client.getGameState().equals(GameState.LOGGED_IN)) {
             return;
         }
-        if (config.woodcutting()) {
-            woodcutting.loop();
-            runningScript = woodcutting;
-        } else if (config.fishingBarbarian()) {
-            fishingBarbarian.loop();
-            runningScript = fishingBarbarian;
-        } else if (config.crafting()) {
-            crafting.loop();
-            runningScript = crafting;
-        } else if (config.inactivityAlert()) {
-            inactivity.loop();
-            runningScript = inactivity;
-        } else {
-            setOverlaysEnabled(false);
+        if(handlePriorityScripts()){
+            return;
+        }
+        handleRunningScripts();
+
+        if(runningScript != null){
+            overlayUtil.handleOverlays(runningScript.getAction());
         }
     }
 
@@ -233,13 +224,54 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onGroundObjectSpawned(GroundObjectSpawned event){
+    public void onGroundObjectSpawned(GroundObjectSpawned event) {
         groundObjects.add(event.getGroundObject());
     }
 
     @Subscribe
-    public void onGroundObjectDespawned(GroundObjectDespawned event){
+    public void onGroundObjectDespawned(GroundObjectDespawned event) {
         groundObjects.remove(event.getGroundObject());
+    }
+
+    @Subscribe
+    public void onScriptPostFired(ScriptPostFired event) {
+        widgets.onScriptPostFired(event);
+    }
+
+
+    //SCRIPT HANDLERS
+
+    /**
+     *
+     * @return True if it needs to be called again.
+     */
+    public boolean handlePriorityScripts(){
+        if(config.specialAttackAlert()){
+            if(specialAttack.needsToRun()){
+                specialAttack.loop();
+                runningScript = specialAttack;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void handleRunningScripts(){
+        if (config.woodcutting()) {
+            woodcutting.loop();
+            runningScript = woodcutting;
+        } else if (config.fishingBarbarian()) {
+            fishingBarbarian.loop();
+            runningScript = fishingBarbarian;
+        } else if (config.crafting()) {
+            crafting.loop();
+            runningScript = crafting;
+        } else if (config.inactivityAlert()) {
+            inactivity.loop();
+            runningScript = inactivity;
+        } else {
+            setOverlaysEnabled(false);
+        }
     }
 
 

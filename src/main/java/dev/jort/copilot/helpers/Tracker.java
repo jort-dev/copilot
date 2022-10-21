@@ -147,14 +147,22 @@ public class Tracker {
         return true;
     }
 
-    public boolean isItemSelected(String itemName){
-        if (!isItemSelected()){
+    public boolean isItemSelected(String itemName) {
+        if (!isItemSelected()) {
             return false;
         }
-        if(!getLastClickedMenuTarget().toLowerCase().contains(itemName.toLowerCase())){
+        if (!getLastClickedMenuTarget().toLowerCase().contains(itemName.toLowerCase())) {
             return false;
         }
         return true;
+    }
+
+    public boolean hasRecentlyClicked() {
+        return hasRecentlyClicked(1000);
+    }
+
+    public boolean hasRecentlyClicked(int ms) {
+        return client.getMouseLastPressedMillis() + ms > System.currentTimeMillis();
     }
 
 

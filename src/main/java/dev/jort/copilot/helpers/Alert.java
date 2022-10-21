@@ -7,6 +7,7 @@ import dev.jort.copilot.overlays.WidgetOverlay;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Preferences;
+import net.runelite.client.Notifier;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,8 +33,12 @@ public class Alert {
     @Inject
     EntityOverlay entityOverlay;
 
+    @Inject
+    private Notifier notifier;
+
     int soundAlertsPlayed = 0;
     boolean previousInteractionNeeded = false;
+    boolean hasFiredSystemAlert = false;
     long alertStartTime = -1;
 
 
@@ -52,6 +57,7 @@ public class Alert {
             widgetOverlay.clear();
             soundAlertsPlayed = 0;
             alertStartTime = -2;
+            hasFiredSystemAlert = false;
             return;
         }
 
@@ -62,6 +68,14 @@ public class Alert {
 
         //enable visual alert
         notificationOverlay.enable();
+
+        //system alert
+        if(config.useSystemNotifications()){
+            if (!hasFiredSystemAlert){
+                notifier.notify("Copilot: interaction needed.");
+                hasFiredSystemAlert = true;
+            }
+        }
 
         //ignore if enough sound alerts are played
         if (soundAlertsPlayed >= config.amountOfSoundAlerts()) {

@@ -51,8 +51,8 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     private EntityOverlay(Client client) {
         this.client = client;
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
-        setLayer(OverlayLayer.ALWAYS_ON_TOP); // otherwise drawn widgets are not shown
-        setPriority(OverlayPriority.HIGH); // probably also needed for same reason
+        setLayer(OverlayLayer.UNDER_WIDGETS);
+        setPriority(OverlayPriority.MED);
     }
 
     public Client getClient() {

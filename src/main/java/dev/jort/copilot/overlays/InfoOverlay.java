@@ -1,6 +1,7 @@
 package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotPlugin;
+import dev.jort.copilot.helpers.Combat;
 import dev.jort.copilot.helpers.Tracker;
 import dev.jort.copilot.helpers.Widgets;
 import dev.jort.copilot.other.Util;
@@ -31,6 +32,8 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     Widgets widgets;
     @Inject
     Tracker tracker;
+    @Inject
+    Combat combat;
 
     private boolean enabled = true;
 
@@ -40,7 +43,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         setPosition(OverlayPosition.TOP_LEFT);
         setResizable(true);
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
-        setPriority(OverlayPriority.MED);
+        setPriority(OverlayPriority.LOW);
     }
 
     @Override
@@ -48,38 +51,21 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         if (!enabled) {
             return null;
         }
-        String text = "Initializing";
+        String step = "Step";
+        String scriptName = "Script";
         if (main.getRunningScript() != null) {
-            text = main.getRunningScript().getAction().getName();
+            step = main.getRunningScript().getAction().getName();
+            scriptName = main.getRunningScript().getClass().getSimpleName();
         }
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Jort's Copilot")
+                .left(step)
                 .leftFont(FontManager.getRunescapeBoldFont())
                 .build());
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left(text)
-                .build());
 
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Last option:")
-//                .right(tracker.getLastClickedMenuOption())
-//                .build());
-//
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Last target no xml:")
-//                .right(Util.removeXml(tracker.getLastClickedMenuTarget()))
-//                .build());
-//
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Item selected: ")
-//                .right("" + tracker.isItemSelected())
-//                .build());
-//
-//
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Right item selected: ")
-//                .right("" + tracker.isItemSelected("glassblowing pipe"))
-//                .build());
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left(scriptName)
+                .right("Jort's Copilot")
+                .build());
         panelComponent.setPreferredSize(new Dimension(200, 100));
 
         return super.render(graphics);

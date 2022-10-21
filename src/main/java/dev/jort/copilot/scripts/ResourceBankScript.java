@@ -16,12 +16,19 @@ public class ResourceBankScript extends Script {
     int[] resourceItemIds;
     int[] resourceObjectIds;
 
+    //'static' idholder to remove entity highlight when tree is clicked, otherwise flashes because it kept switching to the wait action
+    IdHolder clickResourceAction;
+
     /**
      * Required to call before use.
      */
     public void setResources(IdHolder resources) {
         this.resourceItemIds = resources.getItemIds();
         this.resourceObjectIds = resources.getObjectIds();
+
+        clickResourceAction = new IdHolder()
+                .setName("Click resource")
+                .setObjectIds(resourceObjectIds);
         log.info("Initialized " + resources.getName());
     }
 
@@ -36,18 +43,15 @@ public class ResourceBankScript extends Script {
         if (bank.isOpen()) {
             //deposit inventory
             if (!inventory.isEmpty()) {
-                entityOverlay.clear();
                 Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
                 if (widgetToClick != null) {
-                    widgetOverlay.setWidgetToHighlight(widgetToClick);
                     action = new IdHolder()
                             .setName("Deposit inventory")
-                            .setWidgetIds(widgetToClick.getId());
+                            .setWidgets(widgetToClick);
                 }
 
                 if (inventory.containsOnly(resourceItemIds) && resourceItemIds.length == 1) {
                     //if only one type of resource in inventory: we can also press the resource to deposit all
-                    widgetOverlay.setItemIdsToHighlight(resourceItemIds);
                     action.setItemIds(resourceItemIds);
                 }
                 return action;
@@ -56,21 +60,18 @@ public class ResourceBankScript extends Script {
 
         if (inventory.isFull()) {
             //open bank
-            entityOverlay.setGameObjectIdsToHighlight(ids.BANK_OBJECT_IDS).setOnlyHighlightClosest(false);
-            widgetOverlay.clear();
             action = new IdHolder()
                     .setName("Open bank")
                     //dont highlight banker npcs, pathing is bad
                     .setObjectIds(ids.BANK_OBJECT_IDS);
+            entityOverlay.setOnlyHighlightClosest(false);
             return action;
         }
 
-        if (!tracker.isAnimating()) {
+        if (!tracker.isAnimating() && !isWalkingToCorrectGoal()) {
             //click resource
-            entityOverlay.setGameObjectIdsToHighlight(resourceObjectIds).setOnlyHighlightClosest(true);
-            action = new IdHolder()
-                    .setName("Click resource")
-                    .setObjectIds(resourceObjectIds);
+            action = clickResourceAction.setName("Click resource");
+            entityOverlay.setOnlyHighlightClosest(true);
 
             if (bank.isOpen()) {
                 //if in resized mode or resource is behind bank interface, you have to close the bank first
@@ -79,26 +80,24 @@ public class ResourceBankScript extends Script {
                 if (bankBarWidget != null) {
                     Widget closeButtonWidget = bankBarWidget.getChild(11);
                     if (closeButtonWidget != null) {
-                        action.setWidgetIds(closeButtonWidget.getId());
+                        action.setWidgets(closeButtonWidget);
                     }
-                    widgetOverlay.setWidgetToHighlight(closeButtonWidget);
                 }
-            } else {
-                widgetOverlay.clear();
             }
             return action;
         }
 
-        entityOverlay.clear();
-        widgetOverlay.clear();
         action = waitAction;
         return action;
     }
 
+    public boolean isWalkingToCorrectGoal(){
+        return tracker.isWalking() && clickResourceAction.matchId(tracker.getLastClickedId());
+    }
+
     public void determineIfAlertIsNeeded() {
-        boolean walkingToCorrectGoal = tracker.isWalking() && action.matchId(tracker.getLastClickedId());
         boolean isWaiting = action.equals(waitAction);
-        boolean isAlertNeeded = !isWaiting && !walkingToCorrectGoal;
+        boolean isAlertNeeded = !isWaiting && !isWalkingToCorrectGoal();
         alert.handleAlert(isAlertNeeded);
     }
 }

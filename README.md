@@ -55,11 +55,20 @@ You could for example set a single very loud alert, or 1000 soft ticks to keep r
 * Giant's Foundry
 * Special attack reminder
 * Power skilling option
-* Hide widgets when entity interaction is needed
-* System notification option
-* Clicked checker
+
+## Denied features
+* Hide widgets when entity interaction is needed. Denied, because it breaks a lot of scripts. You can't for example check if the bank is open, because the bank widget will be hidden.
 
 ## Bugs
-* Highlighted entities are rendered over inventory / bank.
-* Maples not working.
-* Sometimes despawned entities are highlighted. In closest function double check if it still exists.
+* None known
+
+
+## Credits
+Plugin developed by [Jort](https://jort.dev).  
+Plugin testers:
+* [Debug1010](https://linktr.ee/01)
+Plugin inspired by the following plugins:
+* [Quest Helper](https://github.com/Zoinkwiz/quest-helper)
+* [Skilling Notifications](https://github.com/jodelahithit/runelite-plugins/tree/skilling-notifications)
+* [Easy Blast Furnace](https://github.com/Toofifty/easy-blastfurnace)
+* [Easy Giants Foundry](https://github.com/Toofifty/easy-giantsfoundry)

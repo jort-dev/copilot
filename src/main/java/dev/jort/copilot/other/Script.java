@@ -1,20 +1,23 @@
 package dev.jort.copilot.other;
 
+import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.helpers.*;
-import dev.jort.copilot.overlays.EntityOverlay;
-import dev.jort.copilot.overlays.InfoOverlay;
-import dev.jort.copilot.overlays.NotificationOverlay;
-import dev.jort.copilot.overlays.WidgetOverlay;
+import dev.jort.copilot.overlays.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 
 import javax.inject.Inject;
 
+/*
+Class which all scripts extend to provide them all the helper utilities and a loop function etc.
+ */
 @Slf4j
 public abstract class Script {
 
     @Inject
     public Client client;
+    @Inject
+    public CopilotConfig config;
 
 
     //UTILITIES
@@ -34,6 +37,8 @@ public abstract class Script {
     public Bank bank;
     @Inject
     public Widgets widgets;
+    @Inject
+    public Combat combat;
 
 
     //OVERLAYS
@@ -45,6 +50,8 @@ public abstract class Script {
     public InfoOverlay infoOverlay;
     @Inject
     public WidgetOverlay widgetOverlay;
+    @Inject
+    public CopilotOverlayUtil overlayUtil;
 
 
     //ACTIONS

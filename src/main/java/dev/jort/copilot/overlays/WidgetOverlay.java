@@ -1,7 +1,9 @@
 package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
+import dev.jort.copilot.helpers.Combat;
 import dev.jort.copilot.helpers.Ids;
+import dev.jort.copilot.helpers.Widgets;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
@@ -27,7 +29,7 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
     @Inject
     CopilotOverlayUtil overlayUtil;
 
-    private Widget widgetToHighlight;
+    private Widget[] widgetsToHighlight = new Widget[0];
 
     private int[] itemIdsToHighlight;
 
@@ -39,34 +41,35 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
 
     public WidgetOverlay() {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
-        setLayer(OverlayLayer.ALWAYS_ON_TOP); // otherwise drawn widgets are not shown
-        setPriority(OverlayPriority.HIGH); // probably also needed for same reason
+        setLayer(OverlayLayer.ABOVE_WIDGETS); // otherwise drawn widgets are not shown
+        setPriority(OverlayPriority.MED);
     }
+
 
     @Override
     public Dimension render(Graphics2D graphics) {
         if (!enabled) {
             return null;
         }
-        renderWidget(graphics);
+        renderWidgets(graphics);
         renderItem(graphics);
         return null;
     }
 
-    private boolean containerWidgetValid(Widget widget){
+    private boolean containerWidgetValid(Widget widget) {
         return widget != null && !widget.isHidden();
     }
 
     public Widget getContainerWidget() {
-        if (highlightInventoryContainer){
+        if (highlightInventoryContainer) {
             Widget inventoryContainerWidget = client.getWidget(WidgetInfo.INVENTORY);
             if (!containerWidgetValid(inventoryContainerWidget)) {
                 inventoryContainerWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
             }
-            if(!containerWidgetValid(inventoryContainerWidget)){
+            if (!containerWidgetValid(inventoryContainerWidget)) {
                 inventoryContainerWidget = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
             }
-            if(!containerWidgetValid(inventoryContainerWidget)){
+            if (!containerWidgetValid(inventoryContainerWidget)) {
                 inventoryContainerWidget = client.getWidget(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER);
             }
             return inventoryContainerWidget; // may be null
@@ -80,7 +83,7 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
             return;
         }
         Widget containerWidget = getContainerWidget();
-        if (containerWidget == null){
+        if (containerWidget == null) {
             return;
         }
 
@@ -101,22 +104,27 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
     }
 
 
-    private void renderWidget(Graphics2D graphics) {
-        if (widgetToHighlight == null) {
+    private void renderWidgets(Graphics2D graphics) {
+        if (widgetsToHighlight == null) {
             return;
         }
-        if (widgetToHighlight.isHidden()) {
-            return;
+        for (Widget widget : widgetsToHighlight) {
+            if (widget == null) {
+                continue;
+            }
+            if (widget.isHidden()) {
+                continue;
+            }
+            overlayUtil.highlightShape(graphics, widget.getBounds());
         }
-        overlayUtil.highlightShape(graphics, widgetToHighlight.getBounds());
     }
 
-    public void setWidgetToHighlight(Widget widgetToHighlight) {
-        this.widgetToHighlight = widgetToHighlight;
+    public void setWidgetsToHighlight(Widget... widgetsToHighlight) {
+        this.widgetsToHighlight = widgetsToHighlight;
     }
 
     public void clearHighlightedWidgets() {
-        widgetToHighlight = null;
+        widgetsToHighlight = new Widget[0];
     }
 
     public void setItemIdsToHighlight(int... itemIdsToHighlight) {

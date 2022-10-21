@@ -16,16 +16,11 @@ public class FishingBarbarian extends Script {
     public void handleAction() {
         if (tracker.isAnimating()) {
             action = waitAction;
-            widgetOverlay.clear();
-            entityOverlay.clear();
             return;
         }
 
         //if only cooked fish in inventory, drop
         if (inventory.containsAny(ids.COOKED_FISH_IDS) && !inventory.containsAny(ids.RAW_FISH_IDS)) {
-            entityOverlay.clear();
-            widgetOverlay.setItemIdsToHighlight(ids.COOKED_FISH_IDS);
-            widgetOverlay.setHighlightOneItemOnly(false);
             action = new IdHolder()
                     .setName("Drop fish")
                     .setItemIds(ids.COOKED_FISH_IDS);
@@ -36,13 +31,11 @@ public class FishingBarbarian extends Script {
         if (inventory.isFull()) {
             //if cooking widget is visible, click it
             if (widgets.isMakeWidgetVisible()) {
-                entityOverlay.clear();
                 Widget widgetToHighlight = widgets.getMakeWidget();
                 if (widgetToHighlight != null) {
                     action = new IdHolder()
-                            .setName("Cook fish")
-                            .setWidgetIds(widgetToHighlight.getId());
-                    widgetOverlay.setWidgetToHighlight(widgetToHighlight);
+                            .setName("Cook fish - space")
+                            .setWidgets(widgetToHighlight);
                 }
                 return;
             }
@@ -51,8 +44,6 @@ public class FishingBarbarian extends Script {
             action = new IdHolder()
                     .setName("Click fire")
                     .setObjectIds(ids.BARBARIAN_FIRE);
-            widgetOverlay.clear();
-            entityOverlay.setGameObjectIdsToHighlight(ids.BARBARIAN_FIRE);
             return;
         }
 
@@ -62,8 +53,6 @@ public class FishingBarbarian extends Script {
                 .setObjectIds(ids.ROD_FISHING_SPOT_IDS)
                 .setActions("Lure");
 
-        widgetOverlay.clear();
-        entityOverlay.setNpcIdsToHighlight(ids.ROD_FISHING_SPOT_IDS);
         entityOverlay.setOnlyHighlightClosest(true);
     }
 

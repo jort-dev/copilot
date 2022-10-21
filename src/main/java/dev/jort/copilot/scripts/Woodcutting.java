@@ -1,11 +1,13 @@
 package dev.jort.copilot.scripts;
 
+import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.other.IdHolder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.events.MenuOptionClicked;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,20 +17,28 @@ import java.util.List;
 public class Woodcutting extends ResourceBankScript {
 
     List<IdHolder> idHolders = new ArrayList<>();
+    @Inject
+    CopilotConfig config;
 
-    public void initialize() {
+    @Override
+    public void onStart() {
+        IdHolder willowResource = new IdHolder("WILLOW", "WILLOW_TREE").setItemIds(ItemID.WILLOW_LOGS);
         idHolders.add(new IdHolder("TREE", "EVERGREEN", "DEAD_TREE").setItemIds(ItemID.LOGS));
         idHolders.add(new IdHolder("OAK").setItemIds(ItemID.OAK_LOGS));
-        idHolders.add(new IdHolder("WILLOW").setItemIds(ItemID.WILLOW_LOGS));
-        idHolders.add(new IdHolder("MAPLE").setItemIds(ItemID.MAPLE_LOGS));
-        idHolders.add(new IdHolder("YEW").setItemIds(ItemID.YEW_LOGS));
-        idHolders.add(new IdHolder("MAGIC").setItemIds(ItemID.MAGIC_LOGS));
+        idHolders.add(willowResource);
+        idHolders.add(new IdHolder("MAPLE_TREE").setItemIds(ItemID.MAPLE_LOGS));
+        idHolders.add(new IdHolder("YEW", "YEW_TREE").setItemIds(ItemID.YEW_LOGS));
+        idHolders.add(new IdHolder( "MAGIC_TREE").setItemIds(ItemID.MAGIC_LOGS));
         idHolders.add(new IdHolder("REDWOOD").setItemIds(ItemID.REDWOOD_LOGS));
         idHolders.add(new IdHolder("TEAK").setItemIds(ItemID.TEAK_LOGS));
         idHolders.add(new IdHolder("MAHOGANY").setItemIds(ItemID.MAHOGANY_LOGS));
+        setResources(willowResource); //default
     }
 
     public void onMenuOptionClicked(MenuOptionClicked event) {
+        if(!config.woodcutting()){
+            return;
+        }
         if (!event.getMenuOption().equals("Chop down")) {
             return;
         }
