@@ -66,7 +66,8 @@ You could for example set a single very loud alert, or 1000 soft ticks to keep r
 ## Credits
 Plugin developed by [Jort](https://jort.dev).  
 Plugin testers:
-* [Debug1010](https://linktr.ee/01)
+* [Debug1010](https://linktr.ee/01)  
+
 Plugin inspired by the following plugins:
 * [Quest Helper](https://github.com/Zoinkwiz/quest-helper)
 * [Skilling Notifications](https://github.com/jodelahithit/runelite-plugins/tree/skilling-notifications)

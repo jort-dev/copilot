@@ -200,10 +200,11 @@ public class CopilotPlugin extends Plugin {
         if (!client.getGameState().equals(GameState.LOGGED_IN)) {
             return;
         }
-        if(handlePriorityScripts()){
-            return;
+
+        //only run normal scripts when priority scripts are done
+        if(!handlePriorityScripts()){
+            handleRunningScripts();
         }
-        handleRunningScripts();
 
         if(runningScript != null){
             overlayUtil.handleOverlays(runningScript.getAction());

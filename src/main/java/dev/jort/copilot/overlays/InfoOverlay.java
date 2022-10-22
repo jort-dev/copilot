@@ -18,6 +18,7 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.Arrays;
 
 @Slf4j
 @Singleton
@@ -34,6 +35,8 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     Tracker tracker;
     @Inject
     Combat combat;
+    @Inject
+    WidgetOverlay widgetOverlay;
 
     private boolean enabled = true;
 
@@ -66,6 +69,14 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
                 .left(scriptName)
                 .right("Jort's Copilot")
                 .build());
+
+//        if(main.getRunningScript() != null){
+//            panelComponent.getChildren().add(LineComponent.builder()
+//                    .left(Arrays.toString(widgetOverlay.getWidgetsToHighlight()))
+//                    .right(Arrays.toString(main.getRunningScript().getAction().getWidgets()))
+//                    .build());
+//        }
+
         panelComponent.setPreferredSize(new Dimension(200, 100));
 
         return super.render(graphics);

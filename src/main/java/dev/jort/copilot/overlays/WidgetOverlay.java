@@ -123,6 +123,10 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
         this.widgetsToHighlight = widgetsToHighlight;
     }
 
+    public Widget[] getWidgetsToHighlight(){
+        return widgetsToHighlight;
+    }
+
     public void clearHighlightedWidgets() {
         widgetsToHighlight = new Widget[0];
     }

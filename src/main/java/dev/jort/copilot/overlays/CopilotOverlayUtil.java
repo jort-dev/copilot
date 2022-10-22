@@ -10,6 +10,7 @@ import net.runelite.api.Point;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.Arrays;
 
 @Slf4j
 @Singleton
