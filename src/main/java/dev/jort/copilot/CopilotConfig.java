@@ -47,7 +47,7 @@ public interface CopilotConfig extends Config {
     @ConfigItem(
             keyName = "alternativeSoundId",
             name = "Alt alert sound ID",
-            description = "Configures the sound to play when the inventory is full. Set to 0 to disable.",
+            description = "Configures the sound to play when the inventory is full. Set to 0 to copy above sound.",
             section = settingsSection,
             position = 20
     )
@@ -250,6 +250,17 @@ public interface CopilotConfig extends Config {
             position = 90
     )
     default boolean hideWidgets() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "testScript",
+            name = "Test script",
+            description = "Test the script currently in development.",
+            section = testSection,
+            position = 95
+    )
+    default boolean testScript() {
         return false;
     }
 }

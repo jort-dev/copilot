@@ -63,6 +63,8 @@ public class CopilotPlugin extends Plugin {
     Widgets widgets;
     @Inject
     GroundObjects groundObjects;
+    @Inject
+    GiantsFoundry giantsFoundry;
 
 
     //OVERLAYS
@@ -85,6 +87,7 @@ public class CopilotPlugin extends Plugin {
     @Inject
     SpecialAttack specialAttack;
 
+
     //SCRIPTS
     @Inject
     FishingBarbarian fishingBarbarian;
@@ -94,9 +97,11 @@ public class CopilotPlugin extends Plugin {
     Crafting crafting;
     @Inject
     Inactivity inactivity;
+    @Inject
+    GiantsFoundryHelper giantsFoundryHelper;
 
 
-    Script runningScript = null;
+    Script currentRunningScript = null;
 
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
@@ -133,6 +138,32 @@ public class CopilotPlugin extends Plugin {
 
 
     //API SUBSCRIPTIONS (only work in this class)
+
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        tracker.onGameTick(event);
+        if (!client.getGameState().equals(GameState.LOGGED_IN)) {
+            return;
+        }
+
+        if(config.testScript()){
+            giantsFoundryHelper.loop();
+            currentRunningScript = giantsFoundryHelper;
+            return;
+        }
+
+
+
+        //only run normal scripts when priority scripts are done
+        if (!handlePriorityScripts()) {
+            handleRunningScripts();
+        }
+
+        if (currentRunningScript != null) {
+            overlayUtil.handleOverlays(currentRunningScript.getAction());
+        }
+    }
+
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged event) {
@@ -195,23 +226,6 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onGameTick(GameTick event) {
-        tracker.onGameTick(event);
-        if (!client.getGameState().equals(GameState.LOGGED_IN)) {
-            return;
-        }
-
-        //only run normal scripts when priority scripts are done
-        if(!handlePriorityScripts()){
-            handleRunningScripts();
-        }
-
-        if(runningScript != null){
-            overlayUtil.handleOverlays(runningScript.getAction());
-        }
-    }
-
-    @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
         tracker.onMenuOptionClicked(event);
         woodcutting.onMenuOptionClicked(event);
@@ -243,33 +257,32 @@ public class CopilotPlugin extends Plugin {
     //SCRIPT HANDLERS
 
     /**
-     *
      * @return True if it needs to be called again.
      */
-    public boolean handlePriorityScripts(){
-        if(config.specialAttackAlert()){
-            if(specialAttack.needsToRun()){
+    public boolean handlePriorityScripts() {
+        if (config.specialAttackAlert()) {
+            if (specialAttack.needsToRun()) {
                 specialAttack.loop();
-                runningScript = specialAttack;
+                currentRunningScript = specialAttack;
                 return true;
             }
         }
         return false;
     }
 
-    public void handleRunningScripts(){
+    public void handleRunningScripts() {
         if (config.woodcutting()) {
             woodcutting.loop();
-            runningScript = woodcutting;
+            currentRunningScript = woodcutting;
         } else if (config.fishingBarbarian()) {
             fishingBarbarian.loop();
-            runningScript = fishingBarbarian;
+            currentRunningScript = fishingBarbarian;
         } else if (config.crafting()) {
             crafting.loop();
-            runningScript = crafting;
+            currentRunningScript = crafting;
         } else if (config.inactivityAlert()) {
             inactivity.loop();
-            runningScript = inactivity;
+            currentRunningScript = inactivity;
         } else {
             setOverlaysEnabled(false);
         }
@@ -284,8 +297,8 @@ public class CopilotPlugin extends Plugin {
     }
 
 
-    public Script getRunningScript() {
-        return runningScript;
+    public Script getCurrentRunningScript() {
+        return currentRunningScript;
     }
 
 }

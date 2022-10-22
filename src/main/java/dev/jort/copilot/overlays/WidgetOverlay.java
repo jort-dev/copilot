@@ -42,7 +42,7 @@ public class WidgetOverlay extends Overlay implements CopilotOverlay {
     public WidgetOverlay() {
         setPosition(OverlayPosition.DYNAMIC); // prevent renders being shifted
         setLayer(OverlayLayer.ABOVE_WIDGETS); // otherwise drawn widgets are not shown
-        setPriority(OverlayPriority.MED);
+        setPriority(OverlayPriority.HIGH);
     }
 
 
