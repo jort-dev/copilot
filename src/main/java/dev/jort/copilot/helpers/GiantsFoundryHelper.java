@@ -4,25 +4,50 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameObject;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.ui.ColorScheme;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /*
 When heat in range:
 - alert when almost out of range and highlight
+
+827 - heating
+832 - cooling
+
+9455 - hammering
+9453 - hammering init
+
+9454 - polishing
+9452 - polishing init
+
+9454 - grinding
+9452 - grinding init
+
+heat left max:
+grinding: 17
+polishing heat left max =
+
+
+
  */
 @Slf4j
 @Singleton
-public class GiantsFoundry {
+public class GiantsFoundryHelper {
 
     @Inject
     Client client;
+
+    @Inject
+    Tracker tracker;
+
+    @Inject
+    GameObjects gameObjects;
 
     private final List<Stage> stages = new ArrayList<>();
 
@@ -59,6 +84,112 @@ public class GiantsFoundry {
         }
 
         return Heat.NONE;
+
+    }
+
+
+    /*
+    827 - heating
+    832 - cooling
+
+    9455 - hammering
+    9453 - hammering init
+
+    9454 - polishing
+    9452 - polishing init
+
+    9454 - grinding
+    9452 - grinding init
+     */
+    public enum Activity {
+        HEATING,
+        COOLING,
+        HAMMERING,
+        POLISHING,
+        GRINDING,
+        NONE
+    }
+
+    public Activity getOperatingTool() {
+        if (!tracker.isAnimating()) {
+            return Activity.NONE;
+        }
+        int anim = tracker.getLastAnimationId();
+        if (anim == 827){
+            return Activity.HEATING;
+        }
+        if(anim == 832){
+            return Activity.COOLING;
+        }
+        if(anim == 9455 || anim ==9453){
+            return Activity.HAMMERING;
+        }
+        if(anim != 9454 && anim != 9452){
+            return Activity.NONE;
+        }
+        GameObject polishWheel = gameObjects.closest(POLISHING_WHEEL);
+        GameObject grindingWheel = gameObjects.closest(GRINDSTONE);
+        if(polishWheel == null || grindingWheel== null){
+            log.info("Cannot find objects.");
+            return Activity.NONE;
+        }
+
+        WorldPoint myLocation = client.getLocalPlayer().getWorldLocation();
+        double polishWheelDistance = myLocation.distanceTo(polishWheel.getWorldLocation());
+        double grindingWheelDistance = myLocation.distanceTo(grindingWheel.getWorldLocation());
+        if (polishWheelDistance < grindingWheelDistance){
+            return Activity.POLISHING;
+        }
+        return Activity.GRINDING;
+    }
+
+    public enum Action {
+        USE_MACHINE_TO_LOWER,
+        USE_MACHINE_TO_UPPER,
+        WARM_TO_UPPER,
+        WARM_TO_LOWER,
+        COOL_TO_UPPER,
+        COOL_TO_LOWER,
+        UNKNOWN
+    }
+
+    public Action determineAction() {
+        int heat = getHeatAmount();
+
+        Stage stage = getCurrentStage();
+        switch (stage) {
+            case TRIP_HAMMER: {
+                int[] high = getHighHeatRange();
+                if (heat < high[0]) {
+                    return Action.WARM_TO_UPPER;
+                }
+                if (heat > high[1]) {
+                    return Action.COOL_TO_UPPER;
+                }
+                return Action.USE_MACHINE_TO_LOWER;
+            }
+            case GRINDSTONE: {
+                int[] med = getMedHeatRange();
+                if (heat < med[0]) {
+                    return Action.WARM_TO_LOWER;
+                }
+                if (heat > med[1]) {
+                    return Action.COOL_TO_LOWER;
+                }
+                return Action.USE_MACHINE_TO_UPPER;
+            }
+            case POLISHING_WHEEL: {
+                int[] low = getLowHeatRange();
+                if (heat < low[0]) {
+                    return Action.WARM_TO_UPPER;
+                }
+                if (heat > low[1]) {
+                    return Action.COOL_TO_UPPER;
+                }
+                return Action.USE_MACHINE_TO_LOWER;
+            }
+        }
+        return Action.UNKNOWN;
     }
 
     public int getHeatAmount() {
@@ -152,16 +283,15 @@ public class GiantsFoundry {
 
         return stages;
     }
-    public int getHeatLeft(){
+
+    public int getHeatLeft() {
         return getActionsForHeatLevel();
     }
 
-    public int getActionsForHeatLevel()
-    {
+    public int getActionsForHeatLevel() {
         Heat heatStage = getCurrentHeat();
         Stage stage = getCurrentStage();
-        if (heatStage != stage.getHeat())
-        {
+        if (heatStage != stage.getHeat()) {
             // not the right heat to start with
             return 0;
         }
@@ -169,8 +299,7 @@ public class GiantsFoundry {
         int[] range = getCurrentHeatRange();
         int actions = 0;
         int heat = getHeatAmount();
-        while (heat > range[0] && heat < range[1])
-        {
+        while (heat > range[0] && heat < range[1]) {
             actions++;
             heat += stage.getHeatChange();
         }
@@ -178,10 +307,8 @@ public class GiantsFoundry {
         return actions;
     }
 
-    public int[] getCurrentHeatRange()
-    {
-        switch (getCurrentStage())
-        {
+    public int[] getCurrentHeatRange() {
+        switch (getCurrentStage()) {
             case POLISHING_WHEEL:
                 return getLowHeatRange();
             case GRINDSTONE:
@@ -195,8 +322,7 @@ public class GiantsFoundry {
 
     @Getter
     @AllArgsConstructor
-    public enum Heat
-    {
+    public enum Heat {
         LOW("Low"),
         MED("Medium"),
         HIGH("High"),
@@ -207,13 +333,13 @@ public class GiantsFoundry {
 
     @Getter
     @AllArgsConstructor
-    public enum Stage
-    {
+    public enum Stage {
 
 
-        TRIP_HAMMER("Hammer", Heat.HIGH, 20, -25, GiantsFoundry.TRIP_HAMMER),
-        GRINDSTONE("Grind", Heat.MED, 10, 15, GiantsFoundry.GRINDSTONE),
-        POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundry.POLISHING_WHEEL);
+        TRIP_HAMMER("Hammer", Heat.HIGH, 20, -25, GiantsFoundryHelper.TRIP_HAMMER),
+        GRINDSTONE("Grind", Heat.MED, 10, 15, GiantsFoundryHelper.GRINDSTONE),
+        POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundryHelper.POLISHING_WHEEL);
+//        NONE("None", Heat.NONE, -1, -1, -1);
 
 
         private final String name;
@@ -221,5 +347,5 @@ public class GiantsFoundry {
         private final int progressPerAction;
         private final int heatChange;
         private final int objectId;
-    }
+        }
 }

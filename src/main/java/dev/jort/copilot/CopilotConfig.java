@@ -124,7 +124,7 @@ public interface CopilotConfig extends Config {
     }
 
     @ConfigSection(
-            name = "Activities",
+            name = "Activities - fully guided",
             description = "Set which activity you want assistance with. Only one selected item works.",
             position = 50
     )
@@ -169,7 +169,7 @@ public interface CopilotConfig extends Config {
             name = "Exact tool name",
             description = "Enter the exact name of the tool you are using, for example 'knife' or 'glassblowing pipe'. Case insensitive.",
             section = activitiesSection,
-            position = 66
+            position = 70
     )
     default String craftingToolName() {
         return "Glassblowing pipe";
@@ -180,7 +180,7 @@ public interface CopilotConfig extends Config {
             name = "Exact resource name",
             description = "Enter the exact name of the resource you are using, for example 'molten glass' or 'yew logs'. Case insensitive.",
             section = activitiesSection,
-            position = 67
+            position = 75
     )
     default String craftingResourceName() {
         return "Molten glass";
@@ -191,29 +191,71 @@ public interface CopilotConfig extends Config {
             name = "Exact product name",
             description = "Enter the exact name of the product you are creating, for example 'yew longbow(u)' or 'lantern lens'. Case insensitive.",
             section = activitiesSection,
-            position = 68
+            position = 80
     )
     default String craftingProductName() {
         return "Lantern lens";
     }
 
+    @ConfigSection(
+            name = "Activities - partially guided",
+            description = "Set which activity you want assistance with. Only one selected item works.",
+            position = 85
+    )
+    String partialActivitiesSection = "Partial activities";
 
+
+
+    @ConfigItem(
+            keyName = "giantsFoundry",
+            name = "Giants foundry",
+            description = "Shows you the next thing to click and alerts you when to in the Giants Foundry.",
+            section = partialActivitiesSection,
+            position = 90
+    )
+    default boolean giantsFoundry() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "giantsFoundryToolBuffer",
+            name = "Tool buffer",
+            description = "How many heat or actions should be left before you are alerted to click.",
+            section = partialActivitiesSection,
+            position = 94
+    )
+    default int giantsFoundryToolBuffer() {
+        return 1;
+    }
+
+    @ConfigItem(
+            keyName = "giantsFoundryToolBuffer",
+            name = "Temperature buffer",
+            description = "How many heat should be left whilst changing the temperature before you are alerted to click.",
+            section = partialActivitiesSection,
+            position = 97
+    )
+    default int giantsFoundryTemperatureBuffer() {
+        return 1;
+    }
 
     @ConfigItem(
             keyName = "inactivityAlert",
             name = "General inactivity alert",
             description = "For unimplemented features you can't find above. Alerts you when you have not animated or moved within the set time, but does not show you what to click.",
-            section = activitiesSection,
-            position = 70
+            section = partialActivitiesSection,
+            position = 100
     )
     default boolean inactivityAlert() {
         return false;
     }
 
+
+
     @ConfigSection(
             name = "Test features",
             description = "Testing features. Multiple selections possible.",
-            position = 75
+            position = 105
     )
     String testSection = "Test features";
 
@@ -222,7 +264,7 @@ public interface CopilotConfig extends Config {
             name = "Bogged",
             description = "Dump it.",
             section = testSection,
-            position = 80
+            position = 110
 
     )
     default boolean bogged() {
@@ -234,7 +276,7 @@ public interface CopilotConfig extends Config {
             name = "Test sound",
             description = "Test sounds by typing the ID in chat.",
             section = testSection,
-            position = 85
+            position = 120
 
     )
     default boolean testSounds() {
@@ -247,7 +289,7 @@ public interface CopilotConfig extends Config {
             name = "Hide interface when possible (BREAKS STUFF)",
             description = "Hides all the widgets like the inventory, bank and chatbox when you need to click on an entity, like a tree or monster.",
             section = testSection,
-            position = 90
+            position = 130
     )
     default boolean hideWidgets() {
         return false;
@@ -258,7 +300,7 @@ public interface CopilotConfig extends Config {
             name = "Test script",
             description = "Test the script currently in development.",
             section = testSection,
-            position = 95
+            position = 140
     )
     default boolean testScript() {
         return false;

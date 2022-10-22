@@ -26,6 +26,8 @@ public class Tracker {
     //animation
     private long lastAnimationTime = 0;
 
+    private int lastAnimationId = -2;
+
     //walking
     private long lastWalkingTime = 0;
     private LocalPoint lastPlayerLocation;
@@ -42,6 +44,7 @@ public class Tracker {
     private boolean isAnimatingNow() {
         return getAnimation() > -1;
     }
+
 
     public boolean hasAnimated(int ms) {
         //return true if we have animated the last X ms
@@ -78,6 +81,7 @@ public class Tracker {
     public void onGameTick(GameTick ignored) {
         if (isAnimatingNow()) {
             lastAnimationTime = System.currentTimeMillis();
+            lastAnimationId = getAnimation();
         }
 
         Player player = client.getLocalPlayer();
@@ -164,6 +168,11 @@ public class Tracker {
     public boolean hasRecentlyClicked(int ms) {
         return client.getMouseLastPressedMillis() + ms > System.currentTimeMillis();
     }
+
+    public int getLastAnimationId() {
+        return lastAnimationId;
+    }
+
 
 
 }

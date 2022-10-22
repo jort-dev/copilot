@@ -64,7 +64,7 @@ public class CopilotPlugin extends Plugin {
     @Inject
     GroundObjects groundObjects;
     @Inject
-    GiantsFoundry giantsFoundry;
+    GiantsFoundryHelper giantsFoundryHelper;
 
 
     //OVERLAYS
@@ -98,7 +98,7 @@ public class CopilotPlugin extends Plugin {
     @Inject
     Inactivity inactivity;
     @Inject
-    GiantsFoundryHelper giantsFoundryHelper;
+    GiantsFoundry giantsFoundry;
 
 
     Script currentRunningScript = null;
@@ -146,12 +146,12 @@ public class CopilotPlugin extends Plugin {
             return;
         }
 
-        if(config.testScript()){
-            giantsFoundryHelper.loop();
-            currentRunningScript = giantsFoundryHelper;
+        if (config.testScript()) {
+            giantsFoundry.loop();
+            currentRunningScript = giantsFoundry;
+            overlayUtil.handleOverlays(currentRunningScript.getAction());
             return;
         }
-
 
 
         //only run normal scripts when priority scripts are done
@@ -280,6 +280,9 @@ public class CopilotPlugin extends Plugin {
         } else if (config.crafting()) {
             crafting.loop();
             currentRunningScript = crafting;
+        } else if (config.giantsFoundry()) {
+            giantsFoundry.loop();
+            currentRunningScript = giantsFoundry;
         } else if (config.inactivityAlert()) {
             inactivity.loop();
             currentRunningScript = inactivity;

@@ -1,6 +1,6 @@
 package dev.jort.copilot.scripts.easygiantsfoundry.enums;
 
-import dev.jort.copilot.helpers.GiantsFoundry;
+import dev.jort.copilot.helpers.GiantsFoundryHelper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,9 +10,9 @@ public enum Stage
 {
 
 
-	TRIP_HAMMER("Hammer", Heat.HIGH, 20, -25, GiantsFoundry.TRIP_HAMMER),
-	GRINDSTONE("Grind", Heat.MED, 10, 15, GiantsFoundry.GRINDSTONE),
-	POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundry.POLISHING_WHEEL);
+	TRIP_HAMMER("Hammer", Heat.HIGH, 20, -25, GiantsFoundryHelper.TRIP_HAMMER),
+	GRINDSTONE("Grind", Heat.MED, 10, 15, GiantsFoundryHelper.GRINDSTONE),
+	POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundryHelper.POLISHING_WHEEL);
 
 
 	private final String name;

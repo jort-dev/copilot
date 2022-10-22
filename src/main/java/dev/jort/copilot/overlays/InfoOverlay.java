@@ -1,8 +1,9 @@
 package dev.jort.copilot.overlays;
 
+import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.CopilotPlugin;
 import dev.jort.copilot.helpers.Combat;
-import dev.jort.copilot.helpers.GiantsFoundry;
+import dev.jort.copilot.helpers.GiantsFoundryHelper;
 import dev.jort.copilot.helpers.Tracker;
 import dev.jort.copilot.helpers.Widgets;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.Arrays;
 
 @Slf4j
 @Singleton
@@ -28,6 +30,9 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     CopilotPlugin main;
 
     @Inject
+    CopilotConfig config;
+
+    @Inject
     Widgets widgets;
     @Inject
     Tracker tracker;
@@ -37,7 +42,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     WidgetOverlay widgetOverlay;
 
     @Inject
-    GiantsFoundry giantsFoundry;
+    GiantsFoundryHelper giantsFoundryHelper;
 
     private boolean enabled = true;
 
@@ -55,53 +60,71 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         if (!enabled) {
             return null;
         }
-        String step = "Step";
-        String scriptName = "Script";
-        if (main.getCurrentRunningScript() != null) {
-            step = main.getCurrentRunningScript().getAction().getName();
-            scriptName = main.getCurrentRunningScript().getClass().getSimpleName();
-        }
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left(step)
-                .leftFont(FontManager.getRunescapeBoldFont())
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-//                .left(scriptName)
-                .left(scriptName + "  -  Jort's Copilot")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Heat")
-                .right(giantsFoundry.getCurrentHeat().getName() + " (=" + giantsFoundry.getHeatAmount() + ")")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Actions left")
-                .right(giantsFoundry.getActionsLeftInStage() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Heat left")
-                .right(giantsFoundry.getHeatLeft() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Stage")
-                .right(giantsFoundry.getCurrentStage().getName() + "")
-                .build());
-
-
-//        if(main.getRunningScript() != null){
-//            panelComponent.getChildren().add(LineComponent.builder()
-//                    .left(Arrays.toString(widgetOverlay.getWidgetsToHighlight()))
-//                    .right(Arrays.toString(main.getRunningScript().getAction().getWidgets()))
-//                    .build());
-//        }
-
+        renderScriptText();
+        renderGiantsFoundryText();
         panelComponent.setPreferredSize(new Dimension(200, 100));
+        return null;
+    }
 
-        return super.render(graphics);
+    public void renderScriptText() {
+        if (main.getCurrentRunningScript() == null) {
+            return;
+        }
+
+        String step = main.getCurrentRunningScript().getAction().getName();
+        String scriptName = main.getCurrentRunningScript().getClass().getSimpleName();
+        panelComponent.getChildren().add(LineComponent.builder()
+                .right(step)
+                .rightFont(FontManager.getRunescapeBoldFont())
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Jort's Copilot")
+                .right(scriptName)
+                .build());
+
+
+    }
+
+    public void renderGiantsFoundryText() {
+        if (!config.giantsFoundry()) {
+            return;
+        }
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Heat:")
+                .right(giantsFoundryHelper.getCurrentHeat().getName() + " (" + giantsFoundryHelper.getHeatAmount() + ")")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Actions left:")
+                .right(giantsFoundryHelper.getActionsLeftInStage() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Heat left:")
+                .right(giantsFoundryHelper.getHeatLeft() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Tool to use:")
+                .right(giantsFoundryHelper.getCurrentStage().getName() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Should be busy with: ")
+                .right(giantsFoundryHelper.determineAction().name() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Busy with:")
+                .right(giantsFoundryHelper.getOperatingTool().name() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Animation:")
+                .right(tracker.getAnimation() + "")
+                .build());
     }
 
     @Override
