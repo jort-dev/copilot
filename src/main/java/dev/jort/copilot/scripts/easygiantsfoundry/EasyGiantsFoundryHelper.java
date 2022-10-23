@@ -20,6 +20,7 @@ public class EasyGiantsFoundryHelper
 	private static final int DUNK_LAVA_HEAT = 32;
 	private static final int QUENCH_WATERFALL_HEAT = -32;
 
+
 	@Inject
 	private EasyGiantsFoundryState state;
 
@@ -82,4 +83,5 @@ public class EasyGiantsFoundryHelper
 
 		return actions;
 	}
+
 }

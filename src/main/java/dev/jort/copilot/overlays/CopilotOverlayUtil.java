@@ -10,7 +10,6 @@ import net.runelite.api.Point;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.Arrays;
 
 @Slf4j
 @Singleton
@@ -71,7 +70,7 @@ public class CopilotOverlayUtil {
         widgetOverlay.setItemIdsToHighlight(action.getItemIds());
         entityOverlay.clear();
         entityOverlay.setNpcIdsToHighlight(action.getNpcIds());
-        entityOverlay.setGameObjectIdsToHighlight(action.getObjectIds());
+        entityOverlay.setGameObjectIdsToHighlight(action.getGameObjectIds());
 
         if (config.hideWidgets()) {
             boolean areWidgetsRendered = action.getItemIds().length > 0 || action.getWidgets().length > 0;

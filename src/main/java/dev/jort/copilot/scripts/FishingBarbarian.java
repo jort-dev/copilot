@@ -43,14 +43,14 @@ public class FishingBarbarian extends Script {
             //else click the fire to summon it
             action = new IdHolder()
                     .setName("Click fire")
-                    .setObjectIds(ids.BARBARIAN_FIRE);
+                    .setGameObjectIds(ids.BARBARIAN_FIRE);
             return;
         }
 
         //click fishing spot
         action = new IdHolder()
                 .setName("Click fishing spot")
-                .setObjectIds(ids.ROD_FISHING_SPOT_IDS)
+                .setGameObjectIds(ids.ROD_FISHING_SPOT_IDS)
                 .setActions("Lure");
 
         entityOverlay.setOnlyHighlightClosest(true);

@@ -23,18 +23,19 @@ public class IdHolder {
 
     private String name = "NoName";
     private int[] npcIds = new int[0];
-    private int[] objectIds = new int[0];
+    private int[] gameObjectIds = new int[0];
+    private int[] secondaryGameObjectIds = new int[0];
     private int[] itemIds = new int[0];
     private Widget[] widgets = new Widget[0];
     private String[] actions = new String[0];
 
     public IdHolder(String... contains) {
-        setObjectIds(Ids.determineIds(ObjectID.class, contains));
+        setGameObjectIds(Ids.determineIds(ObjectID.class, contains));
         setName(Util.capitalize(contains[0].toLowerCase()));
     }
 
     public boolean matchId(int id) {
-        return matchId(id, npcIds) || matchId(id, objectIds) || matchId(id, itemIds) || matchId(id, widgets);
+        return matchId(id, npcIds) || matchId(id, gameObjectIds) || matchId(id, secondaryGameObjectIds) || matchId(id, itemIds) || matchId(id, widgets);
     }
 
     public boolean matchAction(String action) {
@@ -51,14 +52,14 @@ public class IdHolder {
     }
 
     private boolean matchId(int idToMatch, Widget... widgets) {
-        if(widgets == null){
+        if (widgets == null) {
             return false;
         }
-        for(Widget widget : widgets){
-            if(widget == null){
+        for (Widget widget : widgets) {
+            if (widget == null) {
                 continue;
             }
-            if(widget.getId() != idToMatch){
+            if (widget.getId() != idToMatch) {
                 continue;
             }
             return true;
@@ -78,8 +79,13 @@ public class IdHolder {
         return this;
     }
 
-    public IdHolder setObjectIds(int... objectIds) {
-        this.objectIds = objectIds;
+    public IdHolder setGameObjectIds(int... gameObjectIds) {
+        this.gameObjectIds = gameObjectIds;
+        return this;
+    }
+
+    public IdHolder setSecondaryGameObjectIds(int... gameObjectIds) {
+        this.secondaryGameObjectIds = gameObjectIds;
         return this;
     }
 

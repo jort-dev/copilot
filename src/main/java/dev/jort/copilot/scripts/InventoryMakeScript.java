@@ -78,7 +78,7 @@ public class InventoryMakeScript extends Script {
         if (!inventory.containsAll(toolAndResourceIds)) {
             action = new IdHolder()
                     .setName("Open bank")
-                    .setObjectIds(ids.BANK_OBJECT_IDS);
+                    .setGameObjectIds(ids.BANK_OBJECT_IDS);
             return;
         }
 

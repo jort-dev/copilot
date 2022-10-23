@@ -24,11 +24,11 @@ public class ResourceBankScript extends Script {
      */
     public void setResources(IdHolder resources) {
         this.resourceItemIds = resources.getItemIds();
-        this.resourceObjectIds = resources.getObjectIds();
+        this.resourceObjectIds = resources.getGameObjectIds();
 
         clickResourceAction = new IdHolder()
                 .setName("Click resource")
-                .setObjectIds(resourceObjectIds);
+                .setGameObjectIds(resourceObjectIds);
         log.info("Initialized " + resources.getName());
     }
 
@@ -63,7 +63,7 @@ public class ResourceBankScript extends Script {
             action = new IdHolder()
                     .setName("Open bank")
                     //dont highlight banker npcs, pathing is bad
-                    .setObjectIds(ids.BANK_OBJECT_IDS);
+                    .setGameObjectIds(ids.BANK_OBJECT_IDS);
             entityOverlay.setOnlyHighlightClosest(false);
             return action;
         }

@@ -40,6 +40,8 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     private int[] gameObjectIdsToHighlight = new int[0];
 
+    private int[] secondaryGameObjectIdsToHighlight = new int[0];
+
 
     private int[] npcIdsToHighlight = new int[0];
 
@@ -88,12 +90,18 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         }
         if (onlyHighlightClosest) {
             highlightTileObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
+            highlightTileObject(graphics, gameObjects.closest(secondaryGameObjectIdsToHighlight));
             highlightActor(graphics, npcs.closest(npcIdsToHighlight));
             return null;
 
         }
 
         List<GameObject> gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), gameObjectIdsToHighlight));
+        for (GameObject gameObject : gameObjectList) {
+            highlightTileObject(graphics, gameObject);
+        }
+
+        gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), secondaryGameObjectIdsToHighlight));
         for (GameObject gameObject : gameObjectList) {
             highlightTileObject(graphics, gameObject);
         }

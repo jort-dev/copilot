@@ -65,6 +65,9 @@ public class GiantsFoundryHelper {
     private static final int SPRITE_ID_GRINDSTONE = 4443;
     private static final int SPRITE_ID_POLISHING_WHEEL = 4444;
 
+    public static final int LAVA_POOL = 44631;
+    public static final int WATERFALL = 44632;
+
     public Heat getCurrentHeat() {
         int heat = getHeatAmount();
 
@@ -110,30 +113,51 @@ public class GiantsFoundryHelper {
         NONE
     }
 
-    public boolean isOperatingMachine(){
-        return getOperatingMachine() != Activity.NONE;
+    public boolean isOperatingMachine() {
+        Activity activity = getActivity();
+        if (activity == Activity.HAMMERING) {
+            return true;
+        }
+        if (activity == Activity.POLISHING) {
+            return true;
+        }
+        if (activity == Activity.GRINDING) {
+            return true;
+        }
+        return false;
     }
 
-    public Activity getOperatingMachine() {
+    public boolean isModifyingTemperature() {
+        Activity activity = getActivity();
+        if (activity == Activity.COOLING) {
+            return true;
+        }
+        if (activity == Activity.HEATING) {
+            return true;
+        }
+        return false;
+    }
+
+    public Activity getActivity() {
         if (!tracker.isAnimating()) {
             return Activity.NONE;
         }
         int anim = tracker.getLastAnimationId();
-        if (anim == 827){
+        if (anim == 827) {
             return Activity.HEATING;
         }
-        if(anim == 832){
+        if (anim == 832) {
             return Activity.COOLING;
         }
-        if(anim == 9455 || anim ==9453){
+        if (anim == 9455 || anim == 9453) {
             return Activity.HAMMERING;
         }
-        if(anim != 9454 && anim != 9452){
+        if (anim != 9454 && anim != 9452) {
             return Activity.NONE;
         }
         GameObject polishWheel = gameObjects.closest(POLISHING_WHEEL);
         GameObject grindingWheel = gameObjects.closest(GRINDSTONE);
-        if(polishWheel == null || grindingWheel== null){
+        if (polishWheel == null || grindingWheel == null) {
             log.info("Cannot find objects.");
             return Activity.NONE;
         }
@@ -141,7 +165,7 @@ public class GiantsFoundryHelper {
         WorldPoint myLocation = client.getLocalPlayer().getWorldLocation();
         double polishWheelDistance = myLocation.distanceTo(polishWheel.getWorldLocation());
         double grindingWheelDistance = myLocation.distanceTo(grindingWheel.getWorldLocation());
-        if (polishWheelDistance < grindingWheelDistance){
+        if (polishWheelDistance < grindingWheelDistance) {
             return Activity.POLISHING;
         }
         return Activity.GRINDING;
@@ -243,6 +267,9 @@ public class GiantsFoundryHelper {
         double progressTillNext = progressPerStage - progress % progressPerStage;
 
         Stage current = getCurrentStage();
+        if (current == null) {
+            return -1;
+        }
         return (int) Math.ceil(progressTillNext / current.getProgressPerAction());
     }
 
@@ -261,6 +288,20 @@ public class GiantsFoundryHelper {
         }
 
         return getStages().get(index);
+    }
+
+    public Stage getNextStage() {
+        List<Stage> stages = getStages();
+        int index = (int) (getProgressAmount() / 1000d * getStages().size());
+        if (index < 0 || index > stages.size() - 1) {
+            return Stage.NONE;
+        }
+
+        if (index > stages.size() - 2) {
+            return Stage.NONE;
+        }
+
+        return getStages().get(index + 1);
     }
 
     public List<Stage> getStages() {
@@ -342,8 +383,8 @@ public class GiantsFoundryHelper {
 
         TRIP_HAMMER("Hammer", Heat.HIGH, 20, -25, GiantsFoundryHelper.TRIP_HAMMER),
         GRINDSTONE("Grind", Heat.MED, 10, 15, GiantsFoundryHelper.GRINDSTONE),
-        POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundryHelper.POLISHING_WHEEL);
-//        NONE("None", Heat.NONE, -1, -1, -1);
+        POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundryHelper.POLISHING_WHEEL),
+        NONE("None", Heat.NONE, -1, -1, -1);
 
 
         private final String name;
@@ -351,5 +392,5 @@ public class GiantsFoundryHelper {
         private final int progressPerAction;
         private final int heatChange;
         private final int objectId;
-        }
+    }
 }

@@ -61,8 +61,8 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         }
         renderScriptText();
         renderGiantsFoundryText();
-        panelComponent.setPreferredSize(new Dimension(200, 100));
-        return null;
+        panelComponent.setPreferredSize(new Dimension(300, 100));
+        return super.render(graphics);
     }
 
     public void renderScriptText() {
@@ -84,6 +84,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
 
 
     }
+
 
     public void renderGiantsFoundryText() {
         if (!config.giantsFoundry()) {
@@ -117,12 +118,31 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Busy with:")
-                .right(giantsFoundryHelper.getOperatingMachine().name() + "")
+                .right(giantsFoundryHelper.getActivity().name() + "")
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Animation:")
                 .right(tracker.getAnimation() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Current stage:")
+                .right(giantsFoundryHelper.getCurrentStage().name() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Next stage:")
+                .right(giantsFoundryHelper.getNextStage().name() + "")
+                .build());
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Using machine:")
+                .right(giantsFoundryHelper.isOperatingMachine() + "")
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Modifying temperature:")
+                .right(giantsFoundryHelper.isModifyingTemperature() + "")
                 .build());
     }
 
