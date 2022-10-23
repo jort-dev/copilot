@@ -110,7 +110,11 @@ public class GiantsFoundryHelper {
         NONE
     }
 
-    public Activity getOperatingTool() {
+    public boolean isOperatingMachine(){
+        return getOperatingMachine() != Activity.NONE;
+    }
+
+    public Activity getOperatingMachine() {
         if (!tracker.isAnimating()) {
             return Activity.NONE;
         }

@@ -8,12 +8,21 @@ import javax.inject.Inject;
 
 public class GiantsFoundry extends Script {
     @Inject
-    GiantsFoundryHelper giantsFoundryHelper;
+    GiantsFoundryHelper gf;
+
+    @Override
+    public void onStart() {
+        action = new IdHolder()
+                .setName("Click tool")
+                .setObjectIds(gf.getCurrentStage().getObjectId());
+
+    }
 
     @Override
     public void onLoop() {
-        action = new IdHolder()
-                .setName("Click tool")
-                .setObjectIds(giantsFoundryHelper.getCurrentStage().getObjectId());
+        if(gf.isOperatingMachine()){
+
+            gf.getHeatLeft();
+        }
     }
 }

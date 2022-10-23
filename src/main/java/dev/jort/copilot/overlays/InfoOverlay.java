@@ -18,7 +18,6 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.Arrays;
 
 @Slf4j
 @Singleton
@@ -118,7 +117,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Busy with:")
-                .right(giantsFoundryHelper.getOperatingTool().name() + "")
+                .right(giantsFoundryHelper.getOperatingMachine().name() + "")
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
