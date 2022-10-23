@@ -14,58 +14,67 @@ public class GiantsFoundry extends Script {
 
     @Override
     public void onLoop() {
+    }
+
+    public void determineHover() {
         if (gf.isOperatingMachine()) {
             //hover next machine if enough actions left
-            if(gf.getHeatLeft() > gf.getActionsLeftInStage() + config.giantsFoundryToolBuffer()){
-                action = new IdHolder()
+            if (gf.getHeatLeft() > gf.getActionsLeftInStage() + config.giantsFoundryToolBuffer()) {
+                action
                         .setName("Hover next machine")
-                        .setGameObjectIds(gf.getNextStage().getObjectId());
+                        .setSecondaryGameObjectIds(gf.getNextStage().getObjectId());
                 return;
             }
 
-            //otherwise hover lava/water
-            if(gf.determineAction() == GiantsFoundryHelper.Action.USE_MACHINE_TO_LOWER){
-                action = new IdHolder()
+            //hover lava if machine is cooling sword down
+            if (gf.determineAction() == GiantsFoundryHelper.Action.USE_MACHINE_TO_LOWER) {
+                action
                         .setName("Hover lava")
-                        .setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
+                        .setSecondaryGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
                 return;
             }
-            if(gf.determineAction() == GiantsFoundryHelper.Action.USE_MACHINE_TO_UPPER){
-                action = new IdHolder()
+
+            //hover water if machine is warming sword
+            if (gf.determineAction() == GiantsFoundryHelper.Action.USE_MACHINE_TO_UPPER) {
+                action
                         .setName("Hover water")
-                        .setGameObjectIds(GiantsFoundryHelper.WATERFALL);
+                        .setSecondaryGameObjectIds(GiantsFoundryHelper.WATERFALL);
                 return;
             }
 
-            log.warn("Unknown state, probably wrong machine!");
-            alert.playAlternativeAlertSound();
+            //if this gets reached, we should stop using  this machine
             return;
         }
 
-        if(gf.isModifyingTemperature()){
-            action = new IdHolder()
+        //hover machine if changing temperature
+        if (gf.isModifyingTemperature()) {
+            action
                     .setName("Hover machine")
-                    .setGameObjectIds(gf.getCurrentStage().getObjectId());
+                    .setSecondaryGameObjectIds(gf.getCurrentStage().getObjectId());
             return;
         }
 
+        //clear hover items
+        action.setSecondaryGameObjectIds();
+    }
 
+    public void determineAction() {
         GiantsFoundryHelper.Action actionNeeded = gf.determineAction();
         String actionString = actionNeeded.name().toLowerCase();
-        if(actionString.contains("machine")){
-            action = new IdHolder()
+        if (actionString.contains("machine")) {
+            action
                     .setName("Click machine")
                     .setGameObjectIds(gf.getCurrentStage().getObjectId());
             return;
         }
-        if(actionString.contains("warm")){
-            action = new IdHolder()
+        if (actionString.contains("warm")) {
+            action
                     .setName("Click lava")
                     .setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
             return;
         }
-        if(actionString.contains("cool")){
-            action = new IdHolder()
+        if (actionString.contains("cool")) {
+            action
                     .setName("Click water")
                     .setGameObjectIds(GiantsFoundryHelper.WATERFALL);
             return;

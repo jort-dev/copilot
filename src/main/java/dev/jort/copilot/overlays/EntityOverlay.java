@@ -68,6 +68,13 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         overlayUtil.highlightShape(graphics, tileObject.getClickbox());
     }
 
+    public void highlightTileObject(Graphics2D graphics, TileObject tileObject, Color color) {
+        if (tileObject == null) {
+            return;
+        }
+        overlayUtil.highlightShape(graphics, tileObject.getClickbox(), color);
+    }
+
     public void highlightActor(Graphics2D graphics, Actor actor) {
         if (actor == null) {
             return;
@@ -103,7 +110,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
         gameObjectList = gameObjects.filter(gameObject -> Util.arrayContains(gameObject.getId(), secondaryGameObjectIdsToHighlight));
         for (GameObject gameObject : gameObjectList) {
-            highlightTileObject(graphics, gameObject);
+            highlightTileObject(graphics, gameObject, config.alternativeHighlightColor());
         }
 
         List<NPC> npcList = npcs.filter(npc -> Util.arrayContains(npc.getId(), npcIdsToHighlight));

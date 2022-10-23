@@ -123,6 +123,18 @@ public interface CopilotConfig extends Config {
         return new Color(0.0f, 1.0f, 1.0f, 0.2f);
     }
 
+    @Alpha
+    @ConfigItem(
+            keyName = "alternativeHighlightColor",
+            name = "Alt highlight color",
+            description = "Set the color of the highlight for alternative items to click, for example the next action.",
+            section = settingsSection,
+            position = 47
+    )
+    default Color alternativeHighlightColor() {
+        return new Color(0.0f, 1.0f, 0.0f, 0.2f);
+    }
+
     @ConfigSection(
             name = "Activities - fully guided",
             description = "Set which activity you want assistance with. Only one selected item works.",
