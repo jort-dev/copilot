@@ -1,7 +1,6 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.helpers.GiantsFoundryHelper;
-import dev.jort.copilot.other.IdHolder;
 import dev.jort.copilot.other.Script;
 import lombok.extern.slf4j.Slf4j;
 

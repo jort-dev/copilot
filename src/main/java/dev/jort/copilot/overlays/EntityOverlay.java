@@ -1,17 +1,23 @@
 package dev.jort.copilot.overlays;
 
+import com.google.common.base.Strings;
 import dev.jort.copilot.CopilotConfig;
+import dev.jort.copilot.dtos.GroundItem;
 import dev.jort.copilot.helpers.GameObjects;
+import dev.jort.copilot.helpers.GroundItems;
 import dev.jort.copilot.helpers.GroundObjects;
 import dev.jort.copilot.helpers.Npcs;
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
+import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
+import net.runelite.client.plugins.groundmarkers.GroundMarkerPlugin;
+import net.runelite.client.ui.overlay.*;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
@@ -30,6 +36,9 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     GroundObjects groundObjects;
 
     @Inject
+    GroundItems groundItems;
+
+    @Inject
     Npcs npcs;
 
     @Inject
@@ -44,6 +53,8 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
 
     private int[] npcIdsToHighlight = new int[0];
+
+    private GroundItem[] groundItemsToHighlight = new GroundItem[0];
 
 
     private boolean onlyHighlightClosest = false;
@@ -85,9 +96,15 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if(config.bogged()){
+        for (GroundItem groundItem : groundItemsToHighlight) {
+            if(groundItem == null){
+                continue;
+            }
+            drawTile(graphics, groundItem.getLocation(), config.highlightColor());
+        }
+        if (config.bogged()) {
             List<GroundObject> pumpIt = groundObjects.filter(groundObject -> groundObject.getId() == 13838);
-            for (GroundObject groundObject : pumpIt){
+            for (GroundObject groundObject : pumpIt) {
                 highlightTileObject(graphics, groundObject);
             }
         }
@@ -121,6 +138,27 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         return null;
     }
 
+    public void drawTile(Graphics2D graphics, WorldPoint point, Color color) {
+        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+
+        if (point.distanceTo(playerLocation) >= 10) {
+            return;
+        }
+
+        LocalPoint lp = LocalPoint.fromWorld(client, point);
+        if (lp == null) {
+            return;
+        }
+
+        Polygon poly = Perspective.getCanvasTilePoly(client, lp);
+        Color lineColor = new Color(color.getRed(), color.getGreen(), color.getBlue());
+        Color fillColor = new Color(0, 0, 0, color.getAlpha());
+        Stroke stroke = new BasicStroke(2.0f);
+        if (poly != null) {
+            OverlayUtil.renderPolygon(graphics, poly, lineColor, fillColor, stroke);
+        }
+    }
+
     public boolean isOnlyHighlightClosest() {
         return onlyHighlightClosest;
     }
@@ -137,6 +175,11 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     public void clear() {
         gameObjectIdsToHighlight = new int[0];
         npcIdsToHighlight = new int[0];
+        secondaryGameObjectIdsToHighlight = new int[0];
+    }
+
+    public void clearGroundItemsToHighlight(){
+        groundItemsToHighlight = new GroundItem[0];
     }
 
     public void setNpcIdsToHighlight(int... npcIdsToHighlight) {
@@ -154,9 +197,17 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         enabled = false;
     }
 
-    public EntityOverlay setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
+    public void setGameObjectIdsToHighlight(int... gameObjectIdsToHighlight) {
         this.gameObjectIdsToHighlight = gameObjectIdsToHighlight;
-        return this;
+    }
+
+
+    public GroundItem[] getGroundItemsToHighlight() {
+        return groundItemsToHighlight;
+    }
+
+    public void setGroundItemsToHighlight(GroundItem... groundItemsToHighlight) {
+        this.groundItemsToHighlight = groundItemsToHighlight;
     }
 
     @Override

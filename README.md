@@ -51,10 +51,14 @@ You could for example set a single very loud alert, or 1000 soft ticks to keep r
 * Enable Esc to close the current interface.
 
 ## Planned features
+* Menu like quest helper
+* Deposit boxes
 * Tempoross
 * Giant's Foundry
-* Special attack reminder
 * Power skilling option
+* Base dim for screen
+* Loot alerter
+* Redwood support
 
 ## Denied features
 * Hide widgets when entity interaction is needed. Denied, because it breaks a lot of scripts. You can't for example check if the bank is open, because the bank widget will be hidden.

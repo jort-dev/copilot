@@ -1,4 +1,4 @@
-package dev.jort.copilot.other;
+package dev.jort.copilot.dtos;
 /*
 Utility for scripts to indicate the IDs to click when alert is active.
 I also use this as a resource set in for example the woodcutting helper.
@@ -6,6 +6,7 @@ I also use this as a resource set in for example the woodcutting helper.
 
 
 import dev.jort.copilot.helpers.Ids;
+import dev.jort.copilot.other.Util;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

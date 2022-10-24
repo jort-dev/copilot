@@ -1,6 +1,6 @@
 package dev.jort.copilot.priority_scripts;
 
-import dev.jort.copilot.other.IdHolder;
+import dev.jort.copilot.dtos.IdHolder;
 import dev.jort.copilot.other.PriorityScript;
 
 import javax.inject.Singleton;
@@ -19,6 +19,7 @@ public class SpecialAttack extends PriorityScript {
         } else {
             action = waitAction;
         }
+        alert.handleAlert(true);
     }
 
     @Override

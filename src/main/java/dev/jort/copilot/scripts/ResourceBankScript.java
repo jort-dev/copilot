@@ -1,6 +1,6 @@
 package dev.jort.copilot.scripts;
 
-import dev.jort.copilot.other.IdHolder;
+import dev.jort.copilot.dtos.IdHolder;
 import dev.jort.copilot.other.Script;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;

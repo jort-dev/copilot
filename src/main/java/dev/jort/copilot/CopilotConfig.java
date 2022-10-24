@@ -78,17 +78,6 @@ public interface CopilotConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "specialAttackAlert",
-            name = "Special attack alert",
-            description = "Alerts when the special attack is charged 100%. Useful for skilling tools made of dragon for example.",
-            section = settingsSection,
-            position = 33
-    )
-    default boolean specialAttackAlert() {
-        return false;
-    }
-
-    @ConfigItem(
             keyName = "useSystemNotification",
             name = "Use system notifications",
             description = "In addition to visual and auditory alerts, also fire system notifications, like most plugins do.",
@@ -134,6 +123,10 @@ public interface CopilotConfig extends Config {
     default Color alternativeHighlightColor() {
         return new Color(0.0f, 1.0f, 0.0f, 0.2f);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     @ConfigSection(
             name = "Activities - fully guided",
@@ -209,13 +202,16 @@ public interface CopilotConfig extends Config {
         return "Lantern lens";
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     @ConfigSection(
             name = "Activities - partially guided",
             description = "Set which activity you want assistance with. Only one selected item works.",
             position = 85
     )
     String partialActivitiesSection = "Partial activities";
-
 
 
     @ConfigItem(
@@ -262,6 +258,52 @@ public interface CopilotConfig extends Config {
         return false;
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @ConfigSection(
+            name = "Activities - additions",
+            description = "These scripts will run before the main running script. Multiple options possible.",
+            position = 101
+    )
+    String priorityScriptsSection = "Priority scripts";
+
+    @ConfigItem(
+            keyName = "specialAttackAlert",
+            name = "Special attack alert",
+            description = "Alerts when the special attack is charged 100%. Useful for skilling tools made of dragon for example.",
+            section = priorityScriptsSection,
+            position = 102
+    )
+    default boolean specialAttackAlert() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "lootAlert",
+            name = "Loot alert",
+            description = "Alerts you when loot is seen on the ground.",
+            section = priorityScriptsSection,
+            position = 103
+    )
+    default boolean lootAlert() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "lootAlertLoot",
+            name = "Loot names",
+            description = "Enter the text the loot should contain, case insensitive, separated by commas.",
+            section = priorityScriptsSection,
+            position = 103
+    )
+    default String lootAlertLoot() {
+        return "bird nest";
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     @ConfigSection(

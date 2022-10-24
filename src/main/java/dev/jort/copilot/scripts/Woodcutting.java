@@ -1,10 +1,9 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.CopilotConfig;
-import dev.jort.copilot.other.IdHolder;
+import dev.jort.copilot.dtos.IdHolder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
 import net.runelite.api.events.MenuOptionClicked;
 
 import javax.inject.Inject;

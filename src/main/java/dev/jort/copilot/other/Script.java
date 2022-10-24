@@ -1,6 +1,7 @@
 package dev.jort.copilot.other;
 
 import dev.jort.copilot.CopilotConfig;
+import dev.jort.copilot.dtos.IdHolder;
 import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.overlays.*;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,8 @@ public abstract class Script {
     public Widgets widgets;
     @Inject
     public Combat combat;
+    @Inject
+    GroundItems groundItems;
 
 
     //OVERLAYS

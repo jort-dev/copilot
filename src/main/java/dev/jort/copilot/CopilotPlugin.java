@@ -3,6 +3,7 @@ package dev.jort.copilot;
 import com.google.inject.Provides;
 import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.overlays.*;
+import dev.jort.copilot.priority_scripts.Loot;
 import dev.jort.copilot.priority_scripts.SpecialAttack;
 import dev.jort.copilot.scripts.*;
 import dev.jort.copilot.other.Script;
@@ -18,6 +19,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.task.Schedule;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -64,6 +66,8 @@ public class CopilotPlugin extends Plugin {
     @Inject
     GroundObjects groundObjects;
     @Inject
+    GroundItems groundItems;
+    @Inject
     GiantsFoundryHelper giantsFoundryHelper;
 
 
@@ -86,6 +90,8 @@ public class CopilotPlugin extends Plugin {
     //PRIORITY SCRIPTS
     @Inject
     SpecialAttack specialAttack;
+    @Inject
+    Loot loot;
 
 
     //SCRIPTS
@@ -167,9 +173,13 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged event) {
+        log.info("Game state changed to " + event.getGameState().name());
         gameObjects.onGameStateChanged(event);
+        groundItems.onGameStateChanged(event);
+        groundObjects.onGameStateChanged(event);
         npcs.onGameStateChanged(event);
     }
+
 
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned event) {
@@ -209,10 +219,13 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
-        // because we disable it when no script is running, enable it when we may have enabled a script
-        setOverlaysEnabled(true);
+        log.info("Plugin config changed!");
         crafting.onConfigChanged(event);
         widgets.hideWidgets(config.hideWidgets());
+        loot.onConfigChanged(event);
+
+        // because we disable it when no script is running, enable it when we may have enabled a script
+        setOverlaysEnabled(true);
     }
 
     public void setOverlaysEnabled(boolean enable) {
@@ -240,17 +253,27 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onGroundObjectSpawned(GroundObjectSpawned event) {
-        groundObjects.add(event.getGroundObject());
+        groundObjects.onGroundObjectSpawned(event);
     }
 
     @Subscribe
     public void onGroundObjectDespawned(GroundObjectDespawned event) {
-        groundObjects.remove(event.getGroundObject());
+        groundObjects.onGroundObjectDespawned(event);
     }
 
     @Subscribe
     public void onScriptPostFired(ScriptPostFired event) {
         widgets.onScriptPostFired(event);
+    }
+
+    @Subscribe
+    public void onItemSpawned(ItemSpawned event) {
+        groundItems.onItemSpawned(event);
+    }
+
+    @Subscribe
+    public void onItemDespawned(ItemDespawned event) {
+        groundItems.onItemDespawned(event);
     }
 
 
@@ -264,6 +287,14 @@ public class CopilotPlugin extends Plugin {
             if (specialAttack.needsToRun()) {
                 specialAttack.loop();
                 currentRunningScript = specialAttack;
+                return true;
+            }
+        }
+
+        if (config.lootAlert()) {
+            if (loot.needsToRun()) {
+                loot.loop();
+                currentRunningScript = loot;
                 return true;
             }
         }

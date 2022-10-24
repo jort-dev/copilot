@@ -2,7 +2,7 @@ package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.helpers.Widgets;
-import dev.jort.copilot.other.IdHolder;
+import dev.jort.copilot.dtos.IdHolder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Point;
