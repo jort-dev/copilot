@@ -85,7 +85,6 @@ public class GroundItems {
 
         if (groundItem.getQuantity() <= item.getQuantity()) {
             collectedGroundItems.remove(tile.getWorldLocation(), item.getId());
-            log.info("removed " + itemDespawned.getItem().getId());
         } else {
             groundItem.setQuantity(groundItem.getQuantity() - item.getQuantity());
             // When picking up an item when multiple stacks appear on the ground,

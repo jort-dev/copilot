@@ -47,12 +47,6 @@ public class CopilotOverlayUtil {
         entityOverlay.clear();
         entityOverlay.setNpcIdsToHighlight(action.getNpcIds());
         entityOverlay.setGameObjectIdsToHighlight(action.getGameObjectIds());
-
-        if (config.hideWidgets()) {
-            boolean areWidgetsRendered = action.getItemIds().length > 0 || action.getWidgets().length > 0;
-            widgets.hideWidgets(!areWidgetsRendered);
-        }
-
     }
 
     public void highlightShape(Graphics2D graphics, Shape shape) {

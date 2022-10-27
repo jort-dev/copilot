@@ -66,23 +66,20 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     }
 
     public void renderScriptText() {
-        if (main.getCurrentRunningScript() == null) {
-            return;
+        String scriptName = "Running";
+        if (main.getCurrentRunningScript() != null) {
+            String step = main.getCurrentRunningScript().getAction().getName();
+            scriptName = main.getCurrentRunningScript().getClass().getSimpleName();
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .right(step)
+                    .rightFont(FontManager.getRunescapeBoldFont())
+                    .build());
         }
-
-        String step = main.getCurrentRunningScript().getAction().getName();
-        String scriptName = main.getCurrentRunningScript().getClass().getSimpleName();
-        panelComponent.getChildren().add(LineComponent.builder()
-                .right(step)
-                .rightFont(FontManager.getRunescapeBoldFont())
-                .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Jort's Copilot")
                 .right(scriptName)
                 .build());
-
-
     }
 
 

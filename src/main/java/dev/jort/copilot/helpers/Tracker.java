@@ -101,7 +101,7 @@ public class Tracker {
         if (event.getWidget() != null) {
             widgetid = event.getWidget().getId();
         }
-        stringJoiner.add("Menu item clicked: ")
+        stringJoiner.add("Clicked")
                 .add("id=" + event.getId())
                 .add("itemid=" + event.getItemId())
                 .add("widgetid=" + widgetid)
@@ -172,7 +172,6 @@ public class Tracker {
     public int getLastAnimationId() {
         return lastAnimationId;
     }
-
 
 
 }

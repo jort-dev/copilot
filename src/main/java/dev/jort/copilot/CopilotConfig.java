@@ -302,6 +302,17 @@ public interface CopilotConfig extends Config {
         return "bird nest";
     }
 
+    @ConfigItem(
+            keyName = "kittenAlert",
+            name = "Kitten alert",
+            description = "Alerts you when you need to interact with your kitten.",
+            section = priorityScriptsSection,
+            position = 104
+    )
+    default boolean kittenAlert() {
+        return false;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -328,24 +339,12 @@ public interface CopilotConfig extends Config {
     @ConfigItem(
             keyName = "testSounds",
             name = "Test sound",
-            description = "Test sounds by typing the ID in chat.",
+            description = "Test sounds by typing the ID in chat. Search 'osrs sound id' for a list.",
             section = testSection,
             position = 120
 
     )
     default boolean testSounds() {
-        return false;
-    }
-
-
-    @ConfigItem(
-            keyName = "hideWidgets",
-            name = "Hide interface when possible (BREAKS STUFF)",
-            description = "Hides all the widgets like the inventory, bank and chatbox when you need to click on an entity, like a tree or monster.",
-            section = testSection,
-            position = 130
-    )
-    default boolean hideWidgets() {
         return false;
     }
 

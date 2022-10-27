@@ -2,11 +2,13 @@ package dev.jort.copilot;
 
 import com.google.inject.Provides;
 import dev.jort.copilot.helpers.*;
+import dev.jort.copilot.other.PriorityScript;
+import dev.jort.copilot.other.Script;
 import dev.jort.copilot.overlays.*;
+import dev.jort.copilot.priority_scripts.Kitten;
 import dev.jort.copilot.priority_scripts.Loot;
 import dev.jort.copilot.priority_scripts.SpecialAttack;
 import dev.jort.copilot.scripts.*;
-import dev.jort.copilot.other.Script;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -19,7 +21,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
 import net.runelite.client.task.Schedule;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -75,9 +76,9 @@ public class CopilotPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
     @Inject
-    private InfoOverlay overlay2d;
+    private InfoOverlay infoOverlay;
     @Inject
-    public EntityOverlay overlay3d;
+    public EntityOverlay entityOverlay;
     @Inject
     WidgetOverlay widgetOverlay;
     @Inject
@@ -88,10 +89,13 @@ public class CopilotPlugin extends Plugin {
 
 
     //PRIORITY SCRIPTS
+    List<PriorityScript> priorityScripts = new ArrayList<>();
     @Inject
     SpecialAttack specialAttack;
     @Inject
     Loot loot;
+    @Inject
+    Kitten kitten;
 
 
     //SCRIPTS
@@ -123,14 +127,19 @@ public class CopilotPlugin extends Plugin {
         log.info("Copilot started!");
 
         //initialize overlays
-        overlays.add(overlay2d);
-        overlays.add(overlay3d);
+        overlays.add(infoOverlay); //we always want to info bar
+        overlays.add(entityOverlay);
         overlays.add(widgetOverlay);
         overlays.add(notificationOverlay);
         for (CopilotOverlay overlay : overlays) {
             overlayManager.add((Overlay) overlay);
             overlay.enable();
         }
+
+        //initialize priority scripts
+        priorityScripts.add(loot);
+        priorityScripts.add(specialAttack);
+        priorityScripts.add(kitten);
     }
 
     @Override
@@ -138,7 +147,6 @@ public class CopilotPlugin extends Plugin {
         for (CopilotOverlay overlay : overlays) {
             overlayManager.remove((Overlay) overlay);
         }
-        widgets.hideWidgets(false);
         log.info("Copilot stopped!");
     }
 
@@ -153,9 +161,6 @@ public class CopilotPlugin extends Plugin {
         }
 
         if (config.testScript()) {
-            giantsFoundry.loop();
-            currentRunningScript = giantsFoundry;
-            overlayUtil.handleOverlays(currentRunningScript.getAction());
             return;
         }
 
@@ -203,6 +208,10 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onChatMessage(ChatMessage event) {
+        log.info("Chat msg: " + event);
+
+        kitten.onChatMessage(event);
+
         if (!event.getType().equals(ChatMessageType.PUBLICCHAT)) {
             return;
         }
@@ -219,9 +228,7 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
-        log.info("Plugin config changed!");
         crafting.onConfigChanged(event);
-        widgets.hideWidgets(config.hideWidgets());
         loot.onConfigChanged(event);
 
         // because we disable it when no script is running, enable it when we may have enabled a script
@@ -232,9 +239,13 @@ public class CopilotPlugin extends Plugin {
         for (CopilotOverlay overlay : overlays) {
             if (enable) {
                 overlay.enable();
-            } else {
-                overlay.disable();
+                continue;
             }
+            if (overlay == infoOverlay) {
+                //we always want the info overlay visible
+                continue;
+            }
+            overlay.disable();
         }
     }
 
@@ -242,6 +253,7 @@ public class CopilotPlugin extends Plugin {
     public void onMenuOptionClicked(MenuOptionClicked event) {
         tracker.onMenuOptionClicked(event);
         woodcutting.onMenuOptionClicked(event);
+        kitten.onMenuOptionClicked(event);
     }
 
     @Subscribe
@@ -262,11 +274,6 @@ public class CopilotPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onScriptPostFired(ScriptPostFired event) {
-        widgets.onScriptPostFired(event);
-    }
-
-    @Subscribe
     public void onItemSpawned(ItemSpawned event) {
         groundItems.onItemSpawned(event);
     }
@@ -283,20 +290,13 @@ public class CopilotPlugin extends Plugin {
      * @return True if it needs to be called again.
      */
     public boolean handlePriorityScripts() {
-        if (config.specialAttackAlert()) {
-            if (specialAttack.needsToRun()) {
-                specialAttack.loop();
-                currentRunningScript = specialAttack;
-                return true;
+        for (PriorityScript priorityScript : priorityScripts) {
+            if (!priorityScript.needsToRun()) {
+                continue;
             }
-        }
-
-        if (config.lootAlert()) {
-            if (loot.needsToRun()) {
-                loot.loop();
-                currentRunningScript = loot;
-                return true;
-            }
+            currentRunningScript = priorityScript;
+            priorityScript.loop();
+            return true;
         }
         return false;
     }
@@ -319,6 +319,7 @@ public class CopilotPlugin extends Plugin {
             currentRunningScript = inactivity;
         } else {
             setOverlaysEnabled(false);
+            currentRunningScript = null; //otherwise info overlay of that script stays
         }
     }
 

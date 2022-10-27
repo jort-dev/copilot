@@ -1,6 +1,6 @@
 package dev.jort.copilot.other;
 
-import net.runelite.api.ItemComposition;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +10,14 @@ import java.util.stream.Stream;
 /*
 General functions also usable without the RuneLite API.
  */
+@Slf4j
 public class Util {
+
+    public static void main(String[] args) {
+        System.out.println("Util test:");
+        System.out.println(Arrays.toString(toArray("hoi", "haha", "hey")));
+        System.out.println(Arrays.toString(toArray(1, 2, 4, 5)));
+    }
 
     public static boolean containsAny(String string, String... stringsToCheck) {
         for (String s : stringsToCheck) {
@@ -21,8 +28,12 @@ public class Util {
         return false;
     }
 
+    public static <T> T[] toArray(T... items) {
+        return items;
+    }
+
     public static boolean arrayContains(int numberToCheck, int... numbers) {
-        if(numbers == null){
+        if (numbers == null) {
             return false;
         }
         for (int number : numbers) {
@@ -46,11 +57,11 @@ public class Util {
         return Stream.concat(Arrays.stream(arr1).boxed(), Arrays.stream(arr2).boxed()).mapToInt(i -> i).toArray();
     }
 
-    public static String capitalize(String str){
+    public static String capitalize(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    public static String removeXml(String s){
+    public static String removeXml(String s) {
         return s.replaceAll("<[^>]+>", "");
     }
 }
