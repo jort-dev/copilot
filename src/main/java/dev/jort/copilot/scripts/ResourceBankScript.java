@@ -1,6 +1,7 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.dtos.IdHolder;
+import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.other.Script;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,7 @@ import net.runelite.api.widgets.WidgetInfo;
 /*
 General script for activities where you harvest resources from a GameObject, and bank them nearby.
  */
-public class ResourceBankScript extends Script {
+public abstract class ResourceBankScript extends Script {
     int[] resourceItemIds;
     int[] resourceObjectIds;
 
@@ -34,9 +35,10 @@ public class ResourceBankScript extends Script {
 
 
     @Override
-    public void onLoop() {
+    public int onLoop() {
         determineAction();
         determineIfAlertIsNeeded();
+        return Run.AGAIN;
     }
 
     public IdHolder determineAction() {
@@ -91,7 +93,7 @@ public class ResourceBankScript extends Script {
         return action;
     }
 
-    public boolean isWalkingToCorrectGoal(){
+    public boolean isWalkingToCorrectGoal() {
         return tracker.isWalking() && clickResourceAction.matchId(tracker.getLastClickedId());
     }
 

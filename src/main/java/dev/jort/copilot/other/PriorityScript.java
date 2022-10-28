@@ -9,6 +9,5 @@ Use it to do something which applies for multiple scripts, for example:
  */
 public abstract class PriorityScript extends Script {
 
-    public abstract boolean needsToRun();
 
 }

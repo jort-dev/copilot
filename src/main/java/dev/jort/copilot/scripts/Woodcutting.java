@@ -2,6 +2,7 @@ package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.dtos.IdHolder;
+import dev.jort.copilot.dtos.Run;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemID;
 import net.runelite.api.events.MenuOptionClicked;
@@ -27,15 +28,23 @@ public class Woodcutting extends ResourceBankScript {
         idHolders.add(willowResource);
         idHolders.add(new IdHolder("MAPLE_TREE").setItemIds(ItemID.MAPLE_LOGS));
         idHolders.add(new IdHolder("YEW", "YEW_TREE").setItemIds(ItemID.YEW_LOGS));
-        idHolders.add(new IdHolder( "MAGIC_TREE").setItemIds(ItemID.MAGIC_LOGS));
+        idHolders.add(new IdHolder("MAGIC_TREE").setItemIds(ItemID.MAGIC_LOGS));
         idHolders.add(new IdHolder("REDWOOD").setItemIds(ItemID.REDWOOD_LOGS));
         idHolders.add(new IdHolder("TEAK").setItemIds(ItemID.TEAK_LOGS));
         idHolders.add(new IdHolder("MAHOGANY").setItemIds(ItemID.MAHOGANY_LOGS));
         setResources(willowResource); //default
     }
 
+    @Override
+    public int onLoop() {
+        if (!config.woodcutting()) {
+            return Run.DONE;
+        }
+        return super.onLoop();
+    }
+
     public void onMenuOptionClicked(MenuOptionClicked event) {
-        if(!config.woodcutting()){
+        if (!config.woodcutting()) {
             return;
         }
         if (!event.getMenuOption().equals("Chop down")) {

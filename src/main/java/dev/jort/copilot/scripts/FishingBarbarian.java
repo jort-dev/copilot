@@ -1,15 +1,20 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.dtos.IdHolder;
+import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.other.Script;
 import net.runelite.api.widgets.Widget;
 
 public class FishingBarbarian extends Script {
 
     @Override
-    public void onLoop() {
+    public int onLoop() {
+        if (!config.fishingBarbarian()) {
+            return Run.DONE;
+        }
         handleAction();
-        determineIfAlertIsNeeded();
+        handleAlert();
+        return Run.AGAIN;
     }
 
 
@@ -56,7 +61,7 @@ public class FishingBarbarian extends Script {
         entityOverlay.setOnlyHighlightClosest(true);
     }
 
-    public void determineIfAlertIsNeeded() {
+    public void handleAlert() {
         boolean lastClickedIdMatches = action.matchId(tracker.getLastClickedId());
         boolean lastClickedActionMatches = action.matchAction(tracker.getLastClickedMenuOption());
         boolean lastActionCorrect = lastClickedIdMatches || lastClickedActionMatches;

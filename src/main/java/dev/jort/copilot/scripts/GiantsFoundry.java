@@ -1,5 +1,6 @@
 package dev.jort.copilot.scripts;
 
+import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.helpers.GiantsFoundryHelper;
 import dev.jort.copilot.other.Script;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,11 @@ public class GiantsFoundry extends Script {
     GiantsFoundryHelper gf;
 
     @Override
-    public void onLoop() {
+    public int onLoop() {
+        if (!config.giantsFoundry()) {
+            return Run.DONE;
+        }
+        return Run.AGAIN;
     }
 
     public void determineHover() {

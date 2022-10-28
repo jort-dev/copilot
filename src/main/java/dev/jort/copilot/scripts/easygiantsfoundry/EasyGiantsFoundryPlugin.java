@@ -19,7 +19,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 
 @Slf4j
-public class EasyGiantsFoundryPlugin extends Script
+public class EasyGiantsFoundryPlugin
 {
 	private static final int TRIP_HAMMER = 44619;
 	private static final int GRINDSTONE = 44620;
@@ -78,14 +78,12 @@ public class EasyGiantsFoundryPlugin extends Script
 	@Inject
 	private PointsTracker pointsTracker;
 
-	@Override
 	public void onStart()
 	{
 		overlayManager.add(overlay2d);
 		overlayManager.add(overlay3d);
 	}
 
-	@Override
 	public void onExit()
 	{
 		overlayManager.remove(overlay2d);
@@ -294,10 +292,5 @@ public class EasyGiantsFoundryPlugin extends Script
 	EasyGiantsFoundryConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(EasyGiantsFoundryConfig.class);
-	}
-
-	@Override
-	public void onLoop() {
-
 	}
 }

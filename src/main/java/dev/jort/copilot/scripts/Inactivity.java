@@ -1,6 +1,7 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.dtos.IdHolder;
+import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.other.Script;
 
 import javax.inject.Singleton;
@@ -8,9 +9,13 @@ import javax.inject.Singleton;
 @Singleton
 public class Inactivity extends Script {
     @Override
-    public void onLoop() {
+    public int onLoop() {
+        if (!config.inactivityAlert()) {
+            return Run.DONE;
+        }
         handleAction();
         handleAlert();
+        return Run.AGAIN;
     }
 
     public void handleAction() {

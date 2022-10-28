@@ -52,7 +52,7 @@ public class Alert {
 
         //always disable visual overlay when no alert is needed
         if (!interactionNeeded) {
-            notificationOverlay.disable();
+            notificationOverlay.clear();
             entityOverlay.clear();
             widgetOverlay.clear();
             soundAlertsPlayed = 0;
@@ -61,17 +61,17 @@ public class Alert {
             return;
         }
 
-        //ignore if interacted recently
+        //ignore if interacted recently or if awaiting the alert delay
         if (Math.max(client.getMouseLastPressedMillis(), alertStartTime) + config.alertDelayMs() > System.currentTimeMillis()) {
             return;
         }
 
         //enable visual alert
-        notificationOverlay.enable();
+        notificationOverlay.toggleOn();
 
         //system alert
-        if(config.useSystemNotifications()){
-            if (!hasFiredSystemAlert){
+        if (config.useSystemNotifications()) {
+            if (!hasFiredSystemAlert) {
                 notifier.notify("Copilot: interaction needed.");
                 hasFiredSystemAlert = true;
             }

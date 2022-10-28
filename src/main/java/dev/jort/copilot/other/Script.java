@@ -2,6 +2,7 @@ package dev.jort.copilot.other;
 
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.dtos.IdHolder;
+import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.overlays.*;
 import lombok.extern.slf4j.Slf4j;
@@ -70,21 +71,22 @@ public abstract class Script {
     private boolean exitRan = false;
 
     //call this function when running the script (each gametick for example)
-    public void loop() {
+    public int loop() {
         if (!running) {
             if (!exitRan) {
                 onExit();
                 exitRan = true;
+                return Run.STOP;
             }
             log.warn("Calling loop in stopped script!");
-            return;
+            return Run.ERROR;
         }
         if (!setupRan) {
             onStart();
             setupRan = true;
-            return;
+            return Run.OK;
         }
-        onLoop();
+        return onLoop();
     }
 
     public void onStart() {
@@ -98,6 +100,6 @@ public abstract class Script {
     }
 
     //dont call this function!
-    public abstract void onLoop();
+    public abstract int onLoop();
 
 }

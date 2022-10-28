@@ -1,6 +1,7 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.CopilotConfig;
+import dev.jort.copilot.dtos.Run;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.events.ConfigChanged;
 
@@ -9,7 +10,7 @@ import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
-public class Crafting extends InventoryMakeScript{
+public class Crafting extends InventoryMakeScript {
     @Inject
     CopilotConfig config;
 
@@ -18,15 +19,22 @@ public class Crafting extends InventoryMakeScript{
         applyConfig();
     }
 
+    @Override
+    public int onLoop() {
+        if (!config.crafting()) {
+            return Run.DONE;
+        }
+        return super.onLoop();
+    }
+
     public void onConfigChanged(ConfigChanged event) {
-        if(!config.crafting()){
+        if (!config.crafting()) {
             return;
         }
-        log.info("Updating crafting with new values.");
         applyConfig();
     }
 
-    public void applyConfig(){
+    public void applyConfig() {
         setValues(config.craftingResourceName(), config.craftingProductName(), config.craftingToolName());
     }
 }

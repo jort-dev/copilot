@@ -1,7 +1,8 @@
 package dev.jort.copilot.scripts;
 
-import dev.jort.copilot.helpers.Ids;
 import dev.jort.copilot.dtos.IdHolder;
+import dev.jort.copilot.dtos.Run;
+import dev.jort.copilot.helpers.Ids;
 import dev.jort.copilot.other.Script;
 import dev.jort.copilot.other.Util;
 import net.runelite.api.ItemID;
@@ -33,9 +34,10 @@ public class InventoryMakeScript extends Script {
 
 
     @Override
-    public void onLoop() {
+    public int onLoop() {
         determineAction();
         determineIfAlertIsNeeded();
+        return Run.AGAIN;
     }
 
     public void determineAction() {

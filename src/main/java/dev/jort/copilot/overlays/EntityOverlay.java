@@ -1,6 +1,5 @@
 package dev.jort.copilot.overlays;
 
-import com.google.common.base.Strings;
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.dtos.GroundItem;
 import dev.jort.copilot.helpers.GameObjects;
@@ -10,14 +9,10 @@ import dev.jort.copilot.helpers.Npcs;
 import dev.jort.copilot.other.Util;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.grounditems.GroundItemsPlugin;
-import net.runelite.client.plugins.groundmarkers.GroundMarkerPlugin;
 import net.runelite.client.ui.overlay.*;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
@@ -96,26 +91,30 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+
+        if (!enabled) {
+            return null;
+        }
+
+        //todo: implement like rest
         for (GroundItem groundItem : groundItemsToHighlight) {
-            if(groundItem == null){
+            if (groundItem == null) {
                 continue;
             }
             drawTile(graphics, groundItem.getLocation(), config.highlightColor());
         }
+
         if (config.bogged()) {
             List<GroundObject> pumpIt = groundObjects.filter(groundObject -> groundObject.getId() == 13838);
             for (GroundObject groundObject : pumpIt) {
                 highlightTileObject(graphics, groundObject);
             }
         }
-
-        if (!enabled) {
-            return null;
-        }
         if (onlyHighlightClosest) {
             highlightTileObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
             highlightTileObject(graphics, gameObjects.closest(secondaryGameObjectIdsToHighlight));
             highlightActor(graphics, npcs.closest(npcIdsToHighlight));
+
             return null;
 
         }
@@ -178,7 +177,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         secondaryGameObjectIdsToHighlight = new int[0];
     }
 
-    public void clearGroundItemsToHighlight(){
+    public void clearGroundItemsToHighlight() {
         groundItemsToHighlight = new GroundItem[0];
     }
 

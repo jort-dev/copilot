@@ -22,6 +22,7 @@ public class NotificationOverlay extends Overlay implements CopilotOverlay {
     CopilotConfig config;
 
     private boolean enabled;
+    private boolean on; //if you disable and enable the overlay again, its state should be restored
 
     public NotificationOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
@@ -31,7 +32,10 @@ public class NotificationOverlay extends Overlay implements CopilotOverlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if(!enabled){
+        if (!enabled) {
+            return null;
+        }
+        if (!on) {
             return null;
         }
         graphics.setColor(config.overlayColor());
@@ -46,18 +50,26 @@ public class NotificationOverlay extends Overlay implements CopilotOverlay {
     }
 
     @Override
-    public void disable(){
+    public void disable() {
         enabled = false;
     }
 
     @Override
     public void clear() {
-        disable();
+        toggleOff();
+    }
+
+    public void toggleOn() {
+        on = true;
+    }
+
+    public void toggleOff() {
+        on = false;
     }
 
     @Override
-    public void setEnabled(boolean enable){
-        if (enable){
+    public void setEnabled(boolean enable) {
+        if (enable) {
             enable();
             return;
         }

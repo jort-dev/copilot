@@ -14,9 +14,7 @@ General functions also usable without the RuneLite API.
 public class Util {
 
     public static void main(String[] args) {
-        System.out.println("Util test:");
-        System.out.println(Arrays.toString(toArray("hoi", "haha", "hey")));
-        System.out.println(Arrays.toString(toArray(1, 2, 4, 5)));
+        System.out.println("Util test...");
     }
 
     public static boolean containsAny(String string, String... stringsToCheck) {
@@ -26,10 +24,6 @@ public class Util {
             }
         }
         return false;
-    }
-
-    public static <T> T[] toArray(T... items) {
-        return items;
     }
 
     public static boolean arrayContains(int numberToCheck, int... numbers) {

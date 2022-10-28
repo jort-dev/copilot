@@ -1,6 +1,7 @@
 package dev.jort.copilot;
 
 import com.google.inject.Provides;
+import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.other.PriorityScript;
 import dev.jort.copilot.other.Script;
@@ -28,6 +29,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -99,6 +101,7 @@ public class CopilotPlugin extends Plugin {
 
 
     //SCRIPTS
+    List<Script> scripts = new ArrayList<>();
     @Inject
     FishingBarbarian fishingBarbarian;
     @Inject
@@ -124,22 +127,21 @@ public class CopilotPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
-        log.info("Copilot started!");
 
         //initialize overlays
-        overlays.add(infoOverlay); //we always want to info bar
-        overlays.add(entityOverlay);
-        overlays.add(widgetOverlay);
-        overlays.add(notificationOverlay);
+        overlays.addAll(Arrays.asList(infoOverlay, entityOverlay, widgetOverlay, notificationOverlay));
         for (CopilotOverlay overlay : overlays) {
             overlayManager.add((Overlay) overlay);
             overlay.enable();
         }
 
         //initialize priority scripts
-        priorityScripts.add(loot);
-        priorityScripts.add(specialAttack);
-        priorityScripts.add(kitten);
+        priorityScripts.addAll(Arrays.asList(loot, specialAttack, kitten));
+
+        //initialize scripts
+        scripts.addAll(Arrays.asList(fishingBarbarian, woodcutting, crafting, inactivity, giantsFoundry));
+
+        log.info("Copilot started!");
     }
 
     @Override
@@ -167,7 +169,7 @@ public class CopilotPlugin extends Plugin {
 
         //only run normal scripts when priority scripts are done
         if (!handlePriorityScripts()) {
-            handleRunningScripts();
+            handleScripts();
         }
 
         if (currentRunningScript != null) {
@@ -198,55 +200,31 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
-        npcs.add(event.getNpc());
+        npcs.onNpcSpawned(event);
     }
 
     @Subscribe
     public void onNpcDespawned(NpcDespawned event) {
-        npcs.remove(event.getNpc());
+        npcs.onNpcDespawned(event);
     }
 
     @Subscribe
     public void onChatMessage(ChatMessage event) {
-        log.info("Chat msg: " + event);
-
         kitten.onChatMessage(event);
-
-        if (!event.getType().equals(ChatMessageType.PUBLICCHAT)) {
-            return;
-        }
-        if (!config.testSounds()) {
-            return;
-        }
-        try {
-            int id = Integer.parseInt(event.getMessage());
-            log.info("Playing sound with ID " + id);
-            alert.playSound(id);
-        } catch (Exception ignored) {
-        }
+        handleSoundTest(event);
     }
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
+        if (!event.getGroup().equals("copilot")) {
+            return;
+        }
+        log.info("Config changed: " + event);
         crafting.onConfigChanged(event);
         loot.onConfigChanged(event);
 
         // because we disable it when no script is running, enable it when we may have enabled a script
-        setOverlaysEnabled(true);
-    }
-
-    public void setOverlaysEnabled(boolean enable) {
-        for (CopilotOverlay overlay : overlays) {
-            if (enable) {
-                overlay.enable();
-                continue;
-            }
-            if (overlay == infoOverlay) {
-                //we always want the info overlay visible
-                continue;
-            }
-            overlay.disable();
-        }
+//        setOverlaysEnabled(true);
     }
 
     @Subscribe
@@ -291,36 +269,26 @@ public class CopilotPlugin extends Plugin {
      */
     public boolean handlePriorityScripts() {
         for (PriorityScript priorityScript : priorityScripts) {
-            if (!priorityScript.needsToRun()) {
+            if (priorityScript.loop() != Run.AGAIN) {
                 continue;
             }
             currentRunningScript = priorityScript;
-            priorityScript.loop();
             return true;
         }
         return false;
     }
 
-    public void handleRunningScripts() {
-        if (config.woodcutting()) {
-            woodcutting.loop();
-            currentRunningScript = woodcutting;
-        } else if (config.fishingBarbarian()) {
-            fishingBarbarian.loop();
-            currentRunningScript = fishingBarbarian;
-        } else if (config.crafting()) {
-            crafting.loop();
-            currentRunningScript = crafting;
-        } else if (config.giantsFoundry()) {
-            giantsFoundry.loop();
-            currentRunningScript = giantsFoundry;
-        } else if (config.inactivityAlert()) {
-            inactivity.loop();
-            currentRunningScript = inactivity;
-        } else {
-            setOverlaysEnabled(false);
-            currentRunningScript = null; //otherwise info overlay of that script stays
+    public void handleScripts() {
+        for (Script script : scripts) {
+            if (script.loop() != Run.AGAIN) {
+                continue;
+            }
+            currentRunningScript = script;
+            return;
         }
+        //this gets reached if no script needs to run
+        clearOverlays();
+        currentRunningScript = null; //otherwise info overlay of that script stays
     }
 
 
@@ -331,6 +299,40 @@ public class CopilotPlugin extends Plugin {
         return configManager.getConfig(CopilotConfig.class);
     }
 
+    public void handleSoundTest(ChatMessage event) {
+        if (!event.getType().equals(ChatMessageType.PUBLICCHAT)) {
+            return;
+        }
+        if (!config.testSounds()) {
+            return;
+        }
+        try {
+            int id = Integer.parseInt(event.getMessage());
+            log.info("Playing sound with ID " + id);
+            alert.playSound(id);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void setOverlaysEnabled(boolean enable) {
+        for (CopilotOverlay overlay : overlays) {
+            if (enable) {
+                overlay.enable();
+                continue;
+            }
+            if (overlay == infoOverlay) {
+                //we always want the info overlay visible
+                continue;
+            }
+            overlay.disable();
+        }
+    }
+
+    public void clearOverlays() {
+        for (CopilotOverlay overlay : overlays) {
+            overlay.clear();
+        }
+    }
 
     public Script getCurrentRunningScript() {
         return currentRunningScript;
