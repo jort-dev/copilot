@@ -6,6 +6,8 @@ import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.other.PriorityScript;
 import dev.jort.copilot.other.Script;
 import dev.jort.copilot.overlays.*;
+import dev.jort.copilot.panel.CopilotPanel;
+import dev.jort.copilot.panel.Icon;
 import dev.jort.copilot.priority_scripts.Kitten;
 import dev.jort.copilot.priority_scripts.Loot;
 import dev.jort.copilot.priority_scripts.SpecialAttack;
@@ -23,10 +25,13 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.task.Schedule;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
+import java.awt.image.BufferedImage;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,13 +56,13 @@ public class CopilotPlugin extends Plugin {
 
     // CUSTOM HELPER OBJECTS
     @Inject
-    private GameObjects gameObjects;
+    GameObjects gameObjects;
     @Inject
     Inventory inventory;
     @Inject
     Tracker tracker;
     @Inject
-    private Chat chat;
+    Chat chat;
     @Inject
     Ids ids;
     @Inject
@@ -113,8 +118,14 @@ public class CopilotPlugin extends Plugin {
     @Inject
     GiantsFoundry giantsFoundry;
 
-
     Script currentRunningScript = null;
+
+
+    //PANEL
+    CopilotPanel panel;
+    NavigationButton navButton;
+    @Inject
+    ClientToolbar clientToolbar;
 
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
@@ -127,19 +138,31 @@ public class CopilotPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
-
-        //initialize overlays
+        //overlays
         overlays.addAll(Arrays.asList(infoOverlay, entityOverlay, widgetOverlay, notificationOverlay));
         for (CopilotOverlay overlay : overlays) {
             overlayManager.add((Overlay) overlay);
             overlay.enable();
         }
 
-        //initialize priority scripts
+        //priority scripts
         priorityScripts.addAll(Arrays.asList(loot, specialAttack, kitten));
 
-        //initialize scripts
+        //scripts
         scripts.addAll(Arrays.asList(fishingBarbarian, woodcutting, crafting, inactivity, giantsFoundry));
+
+        //panel
+        panel = new CopilotPanel(this);
+
+        final BufferedImage icon = Icon.COPILOT_ICON.getImage();
+        navButton = NavigationButton.builder()
+                .tooltip("Jort's Copilot")
+                .icon(icon)
+                .priority(2)
+                .panel(panel)
+                .build();
+
+        clientToolbar.addNavigation(navButton);
 
         log.info("Copilot started!");
     }
@@ -149,6 +172,8 @@ public class CopilotPlugin extends Plugin {
         for (CopilotOverlay overlay : overlays) {
             overlayManager.remove((Overlay) overlay);
         }
+
+        clientToolbar.removeNavigation(navButton);
         log.info("Copilot stopped!");
     }
 

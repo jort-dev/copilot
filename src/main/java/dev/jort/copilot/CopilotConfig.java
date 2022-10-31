@@ -299,7 +299,7 @@ public interface CopilotConfig extends Config {
             position = 103
     )
     default String lootAlertLoot() {
-        return "bird nest";
+        return "bird,clue,fossil,key";
     }
 
     @ConfigItem(
