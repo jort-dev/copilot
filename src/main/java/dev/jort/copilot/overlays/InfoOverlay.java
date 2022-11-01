@@ -8,6 +8,8 @@ import dev.jort.copilot.helpers.Tracker;
 import dev.jort.copilot.helpers.Widgets;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.Skill;
+import net.runelite.api.Varbits;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -61,6 +63,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         }
         renderScriptText();
         renderGiantsFoundryText();
+        renderDebugText();
         panelComponent.setPreferredSize(new Dimension(300, 100));
         return super.render(graphics);
     }
@@ -79,6 +82,27 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Jort's Copilot")
                 .right(scriptName)
+                .build());
+    }
+
+    public void renderDebugText() {
+        if (!config.debug()) {
+            return;
+        }
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Debug")
+                .leftFont(FontManager.getRunescapeBoldFont())
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("HP:")
+                .right("" + client.getBoostedSkillLevel(Skill.HITPOINTS))
+                .build());
+
+        int fakeHp = client.getVarbitValue(Varbits.NMZ_ABSORPTION);
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("NMZ HP:")
+                .right("" + fakeHp)
                 .build());
     }
 

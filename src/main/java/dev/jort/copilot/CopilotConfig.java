@@ -13,20 +13,21 @@ The positions are in increments of 5, so you can wiggle something between them w
 public interface CopilotConfig extends Config {
 
     @ConfigSection(
-            name = "Settings",
-            description = "Configure settings which apply to all helpers.",
+            name = "Alert settings",
+            description = "Configure sound alert settings.",
+            closedByDefault = true,
             position = 5
     )
-    String settingsSection = "Settings";
+    String alertSettings = "AlertSettings";
 
     @Range(
             max = SoundEffectVolume.HIGH
     )
     @ConfigItem(
             keyName = "alertVolume",
-            name = "Alert volume",
+            name = "Volume",
             description = "Configures the volume the alerts. Off=0, loudest=127",
-            section = settingsSection,
+            section = alertSettings,
             position = 10
     )
     default int alertVolume() {
@@ -35,9 +36,9 @@ public interface CopilotConfig extends Config {
 
     @ConfigItem(
             keyName = "mainSoundId",
-            name = "Alert sound ID",
+            name = "Sound ID",
             description = "Configures the sound to play for alerts. For inspiration: search 'sound id osrs'.",
-            section = settingsSection,
+            section = alertSettings,
             position = 15
     )
     default int mainSoundId() {
@@ -46,9 +47,9 @@ public interface CopilotConfig extends Config {
 
     @ConfigItem(
             keyName = "alternativeSoundId",
-            name = "Alt alert sound ID",
+            name = "Alt sound ID",
             description = "Configures the sound to play when the inventory is full. Set to 0 to copy above sound.",
-            section = settingsSection,
+            section = alertSettings,
             position = 20
     )
     default int alternativeSoundId() {
@@ -57,9 +58,9 @@ public interface CopilotConfig extends Config {
 
     @ConfigItem(
             keyName = "alertDelay",
-            name = "Alert delay",
+            name = "Delay",
             description = "Configure after how many milliseconds of inactivity the alert go off.",
-            section = settingsSection,
+            section = alertSettings,
             position = 25
     )
     default int alertDelayMs() {
@@ -68,9 +69,9 @@ public interface CopilotConfig extends Config {
 
     @ConfigItem(
             keyName = "amountOfAlerts",
-            name = "Amount of alerts",
+            name = "Amount",
             description = "Configure after how many times the alert sound is played.",
-            section = settingsSection,
+            section = alertSettings,
             position = 30
     )
     default int amountOfSoundAlerts() {
@@ -79,21 +80,33 @@ public interface CopilotConfig extends Config {
 
     @ConfigItem(
             keyName = "useSystemNotification",
-            name = "Use system notifications",
-            description = "In addition to visual and auditory alerts, also fire system notifications, like most plugins do.",
-            section = settingsSection,
+            name = "System notification",
+            description = "In addition to visual and auditory alerts, also fire a system notification, like most plugins do.",
+            section = alertSettings,
             position = 35
     )
     default boolean useSystemNotifications() {
         return false;
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @ConfigSection(
+            name = "Overlay settings",
+            description = "Configure overlay settings.",
+            closedByDefault = true,
+            position = 37
+    )
+    String overlaySettings = "OverlaySettings";
+
     @Alpha
     @ConfigItem(
             keyName = "overlayColor",
             name = "Notification color",
             description = "Set the notification overlay color",
-            section = settingsSection,
+            section = overlaySettings,
             position = 40
     )
     default Color overlayColor() {
@@ -105,7 +118,7 @@ public interface CopilotConfig extends Config {
             keyName = "highlightColor",
             name = "Highlight color",
             description = "Set the color of the highlight for items to click.",
-            section = settingsSection,
+            section = overlaySettings,
             position = 45
     )
     default Color highlightColor() {
@@ -117,7 +130,7 @@ public interface CopilotConfig extends Config {
             keyName = "alternativeHighlightColor",
             name = "Alt highlight color",
             description = "Set the color of the highlight for alternative items to click, for example the next action.",
-            section = settingsSection,
+            section = overlaySettings,
             position = 47
     )
     default Color alternativeHighlightColor() {
@@ -131,6 +144,7 @@ public interface CopilotConfig extends Config {
     @ConfigSection(
             name = "Activities - fully guided",
             description = "Set which activity you want assistance with. Only one selected item works.",
+            closedByDefault = true,
             position = 50
     )
     String activitiesSection = "Activities";
@@ -209,6 +223,7 @@ public interface CopilotConfig extends Config {
     @ConfigSection(
             name = "Activities - partially guided",
             description = "Set which activity you want assistance with. Only one selected item works.",
+            closedByDefault = true,
             position = 85
     )
     String partialActivitiesSection = "Partial activities";
@@ -265,6 +280,7 @@ public interface CopilotConfig extends Config {
     @ConfigSection(
             name = "Activities - additions",
             description = "These scripts will run before the main running script. Multiple options possible.",
+            closedByDefault = true,
             position = 101
     )
     String priorityScriptsSection = "Priority scripts";
@@ -313,6 +329,17 @@ public interface CopilotConfig extends Config {
         return false;
     }
 
+    @ConfigItem(
+            keyName = "hpAlert",
+            name = "Alerts when hp is above threshold.",
+            description = "Use it for Nightmare Zone for example. Set to 0 or lower to disable",
+            section = priorityScriptsSection,
+            position = 104
+    )
+    default int hpAlert() {
+        return 0;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -320,6 +347,7 @@ public interface CopilotConfig extends Config {
     @ConfigSection(
             name = "Test features",
             description = "Testing features. Multiple selections possible.",
+            closedByDefault = true,
             position = 105
     )
     String testSection = "Test features";
@@ -358,4 +386,17 @@ public interface CopilotConfig extends Config {
     default boolean testScript() {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "debug",
+            name = "Debug",
+            description = "Enable debug mode with more paint and log messages.",
+            section = testSection,
+            position = 150
+    )
+    default boolean debug() {
+        return false;
+    }
+
+
 }

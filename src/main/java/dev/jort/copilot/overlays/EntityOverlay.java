@@ -200,6 +200,10 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         this.gameObjectIdsToHighlight = gameObjectIdsToHighlight;
     }
 
+    public void setSecondaryGameObjectIdsToHighlight(int... secondaryGameObjectIdsToHighlight) {
+        this.secondaryGameObjectIdsToHighlight = secondaryGameObjectIdsToHighlight;
+    }
+
 
     public GroundItem[] getGroundItemsToHighlight() {
         return groundItemsToHighlight;

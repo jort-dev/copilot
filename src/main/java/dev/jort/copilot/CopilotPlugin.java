@@ -8,6 +8,7 @@ import dev.jort.copilot.other.Script;
 import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.panel.CopilotPanel;
 import dev.jort.copilot.panel.Icon;
+import dev.jort.copilot.priority_scripts.Hp;
 import dev.jort.copilot.priority_scripts.Kitten;
 import dev.jort.copilot.priority_scripts.Loot;
 import dev.jort.copilot.priority_scripts.SpecialAttack;
@@ -103,6 +104,8 @@ public class CopilotPlugin extends Plugin {
     Loot loot;
     @Inject
     Kitten kitten;
+    @Inject
+    Hp hp;
 
 
     //SCRIPTS
@@ -146,7 +149,7 @@ public class CopilotPlugin extends Plugin {
         }
 
         //priority scripts
-        priorityScripts.addAll(Arrays.asList(loot, specialAttack, kitten));
+        priorityScripts.addAll(Arrays.asList(loot, specialAttack, kitten, hp));
 
         //scripts
         scripts.addAll(Arrays.asList(fishingBarbarian, woodcutting, crafting, inactivity, giantsFoundry));

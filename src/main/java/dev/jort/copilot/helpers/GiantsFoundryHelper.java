@@ -1,7 +1,7 @@
 package dev.jort.copilot.helpers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import dev.jort.copilot.dtos.Heat;
+import dev.jort.copilot.dtos.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
@@ -284,7 +284,7 @@ public class GiantsFoundryHelper {
     public Stage getCurrentStage() {
         int index = (int) (getProgressAmount() / 1000d * getStages().size());
         if (index < 0 || index > getStages().size() - 1) {
-            return null;
+            return Stage.NONE;
         }
 
         return getStages().get(index);
@@ -365,32 +365,4 @@ public class GiantsFoundryHelper {
         }
     }
 
-    @Getter
-    @AllArgsConstructor
-    public enum Heat {
-        LOW("Low"),
-        MED("Medium"),
-        HIGH("High"),
-        NONE("Not in range");
-
-        private final String name;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public enum Stage {
-
-
-        TRIP_HAMMER("Hammer", Heat.HIGH, 20, -25, GiantsFoundryHelper.TRIP_HAMMER),
-        GRINDSTONE("Grind", Heat.MED, 10, 15, GiantsFoundryHelper.GRINDSTONE),
-        POLISHING_WHEEL("Polish", Heat.LOW, 10, -17, GiantsFoundryHelper.POLISHING_WHEEL),
-        NONE("None", Heat.NONE, -1, -1, -1);
-
-
-        private final String name;
-        private final Heat heat;
-        private final int progressPerAction;
-        private final int heatChange;
-        private final int objectId;
-    }
 }
