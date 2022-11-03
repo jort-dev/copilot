@@ -63,6 +63,7 @@ public class Kitten extends PriorityScript {
             return;
         }
         kittenMessageReceived = true;
+        log.info("Kitten needs attention.");
     }
 
     public void onMenuOptionClicked(MenuOptionClicked event) {
@@ -73,6 +74,7 @@ public class Kitten extends PriorityScript {
             return;
         }
         kittenMessageReceived = false;
+        log.info("Kitten does not need attention anymore.");
     }
 
 }

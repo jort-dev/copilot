@@ -81,10 +81,13 @@ Some configuration options further explained:
 * Fix notification overlay flash
 * Make script queue also fancy
 * Highlight kitten / add closests by name functions
+* Hook into native notification system
+* Crafting: option for multiple items in text box?
 
 ## Denied features
 
-* Hide widgets when entity interaction is needed. Denied, because it breaks a lot of scripts. You can't for example
+* Hide widgets when entity interaction is needed. Denied, because it can remove the need to click, and it breaks a lot
+  of scripts. You can't for example
   check if the bank is open, because the bank widget will be hidden.
 
 ## Bugs

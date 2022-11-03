@@ -1,10 +1,12 @@
 package dev.jort.copilot.helpers;
 
+import dev.jort.copilot.dtos.Action;
 import dev.jort.copilot.dtos.Heat;
 import dev.jort.copilot.dtos.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 
@@ -67,6 +69,7 @@ public class GiantsFoundryHelper {
 
     public static final int LAVA_POOL = 44631;
     public static final int WATERFALL = 44632;
+    public static final int KOVAC = NpcID.KOVAC_11472;
 
     public Heat getCurrentHeat() {
         int heat = getHeatAmount();
@@ -171,14 +174,28 @@ public class GiantsFoundryHelper {
         return Activity.GRINDING;
     }
 
-    public enum Action {
-        USE_MACHINE_TO_LOWER,
-        USE_MACHINE_TO_UPPER,
-        WARM_TO_UPPER,
-        WARM_TO_LOWER,
-        COOL_TO_UPPER,
-        COOL_TO_LOWER,
-        UNKNOWN
+    /*
+        Maximum amount of heat left per stage
+            STEEL_MITHRIL:
+            RED_MAX = 10
+            GREEN_MAX = 15
+            YELLOW_MAX = 17
+     */
+    public int getMaxHeatLeftInStage() {
+        Stage stage = getCurrentStage();
+        if (stage.equals(Stage.NONE)) {
+            return -1;
+        }
+        if (stage.equals(Stage.TRIP_HAMMER)) {
+            return 10;
+        }
+        if (stage.equals(Stage.GRINDSTONE)) {
+            return 17;
+        }
+        if (stage.equals(Stage.POLISHING_WHEEL)) {
+            return 15;
+        }
+        return -2;
     }
 
     public Action determineAction() {

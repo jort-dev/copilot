@@ -44,6 +44,7 @@ public class CopilotOverlayUtil {
         widgetOverlay.setItemIdsToHighlight(action.getItemIds());
         entityOverlay.clear();
         entityOverlay.setNpcIdsToHighlight(action.getNpcIds());
+        entityOverlay.setSecondaryNpcIdsToHighlight(action.getSecondaryNpcIds());
         entityOverlay.setGameObjectIdsToHighlight(action.getGameObjectIds());
         entityOverlay.setSecondaryGameObjectIdsToHighlight(action.getSecondaryGameObjectIds());
     }

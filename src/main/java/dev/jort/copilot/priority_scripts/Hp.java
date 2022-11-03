@@ -26,8 +26,7 @@ public class Hp extends PriorityScript {
             return Run.DONE;
         }
         int hp = client.getBoostedSkillLevel(Skill.HITPOINTS);
-        int fakeHp = client.getVarbitValue(Varbits.NMZ_ABSORPTION);
-//        hp = hp - fakeHp;
+        int absorptionLeft = client.getVarbitValue(Varbits.NMZ_ABSORPTION);
         if (hp <= config.hpAlert()) {
             return Run.DONE;
         }

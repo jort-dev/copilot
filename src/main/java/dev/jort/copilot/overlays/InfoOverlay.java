@@ -6,6 +6,7 @@ import dev.jort.copilot.helpers.Combat;
 import dev.jort.copilot.helpers.GiantsFoundryHelper;
 import dev.jort.copilot.helpers.Tracker;
 import dev.jort.copilot.helpers.Widgets;
+import dev.jort.copilot.scripts.GiantsFoundry;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
@@ -34,6 +35,9 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     CopilotConfig config;
 
     @Inject
+    GiantsFoundry giantsFoundry;
+
+    @Inject
     Widgets widgets;
     @Inject
     Tracker tracker;
@@ -41,9 +45,12 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     Combat combat;
     @Inject
     WidgetOverlay widgetOverlay;
+    @Inject
+    CopilotOverlayUtil copilotOverlayUtil;
 
     @Inject
     GiantsFoundryHelper giantsFoundryHelper;
+
 
     private boolean enabled = true;
 
@@ -62,7 +69,7 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
             return null;
         }
         renderScriptText();
-        renderGiantsFoundryText();
+        giantsFoundry.onPaint(panelComponent);
         renderDebugText();
         panelComponent.setPreferredSize(new Dimension(300, 100));
         return super.render(graphics);
@@ -106,66 +113,6 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
                 .build());
     }
 
-
-    public void renderGiantsFoundryText() {
-        if (!config.giantsFoundry()) {
-            return;
-        }
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Heat:")
-                .right(giantsFoundryHelper.getCurrentHeat().getName() + " (" + giantsFoundryHelper.getHeatAmount() + ")")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Actions left:")
-                .right(giantsFoundryHelper.getActionsLeftInStage() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Heat left:")
-                .right(giantsFoundryHelper.getHeatLeft() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Tool to use:")
-                .right(giantsFoundryHelper.getCurrentStage().getName() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Should be busy with: ")
-                .right(giantsFoundryHelper.determineAction().name() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Busy with:")
-                .right(giantsFoundryHelper.getActivity().name() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Animation:")
-                .right(tracker.getAnimation() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Current stage:")
-                .right(giantsFoundryHelper.getCurrentStage().name() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Next stage:")
-                .right(giantsFoundryHelper.getNextStage().name() + "")
-                .build());
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Using machine:")
-                .right(giantsFoundryHelper.isOperatingMachine() + "")
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Modifying temperature:")
-                .right(giantsFoundryHelper.isModifyingTemperature() + "")
-                .build());
-    }
 
     @Override
     public void clear() {

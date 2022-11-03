@@ -24,6 +24,7 @@ public class IdHolder {
 
     private String name = "NoName";
     private int[] npcIds = new int[0];
+    private int[] secondaryNpcIds = new int[0];
     private int[] gameObjectIds = new int[0];
     private int[] secondaryGameObjectIds = new int[0];
     private int[] itemIds = new int[0];
@@ -36,7 +37,7 @@ public class IdHolder {
     }
 
     public boolean matchId(int id) {
-        return matchId(id, npcIds) || matchId(id, gameObjectIds) || matchId(id, secondaryGameObjectIds) || matchId(id, itemIds) || matchId(id, widgets);
+        return matchId(id, npcIds) || matchId(id, secondaryNpcIds) || matchId(id, gameObjectIds) || matchId(id, secondaryGameObjectIds) || matchId(id, itemIds) || matchId(id, widgets);
     }
 
     public boolean matchAction(String action) {
@@ -87,6 +88,11 @@ public class IdHolder {
 
     public IdHolder setSecondaryGameObjectIds(int... gameObjectIds) {
         this.secondaryGameObjectIds = gameObjectIds;
+        return this;
+    }
+
+    public IdHolder setSecondaryNpcIds(int... secondaryNpcIds) {
+        this.secondaryNpcIds = secondaryNpcIds;
         return this;
     }
 

@@ -70,11 +70,10 @@ public class Alert {
         notificationOverlay.toggleOn();
 
         //system alert
-        if (config.useSystemNotifications()) {
-            if (!hasFiredSystemAlert) {
-                notifier.notify("Copilot: interaction needed.");
-                hasFiredSystemAlert = true;
-            }
+
+        if (!hasFiredSystemAlert) {
+            systemAlert("Interaction needed.");
+            hasFiredSystemAlert = true;
         }
 
         //ignore if enough sound alerts are played
@@ -85,7 +84,8 @@ public class Alert {
         //play sound alert
         if (inventory.isFull()) {
             playAlternativeAlertSound();
-        } else {
+        }
+        else {
             playAlertSound();
         }
         soundAlertsPlayed++;
@@ -93,6 +93,13 @@ public class Alert {
 
     public void playAlertSound() {
         playSound(config.mainSoundId());
+    }
+
+    public void systemAlert(String text) {
+        if (!config.useSystemNotifications()) {
+            return;
+        }
+        notifier.notify("Copilot: " + text);
     }
 
     public void playAlternativeAlertSound() {

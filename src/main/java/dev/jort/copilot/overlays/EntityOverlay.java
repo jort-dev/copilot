@@ -43,11 +43,11 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     CopilotOverlayUtil overlayUtil;
 
     private int[] gameObjectIdsToHighlight = new int[0];
-
     private int[] secondaryGameObjectIdsToHighlight = new int[0];
 
-
     private int[] npcIdsToHighlight = new int[0];
+    private int[] secondaryNpcIdsToHighlight = new int[0];
+
 
     private GroundItem[] groundItemsToHighlight = new GroundItem[0];
 
@@ -89,6 +89,13 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         overlayUtil.highlightShape(graphics, actor.getCanvasTilePoly());
     }
 
+    public void highlightActor(Graphics2D graphics, Actor actor, Color color) {
+        if (actor == null) {
+            return;
+        }
+        overlayUtil.highlightShape(graphics, actor.getCanvasTilePoly(), color);
+    }
+
     @Override
     public Dimension render(Graphics2D graphics) {
 
@@ -114,6 +121,7 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
             highlightTileObject(graphics, gameObjects.closest(gameObjectIdsToHighlight));
             highlightTileObject(graphics, gameObjects.closest(secondaryGameObjectIdsToHighlight));
             highlightActor(graphics, npcs.closest(npcIdsToHighlight));
+            highlightActor(graphics, npcs.closest(secondaryNpcIdsToHighlight));
 
             return null;
 
@@ -133,6 +141,12 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
         for (NPC npc : npcList) {
             highlightActor(graphics, npc);
         }
+
+        //todo: bug: somehow secondary npcs stay highlighted
+//        npcList = npcs.filter(npc -> Util.arrayContains(npc.getId(), secondaryNpcIdsToHighlight));
+//        for (NPC npc : npcList) {
+//            highlightActor(graphics, npc, config.alternativeHighlightColor());
+//        }
 
         return null;
     }
@@ -173,8 +187,9 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
     @Override
     public void clear() {
         gameObjectIdsToHighlight = new int[0];
-        npcIdsToHighlight = new int[0];
         secondaryGameObjectIdsToHighlight = new int[0];
+        npcIdsToHighlight = new int[0];
+        secondaryNpcIdsToHighlight = new int[0];
     }
 
     public void clearGroundItemsToHighlight() {
@@ -202,6 +217,10 @@ public class EntityOverlay extends Overlay implements CopilotOverlay {
 
     public void setSecondaryGameObjectIdsToHighlight(int... secondaryGameObjectIdsToHighlight) {
         this.secondaryGameObjectIdsToHighlight = secondaryGameObjectIdsToHighlight;
+    }
+
+    public void setSecondaryNpcIdsToHighlight(int... secondaryNpcIdsToHighlight) {
+        this.secondaryNpcIdsToHighlight = secondaryNpcIdsToHighlight;
     }
 
 
