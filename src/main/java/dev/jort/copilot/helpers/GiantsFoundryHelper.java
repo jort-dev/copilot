@@ -1,13 +1,16 @@
 package dev.jort.copilot.helpers;
 
 import dev.jort.copilot.dtos.Action;
+import dev.jort.copilot.dtos.Activity;
 import dev.jort.copilot.dtos.Heat;
 import dev.jort.copilot.dtos.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.InventoryID;
 import net.runelite.api.NpcID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 
 import javax.inject.Inject;
@@ -107,15 +110,6 @@ public class GiantsFoundryHelper {
     9454 - grinding
     9452 - grinding init
      */
-    public enum Activity {
-        HEATING,
-        COOLING,
-        HAMMERING,
-        POLISHING,
-        GRINDING,
-        NONE
-    }
-
     public boolean isOperatingMachine() {
         Activity activity = getActivity();
         if (activity == Activity.HAMMERING) {
@@ -379,6 +373,17 @@ public class GiantsFoundryHelper {
                 return getHighHeatRange();
             default:
                 return new int[]{0, 0};
+        }
+    }
+
+    private static final int PREFORM = 27010;
+
+    public void onItemContainerChanged(ItemContainerChanged event) {
+        if (event.getContainerId() == InventoryID.EQUIPMENT.getId()
+                && event.getItemContainer().count(PREFORM) == 0) {
+            //otherwise widgets stay cached when next commission is given!
+            stages.clear();
+            heatRangeRatio = 0;
         }
     }
 

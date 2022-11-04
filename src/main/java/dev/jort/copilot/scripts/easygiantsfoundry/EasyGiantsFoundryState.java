@@ -37,6 +37,7 @@ public class EasyGiantsFoundryState
 
 	static final int WIDGET_PROGRESS_PARENT = 49414219;
 	// children with type 3 are stage boxes
+	private static final int PREFORM = 27010;
 	// every 11th child is a sprite
 
 	private static final int SPRITE_ID_TRIP_HAMMER = 4442;

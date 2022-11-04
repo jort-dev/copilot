@@ -1,6 +1,7 @@
 package dev.jort.copilot.scripts;
 
 import dev.jort.copilot.dtos.Action;
+import dev.jort.copilot.dtos.Activity;
 import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.dtos.Stage;
 import dev.jort.copilot.helpers.GiantsFoundryHelper;
@@ -17,8 +18,7 @@ import java.util.StringJoiner;
 /*
 Biggest jump when changing temperature with dunking
 5
- */
-public class GiantsFoundry extends Script implements Painter {
+ */ public class GiantsFoundry extends Script implements Painter {
     @Inject
     GiantsFoundryHelper gf;
 
@@ -40,7 +40,8 @@ public class GiantsFoundry extends Script implements Painter {
         action.setGameObjectIds();
         action.setSecondaryGameObjectIds();
         determineHover();
-        determineAction();
+//        determineAction();
+        newDetermineAction();
 
         if (!lastAction.equals(action.getName())) {
             lastAction = action.getName();
@@ -150,30 +151,27 @@ public class GiantsFoundry extends Script implements Painter {
 
     public void clickMachine() {
         Stage stage = gf.getCurrentStage();
-        action
-                .setName("Click " + stage.getName())
-                .setGameObjectIds(stage.getObjectId());
+        action.setName("Click " + stage.getName()).setGameObjectIds(stage.getObjectId());
     }
 
     public void clickLava() {
-        action
-                .setName("Click lava")
-                .setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
+        action.setName("Click lava").setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
     }
 
     public void clickWater() {
-        action
-                .setName("Click water")
-                .setGameObjectIds(GiantsFoundryHelper.WATERFALL);
+        action.setName("Click water").setGameObjectIds(GiantsFoundryHelper.WATERFALL);
     }
 
     public void newDetermineAction() {
         boolean canFinishStageWithHeat = gf.getHeatLeft() - config.giantsFoundryToolBuffer() > gf.getActionsLeftInStage();
         Stage currentStage = gf.getCurrentStage();
         boolean machineHeatsSword = currentStage.equals(Stage.GRINDSTONE);
+        Action action = gf.determineAction();
+        String actionName = action.name().toLowerCase();
+        Activity currentActivity = gf.getActivity();
 
         if (gf.isOperatingMachine()) {
-            boolean hasEnoughHeatLeft = gf.getHeatLeft() < config.giantsFoundryToolBuffer();
+            boolean hasEnoughHeatLeft = gf.getHeatLeft() >= config.giantsFoundryToolBuffer();
             if (hasEnoughHeatLeft) {
                 clickMachine();
             }
@@ -187,7 +185,37 @@ public class GiantsFoundry extends Script implements Painter {
             }
         }
         else if (gf.isModifyingTemperature()) {
-            if (gf.getMaxHeatLeftInStage() - config.giantsFoundryTemperatureBuffer() > gf.getHeatLeft()) ;
+            int amountOfHeatToCollect = gf.getMaxHeatLeftInStage() - config.giantsFoundryTemperatureBuffer();
+            boolean hasCollectedEnoughTemperature = gf.getHeatLeft() >= amountOfHeatToCollect;
+            if (hasCollectedEnoughTemperature || canFinishStageWithHeat) {
+                clickMachine();
+            }
+            else {
+                if (currentActivity.equals(Activity.HEATING)) {
+                    clickLava();
+                }
+                else if (currentActivity.equals(Activity.COOLING)) {
+                    clickWater();
+                }
+                else {
+                    log.info("Unknown activity: " + currentActivity.name());
+                }
+            }
+        }
+        //this gets reached if we are in between machines
+        else {
+            if (actionName.contains("warm")) {
+                clickLava();
+            }
+            else if (actionName.contains("cool")) {
+                clickWater();
+            }
+            else if (actionName.contains("machine")) {
+                clickMachine();
+            }
+            else {
+                log.info("Unknown action: " + action);
+            }
         }
     }
 
@@ -196,21 +224,15 @@ public class GiantsFoundry extends Script implements Painter {
         Action actionNeeded = gf.determineAction();
         String actionString = actionNeeded.name().toLowerCase();
         if (actionString.contains("machine")) {
-            action
-                    .setName("Click machine")
-                    .setGameObjectIds(gf.getCurrentStage().getObjectId());
+            action.setName("Click machine").setGameObjectIds(gf.getCurrentStage().getObjectId());
             return;
         }
         if (actionString.contains("warm")) {
-            action
-                    .setName("Click lava")
-                    .setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
+            action.setName("Click lava").setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
             return;
         }
         if (actionString.contains("cool")) {
-            action
-                    .setName("Click water")
-                    .setGameObjectIds(GiantsFoundryHelper.WATERFALL);
+            action.setName("Click water").setGameObjectIds(GiantsFoundryHelper.WATERFALL);
             return;
         }
     }
@@ -218,6 +240,9 @@ public class GiantsFoundry extends Script implements Painter {
     @Override
     public void onPaint(PanelComponent p) {
         if (!config.giantsFoundry()) {
+            return;
+        }
+        if (!config.debug()) {
             return;
         }
         //TODO: cannot debug local variables here (booleans stay false)
@@ -234,18 +259,14 @@ public class GiantsFoundry extends Script implements Painter {
         draw("Next stage:", gf.getNextStage().name());
         draw("Using machine:", gf.isOperatingMachine());
         draw("Modifying temperature:", gf.isModifyingTemperature());
-        draw("Current action : ", action.getName());
-        draw("Last action : ", lastAction);
+        draw("Max heat: ", gf.getMaxHeatLeftInStage());
     }
 
     PanelComponent panelComponent;
 
 
     public void draw(Object left, Object right) {
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left(left.toString())
-                .right(right.toString())
-                .build());
+        panelComponent.getChildren().add(LineComponent.builder().left(left.toString()).right(right.toString()).build());
     }
 
     public void draw(Object left) {
@@ -259,4 +280,5 @@ public class GiantsFoundry extends Script implements Painter {
         }
         log.info("Log: " + stringJoiner);
     }
+
 }
