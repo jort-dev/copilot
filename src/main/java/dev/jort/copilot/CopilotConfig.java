@@ -243,7 +243,7 @@ public interface CopilotConfig extends Config {
     @ConfigItem(
             keyName = "giantsFoundryToolBuffer",
             name = "Tool buffer",
-            description = "How many heat or actions should be left before you are alerted to click.",
+            description = "If set to 1, you will be alerted to click the temperature modifier if there is still 1 temperature left in the sword. Set higher the sword keeps getting damaged due to wrong temperature.",
             section = partialActivitiesSection,
             position = 94
     )
@@ -252,14 +252,14 @@ public interface CopilotConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "giantsFoundryToolBuffer",
+            keyName = "giantsFoundryTemperatureBuffer",
             name = "Temperature buffer",
-            description = "How many heat should be left whilst changing the temperature before you are alerted to click.",
+            description = "If set to 3, you will be alerted to click the machine if the sword can still have 3 more heat stored into it. Set to higher if you keep overshooting the temperature.",
             section = partialActivitiesSection,
             position = 97
     )
     default int giantsFoundryTemperatureBuffer() {
-        return 1;
+        return 3;
     }
 
     @ConfigItem(

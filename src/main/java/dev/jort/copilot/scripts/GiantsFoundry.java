@@ -1,7 +1,6 @@
 package dev.jort.copilot.scripts;
 
-import dev.jort.copilot.dtos.Action;
-import dev.jort.copilot.dtos.Activity;
+import dev.jort.copilot.dtos.Range;
 import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.dtos.Stage;
 import dev.jort.copilot.helpers.GiantsFoundryHelper;
@@ -41,7 +40,7 @@ Biggest jump when changing temperature with dunking
         action.setSecondaryGameObjectIds();
         determineHover();
 //        determineAction();
-        newDetermineAction();
+        determineAction();
 
         if (!lastAction.equals(action.getName())) {
             lastAction = action.getName();
@@ -162,78 +161,75 @@ Biggest jump when changing temperature with dunking
         action.setName("Click water").setGameObjectIds(GiantsFoundryHelper.WATERFALL);
     }
 
-    public void newDetermineAction() {
-        boolean canFinishStageWithHeat = gf.getHeatLeft() - config.giantsFoundryToolBuffer() > gf.getActionsLeftInStage();
+
+    public void debug(Object msg) {
+        log.info(msg.toString());
+    }
+
+    /*
+    when done using tool and should be caching temperature - it shows wrong temperature
+    when warming up for grindstone - bell rings too early and temperature can drop again for another bell ring
+     */
+    public void determineAction() {
+        boolean canFinishStageWithHeat = gf.getHeatLeft() - config.giantsFoundryToolBuffer() >= gf.getActionsLeftInStage();
         Stage currentStage = gf.getCurrentStage();
         boolean machineHeatsSword = currentStage.equals(Stage.GRINDSTONE);
-        Action action = gf.determineAction();
-        String actionName = action.name().toLowerCase();
-        Activity currentActivity = gf.getActivity();
+        boolean machineCoolsSword = currentStage.equals(Stage.TRIP_HAMMER) || currentStage.equals(Stage.POLISHING_WHEEL);
+
 
         if (gf.isOperatingMachine()) {
             boolean hasEnoughHeatLeft = gf.getHeatLeft() >= config.giantsFoundryToolBuffer();
             if (hasEnoughHeatLeft) {
+                debug("operate -> machine");
                 clickMachine();
             }
             else {
                 if (machineHeatsSword) {
+                    debug("operate -> water");
                     clickWater();
                 }
-                else {
+                else if (machineCoolsSword) {
+                    debug("operate -> lava");
                     clickLava();
+                }
+                else {
+                    log.info("Current stage = " + currentStage.name() + " = WRONG");
                 }
             }
         }
-        else if (gf.isModifyingTemperature()) {
-            int amountOfHeatToCollect = gf.getMaxHeatLeftInStage() - config.giantsFoundryTemperatureBuffer();
-            boolean hasCollectedEnoughTemperature = gf.getHeatLeft() >= amountOfHeatToCollect;
-            if (hasCollectedEnoughTemperature || canFinishStageWithHeat) {
-                clickMachine();
-            }
-            else {
-                if (currentActivity.equals(Activity.HEATING)) {
-                    clickLava();
-                }
-                else if (currentActivity.equals(Activity.COOLING)) {
-                    clickWater();
-                }
-                else {
-                    log.info("Unknown activity: " + currentActivity.name());
-                }
-            }
-        }
-        //this gets reached if we are in between machines
+        //else we are either modifying temperature or between machines
         else {
-            if (actionName.contains("warm")) {
-                clickLava();
+            Range range = gf.getLevel();
+            if (range.equals(Range.IN)) {
+                int amountOfHeatToCollect = gf.getMaxHeatLeftInStage() - config.giantsFoundryTemperatureBuffer();
+                boolean hasCollectedEnoughTemperature = gf.getHeatLeft() >= amountOfHeatToCollect;
+                if (hasCollectedEnoughTemperature || canFinishStageWithHeat) {
+                    debug("in -> machine");
+                    clickMachine();
+                }
+                else {
+                    //gather more heat
+                    if (machineHeatsSword) {
+                        debug("in -> water");
+                        clickWater();
+                    }
+                    else {
+                        debug("in -> lava");
+                        clickLava();
+                    }
+                }
             }
-            else if (actionName.contains("cool")) {
+            else if (range.equals(Range.ABOVE)) {
+                debug("above -> water");
                 clickWater();
             }
-            else if (actionName.contains("machine")) {
-                clickMachine();
+            else if (range.equals(Range.BELOW)) {
+                debug("below -> lava");
+                clickLava();
             }
             else {
-                log.info("Unknown action: " + action);
+                debug("else -> unknown");
             }
-        }
-    }
-
-
-    public void determineAction() {
-        Action actionNeeded = gf.determineAction();
-        String actionString = actionNeeded.name().toLowerCase();
-        if (actionString.contains("machine")) {
-            action.setName("Click machine").setGameObjectIds(gf.getCurrentStage().getObjectId());
-            return;
-        }
-        if (actionString.contains("warm")) {
-            action.setName("Click lava").setGameObjectIds(GiantsFoundryHelper.LAVA_POOL);
-            return;
-        }
-        if (actionString.contains("cool")) {
-            action.setName("Click water").setGameObjectIds(GiantsFoundryHelper.WATERFALL);
-            return;
         }
     }
 
@@ -248,18 +244,17 @@ Biggest jump when changing temperature with dunking
         //TODO: cannot debug local variables here (booleans stay false)
         panelComponent = p;
 
-        draw("Heat:", gf.getCurrentHeat().getName() + " (" + gf.getHeatAmount() + ")");
+        draw("Heat:", gf.getHeatAmount() + " (" + gf.getCurrentHeat().name() + ")");
         draw("Actions left:", gf.getActionsLeftInStage());
         draw("Heat left:", gf.getHeatLeft());
+        draw("Max heat left: ", gf.getMaxHeatLeftInStage());
         draw("Tool to use:", gf.getCurrentStage().getName());
-        draw("Should be busy with: ", gf.determineAction().name());
-        draw("Busy with:", gf.getActivity().name());
-        draw("Animation:", tracker.getAnimation());
-        draw("Current stage:", gf.getCurrentStage().name());
-        draw("Next stage:", gf.getNextStage().name());
-        draw("Using machine:", gf.isOperatingMachine());
-        draw("Modifying temperature:", gf.isModifyingTemperature());
-        draw("Max heat: ", gf.getMaxHeatLeftInStage());
+        draw("Busy with:", gf.getActivity().name().toLowerCase());
+        draw("Current stage:", gf.getCurrentStage().name().toLowerCase());
+        draw("Next stage:", gf.getNextStage().name().toLowerCase());
+        draw("Is using machine:", gf.isOperatingMachine());
+        draw("Is modifying temperature:", gf.isModifyingTemperature());
+        draw("Heat range level: ", gf.getLevel());
     }
 
     PanelComponent panelComponent;

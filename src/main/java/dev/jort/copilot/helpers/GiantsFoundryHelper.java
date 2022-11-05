@@ -1,8 +1,8 @@
 package dev.jort.copilot.helpers;
 
-import dev.jort.copilot.dtos.Action;
 import dev.jort.copilot.dtos.Activity;
 import dev.jort.copilot.dtos.Heat;
+import dev.jort.copilot.dtos.Range;
 import dev.jort.copilot.dtos.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -152,6 +152,8 @@ public class GiantsFoundryHelper {
         if (anim != 9454 && anim != 9452) {
             return Activity.NONE;
         }
+
+        //polish and grind use the same animations, so pick the closest
         GameObject polishWheel = gameObjects.closest(POLISHING_WHEEL);
         GameObject grindingWheel = gameObjects.closest(GRINDSTONE);
         if (polishWheel == null || grindingWheel == null) {
@@ -177,9 +179,6 @@ public class GiantsFoundryHelper {
      */
     public int getMaxHeatLeftInStage() {
         Stage stage = getCurrentStage();
-        if (stage.equals(Stage.NONE)) {
-            return -1;
-        }
         if (stage.equals(Stage.TRIP_HAMMER)) {
             return 10;
         }
@@ -189,46 +188,47 @@ public class GiantsFoundryHelper {
         if (stage.equals(Stage.POLISHING_WHEEL)) {
             return 15;
         }
-        return -2;
+        return -1;
     }
 
-    public Action determineAction() {
+
+    public Range getLevel() {
         int heat = getHeatAmount();
 
         Stage stage = getCurrentStage();
         switch (stage) {
             case TRIP_HAMMER: {
                 int[] high = getHighHeatRange();
-                if (heat < high[0]) {
-                    return Action.WARM_TO_UPPER;
+                if (heat <= high[0]) {
+                    return Range.BELOW;
                 }
-                if (heat > high[1]) {
-                    return Action.COOL_TO_UPPER;
+                if (heat >= high[1]) {
+                    return Range.ABOVE;
                 }
-                return Action.USE_MACHINE_TO_LOWER;
+                return Range.IN;
             }
             case GRINDSTONE: {
                 int[] med = getMedHeatRange();
-                if (heat < med[0]) {
-                    return Action.WARM_TO_LOWER;
+                if (heat <= med[0]) {
+                    return Range.BELOW;
                 }
-                if (heat > med[1]) {
-                    return Action.COOL_TO_LOWER;
+                if (heat >= med[1]) {
+                    return Range.ABOVE;
                 }
-                return Action.USE_MACHINE_TO_UPPER;
+                return Range.IN;
             }
             case POLISHING_WHEEL: {
                 int[] low = getLowHeatRange();
-                if (heat < low[0]) {
-                    return Action.WARM_TO_UPPER;
+                if (heat <= low[0]) {
+                    return Range.BELOW;
                 }
-                if (heat > low[1]) {
-                    return Action.COOL_TO_UPPER;
+                if (heat >= low[1]) {
+                    return Range.ABOVE;
                 }
-                return Action.USE_MACHINE_TO_LOWER;
+                return Range.IN;
             }
         }
-        return Action.UNKNOWN;
+        return Range.UNKNOWN;
     }
 
     public int getHeatAmount() {
@@ -359,7 +359,6 @@ public class GiantsFoundryHelper {
             actions++;
             heat += stage.getHeatChange();
         }
-
         return actions;
     }
 
@@ -381,6 +380,7 @@ public class GiantsFoundryHelper {
     public void onItemContainerChanged(ItemContainerChanged event) {
         if (event.getContainerId() == InventoryID.EQUIPMENT.getId()
                 && event.getItemContainer().count(PREFORM) == 0) {
+            log.info("Resetting stages!");
             //otherwise widgets stay cached when next commission is given!
             stages.clear();
             heatRangeRatio = 0;

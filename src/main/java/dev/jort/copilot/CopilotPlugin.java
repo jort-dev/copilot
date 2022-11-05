@@ -264,6 +264,7 @@ public class CopilotPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
+        giantsFoundryHelper.onItemContainerChanged(event);
         if (event.getContainerId() == InventoryID.INVENTORY.getId()) {
             inventory.update();
         }
