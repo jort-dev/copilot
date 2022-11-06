@@ -21,13 +21,6 @@ Biggest jump when changing temperature with dunking
     @Inject
     GiantsFoundryHelper gf;
 
-
-    public volatile boolean canFinishStageWithHeat;
-    public volatile boolean hasEnoughHeat;
-    public volatile boolean isNextStageWarmer;
-    public volatile boolean machineHeatsSword;
-    public volatile boolean testBoolean = false;
-
     String lastAction = waitAction.getName();
 
 
@@ -38,8 +31,6 @@ Biggest jump when changing temperature with dunking
         }
         action.setGameObjectIds();
         action.setSecondaryGameObjectIds();
-        determineHover();
-//        determineAction();
         determineAction();
 
         if (!lastAction.equals(action.getName())) {
@@ -64,88 +55,8 @@ Biggest jump when changing temperature with dunking
         action.setSecondaryNpcIds(GiantsFoundryHelper.KOVAC);
     }
 
-
-    public void determineHover() {
-        Stage currentStage = gf.getCurrentStage();
-        Stage nextStage = gf.getNextStage();
-
-        //we cant determine hover without knowing the current stage
-        if (currentStage.equals(Stage.NONE)) {
-            return;
-        }
-
-        canFinishStageWithHeat = gf.getHeatLeft() > gf.getActionsLeftInStage();
-
-        //if we are between machines: how much heat is required for us to click the machine instead of the temperature changer
-        hasEnoughHeat = gf.getHeatLeft() > 5;
-
-
-        //if there is no next stage, next stage will be NONE, which is a higher ordinal, so the next stage is 'colder'
-        isNextStageWarmer = currentStage.ordinal() > nextStage.ordinal();
-        boolean isFinalStage = nextStage.equals(Stage.NONE);
-
-        machineHeatsSword = currentStage.equals(Stage.GRINDSTONE);
-        testBoolean = true;
-//        logg(canFinishStageWithHeat, hasEnoughHeat, isNextStageWarmer, machineHeatsSword, isFinalStage);
-
-
-        if (gf.isOperatingMachine()) {
-            if (canFinishStageWithHeat) {
-                if (isNextStageWarmer) {
-                    hoverLava();
-                }
-                else {
-                    if (isFinalStage) {
-                        hoverKovac();
-                    }
-                    else {
-                        hoverWater();
-                    }
-                }
-            }
-            else {
-                if (machineHeatsSword) {
-                    hoverWater();
-                }
-                else {
-                    hoverLava();
-                }
-            }
-        }
-        else if (gf.isModifyingTemperature()) {
-            action.setSecondaryGameObjectIds(currentStage.getObjectId());
-        }
-        //this gets reached if we are in between actions
-        else {
-            //if we have enough heat, we should currently click the machine, so the next action is to change temperature
-            if (hasEnoughHeat) {
-                if (canFinishStageWithHeat) {
-                    if (isNextStageWarmer) {
-                        hoverLava();
-                    }
-                    else {
-                        if (isFinalStage) {
-                            hoverKovac();
-                        }
-                        else {
-                            hoverWater();
-                        }
-                    }
-                }
-                else {
-                    if (machineHeatsSword) {
-                        hoverWater();
-                    }
-                    else {
-                        hoverLava();
-                    }
-                }
-            }
-            //else the next action is to click the machine, because we should be changing temperature rn
-            else {
-                action.setSecondaryGameObjectIds(currentStage.getObjectId());
-            }
-        }
+    public void hoverMachine() {
+        action.setSecondaryGameObjectIds(gf.getCurrentStage().getObjectId());
     }
 
     public void clickMachine() {
@@ -173,8 +84,12 @@ Biggest jump when changing temperature with dunking
     public void determineAction() {
         boolean canFinishStageWithHeat = gf.getHeatLeft() - config.giantsFoundryToolBuffer() >= gf.getActionsLeftInStage();
         Stage currentStage = gf.getCurrentStage();
+        Stage nextStage = gf.getNextStage();
         boolean machineHeatsSword = currentStage.equals(Stage.GRINDSTONE);
         boolean machineCoolsSword = currentStage.equals(Stage.TRIP_HAMMER) || currentStage.equals(Stage.POLISHING_WHEEL);
+        //if there is no next stage, next stage will be NONE, which is a higher ordinal, so the next stage is 'colder'
+        boolean isNextStageWarmer = currentStage.ordinal() > nextStage.ordinal();
+        boolean isFinalStage = nextStage.equals(Stage.NONE);
 
 
         if (gf.isOperatingMachine()) {
@@ -182,8 +97,25 @@ Biggest jump when changing temperature with dunking
             if (hasEnoughHeatLeft) {
                 debug("operate -> machine");
                 clickMachine();
+                if (canFinishStageWithHeat) {
+                    if (isNextStageWarmer) {
+                        hoverLava();
+                    }
+                    else {
+                        hoverWater();
+                    }
+                }
+                else {
+                    if (machineHeatsSword) {
+                        hoverWater();
+                    }
+                    else {
+                        hoverLava();
+                    }
+                }
             }
             else {
+                hoverMachine();
                 if (machineHeatsSword) {
                     debug("operate -> water");
                     clickWater();
@@ -191,6 +123,7 @@ Biggest jump when changing temperature with dunking
                 else if (machineCoolsSword) {
                     debug("operate -> lava");
                     clickLava();
+
                 }
                 else {
                     log.info("Current stage = " + currentStage.name() + " = WRONG");
@@ -206,26 +139,47 @@ Biggest jump when changing temperature with dunking
                 if (hasCollectedEnoughTemperature || canFinishStageWithHeat) {
                     debug("in -> machine");
                     clickMachine();
+
+                    if (hasCollectedEnoughTemperature) {
+                        if (machineHeatsSword) {
+                            hoverWater();
+                        }
+                        else {
+                            hoverLava();
+                        }
+                    }
+                    else if (canFinishStageWithHeat) {
+                        if (isNextStageWarmer) {
+                            hoverLava();
+                        }
+                        else {
+                            hoverWater();
+                        }
+                    }
                 }
                 else {
                     //gather more heat
                     if (machineHeatsSword) {
                         debug("in -> water");
                         clickWater();
+                        hoverMachine();
                     }
                     else {
                         debug("in -> lava");
                         clickLava();
+                        hoverMachine();
                     }
                 }
             }
             else if (range.equals(Range.ABOVE)) {
                 debug("above -> water");
                 clickWater();
+                hoverMachine();
             }
             else if (range.equals(Range.BELOW)) {
                 debug("below -> lava");
                 clickLava();
+                hoverMachine();
             }
             else {
                 debug("else -> unknown");
