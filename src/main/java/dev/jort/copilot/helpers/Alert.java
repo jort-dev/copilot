@@ -8,9 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Preferences;
 import net.runelite.client.Notifier;
+import net.runelite.client.input.MouseAdapter;
+import net.runelite.client.input.MouseListener;
+import net.runelite.client.input.MouseManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.swing.*;
+import java.awt.event.MouseEvent;
 
 @Singleton
 @Slf4j
@@ -36,10 +41,30 @@ public class Alert {
     @Inject
     private Notifier notifier;
 
+    @Inject
+    private MouseManager mouseManager;
+
     int soundAlertsPlayed = 0;
     boolean previousInteractionNeeded = false;
     boolean hasFiredSystemAlert = false;
     long alertStartTime = -1;
+
+    @Inject
+    public Alert(MouseManager mouseManager) {
+        this.mouseManager = mouseManager;
+
+        final MouseListener mouseListener = new MouseAdapter() {
+            @Override
+            public MouseEvent mousePressed(MouseEvent mouseEvent) {
+                if (SwingUtilities.isLeftMouseButton(mouseEvent) && config.disableInput()) {
+                    mouseEvent.consume();
+                    log.info("Mouse event consumed!");
+                }
+                return mouseEvent;
+            }
+        };
+        mouseManager.registerMouseListener(mouseListener);
+    }
 
 
     public void handleAlert(boolean interactionNeeded) {

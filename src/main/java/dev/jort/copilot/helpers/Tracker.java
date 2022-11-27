@@ -1,12 +1,14 @@
 package dev.jort.copilot.helpers;
 
 
+import dev.jort.copilot.CopilotConfig;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
@@ -22,6 +24,12 @@ public class Tracker {
 
     @Inject
     Client client;
+
+    @Inject
+    CopilotConfig config;
+
+    @Inject
+    ConfigManager configManager;
 
     //animation
     private long lastAnimationTime = 0;
@@ -40,6 +48,14 @@ public class Tracker {
 
     private long lastMenuClickTime = 0;
 
+
+    private int missClickCount = 0;
+
+    private static long startTime;
+
+    public Tracker() {
+        startTime = System.currentTimeMillis();
+    }
 
     private boolean isAnimatingNow() {
         return getAnimation() > -1;
@@ -111,6 +127,23 @@ public class Tracker {
         if (event.getMenuOption().equals("Walk here")) {
             lastWalkingTime = System.currentTimeMillis();
         }
+
+        String option = event.getMenuOption();
+        if (option.equals("Cancel") || option.equals("Walk here")) {
+            missClickCount++;
+        }
+        else {
+            missClickCount = 0;
+        }
+        if (config.disableInputOnError()) {
+            if (missClickCount > config.allowedErrors()) {
+                log.info("Too many misclicks, disabling input!");
+                configManager.setConfiguration("copilot", "disableInput", true);
+                missClickCount = 0;
+            }
+        }
+
+
         lastMenuClickTime = System.currentTimeMillis();
         lastClickedMenuOption = event.getMenuOption();
         lastClickedMenuTarget = event.getMenuTarget();
@@ -171,6 +204,26 @@ public class Tracker {
 
     public int getLastAnimationId() {
         return lastAnimationId;
+    }
+
+    public static long timeRan() {
+        return System.currentTimeMillis() - startTime;
+    }
+
+    private final String formatTime(final long ms) {
+        long s = ms / 1000, m = s / 60, h = m / 60;
+        s %= 60;
+        m %= 60;
+        h %= 24;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
+
+    public String getTimeRunning() {
+        return formatTime(timeRan());
+    }
+
+    public int getMissClickCount() {
+        return missClickCount;
     }
 
 

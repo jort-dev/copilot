@@ -399,6 +399,39 @@ public interface CopilotConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "disableInput",
+            name = "Disable input",
+            description = "Use this if input incorrectly disabled by script.",
+            section = testSection,
+            position = 130
+    )
+    default boolean disableInput() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "disableInputOnError",
+            name = "Disable input on error",
+            description = "Disable input to the game when you make too many mistakes.",
+            section = testSection,
+            position = 135
+    )
+    default boolean disableInputOnError() {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "allowedErrors",
+            name = "Allowed errors",
+            description = "How many errors are allowed before input gets disabled.",
+            section = testSection,
+            position = 135
+    )
+    default int allowedErrors() {
+        return 5;
+    }
+
+    @ConfigItem(
             keyName = "testScript",
             name = "Test script",
             description = "Test the script currently in development.",
