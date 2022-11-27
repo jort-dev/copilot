@@ -16,20 +16,22 @@ General script for activities where you harvest resources from a GameObject, and
 public abstract class ResourceBankScript extends Script {
     int[] resourceItemIds;
     int[] resourceObjectIds;
+    int[] toolIds;
+    public IdHolder waitAction = new IdHolder().setName("Wait");
 
-    //'static' idholder to remove entity highlight when tree is clicked, otherwise flashes because it kept switching to the wait action
-    IdHolder clickResourceAction;
+//    //'static' idholder to remove entity highlight when tree is clicked, otherwise flashes because it kept switching to the wait action
+//    IdHolder clickResourceAction;
 
     /**
      * Required to call before use.
      */
-    public void setResources(IdHolder resources) {
+    public void setResources(IdHolder resources, int... toolIds) {
         this.resourceItemIds = resources.getItemIds();
         this.resourceObjectIds = resources.getGameObjectIds();
-
-        clickResourceAction = new IdHolder()
-                .setName("Click resource")
-                .setGameObjectIds(resourceObjectIds);
+        this.toolIds = toolIds;
+        if (this.toolIds == null || this.toolIds.length == 0) {
+            toolIds = null;
+        }
         log.info("Initialized " + resources.getName());
     }
 
@@ -43,8 +45,8 @@ public abstract class ResourceBankScript extends Script {
 
     public IdHolder determineAction() {
         if (bank.isOpen()) {
-            //deposit inventory
-            if (!inventory.isEmpty()) {
+            //deposit resource if we have it
+            if (inventory.containsAny(resourceItemIds)) {
                 Widget widgetToClick = client.getWidget(WidgetInfo.BANK_DEPOSIT_INVENTORY);
                 if (widgetToClick != null) {
                     action = new IdHolder()
@@ -56,8 +58,29 @@ public abstract class ResourceBankScript extends Script {
                     //if only one type of resource in inventory: we can also press the resource to deposit all
                     action.setItemIds(resourceItemIds);
                 }
+
+                if (isUsingTools()) {
+                    //if using a tool in the inventory, we have to deposit by clicking the resources
+                    action.setWidgets(); //clear the deposit all option
+                    action.setItemIds(resourceItemIds);
+                }
                 return action;
             }
+
+            //close bank when everything is deposited
+            //if in resized mode or resource is behind bank interface, you have to close the bank first
+            action = new IdHolder()
+                    .setName("Close bank or click resource")
+                    .setGameObjectIds(resourceObjectIds);
+            entityOverlay.setOnlyHighlightClosest(true);
+            Widget bankBarWidget = client.getWidget(12, 2);
+            if (bankBarWidget != null) {
+                Widget closeButtonWidget = bankBarWidget.getChild(11);
+                if (closeButtonWidget != null) {
+                    action.setWidgets(closeButtonWidget);
+                }
+            }
+            return action;
         }
 
         if (inventory.isFull()) {
@@ -72,20 +95,10 @@ public abstract class ResourceBankScript extends Script {
 
         if (!tracker.isAnimating() && !isWalkingToCorrectGoal()) {
             //click resource
-            action = clickResourceAction.setName("Click resource");
+            action = new IdHolder()
+                    .setName("Click resource")
+                    .setGameObjectIds(resourceObjectIds);
             entityOverlay.setOnlyHighlightClosest(true);
-
-            if (bank.isOpen()) {
-                //if in resized mode or resource is behind bank interface, you have to close the bank first
-                action.setName("Close bank or click resource");
-                Widget bankBarWidget = client.getWidget(12, 2);
-                if (bankBarWidget != null) {
-                    Widget closeButtonWidget = bankBarWidget.getChild(11);
-                    if (closeButtonWidget != null) {
-                        action.setWidgets(closeButtonWidget);
-                    }
-                }
-            }
             return action;
         }
 
@@ -93,13 +106,23 @@ public abstract class ResourceBankScript extends Script {
         return action;
     }
 
+    public boolean isUsingTools() {
+        return this.toolIds != null;
+    }
+
     public boolean isWalkingToCorrectGoal() {
-        return tracker.isWalking() && clickResourceAction.matchId(tracker.getLastClickedId());
+        //create fresh one, because if reusing one in script, it keeps switching to the wait one, which does not have ids
+        IdHolder ids = new IdHolder().setGameObjectIds(resourceObjectIds);
+        return tracker.isWalking() && ids.matchId(tracker.getLastClickedId());
+    }
+
+    public boolean isAlertNeeded() {
+        boolean isWaiting = action.equals(waitAction);
+        boolean isAlertNeeded = !isWaiting && !isWalkingToCorrectGoal() && !tracker.isAnimating();
+        return isAlertNeeded;
     }
 
     public void determineIfAlertIsNeeded() {
-        boolean isWaiting = action.equals(waitAction);
-        boolean isAlertNeeded = !isWaiting && !isWalkingToCorrectGoal();
-        alert.handleAlert(isAlertNeeded);
+        alert.handleAlert(isAlertNeeded());
     }
 }

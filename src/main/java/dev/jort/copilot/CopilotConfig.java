@@ -57,6 +57,17 @@ public interface CopilotConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "importantSoundId",
+            name = "Important sound ID",
+            description = "Configures the sound to play when attention is really needed.",
+            section = alertSettings,
+            position = 22
+    )
+    default int importantAlertSoundId() {
+        return 202;
+    }
+
+    @ConfigItem(
             keyName = "alertDelay",
             name = "Delay",
             description = "Configure after how many milliseconds of inactivity the alert go off.",
@@ -338,6 +349,17 @@ public interface CopilotConfig extends Config {
     )
     default int hpAlert() {
         return 0;
+    }
+
+    @ConfigItem(
+            keyName = "playerAlert",
+            name = "Alerts when a specified player is detected.",
+            description = "Useful for AFKing in the wilderness.",
+            section = priorityScriptsSection,
+            position = 105
+    )
+    default boolean playerAlert() {
+        return false;
     }
 
 

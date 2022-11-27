@@ -2,11 +2,9 @@ package dev.jort.copilot.overlays;
 
 import dev.jort.copilot.CopilotConfig;
 import dev.jort.copilot.CopilotPlugin;
-import dev.jort.copilot.helpers.Combat;
-import dev.jort.copilot.helpers.GiantsFoundryHelper;
-import dev.jort.copilot.helpers.Tracker;
-import dev.jort.copilot.helpers.Widgets;
+import dev.jort.copilot.helpers.*;
 import dev.jort.copilot.scripts.GiantsFoundry;
+import dev.jort.copilot.scripts.Woodcutting;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.ui.FontManager;
@@ -19,6 +17,7 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.Arrays;
 
 @Slf4j
 @Singleton
@@ -40,11 +39,15 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
     @Inject
     Tracker tracker;
     @Inject
+    Players players;
+    @Inject
     Combat combat;
     @Inject
     WidgetOverlay widgetOverlay;
     @Inject
     CopilotOverlayUtil copilotOverlayUtil;
+    @Inject
+    Woodcutting woodcutting;
 
     @Inject
     GiantsFoundryHelper giantsFoundryHelper;
@@ -90,10 +93,29 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
                 .build());
     }
 
+    public void draw(Object left, Object right) {
+        panelComponent.getChildren().add(LineComponent.builder().left(left.toString()).right(right.toString()).build());
+    }
+
+
     public void renderDebugText() {
         if (!config.debug()) {
             return;
         }
+        draw("Last ID", tracker.getLastClickedId());
+        draw("Alert needed", woodcutting.isAlertNeeded());
+//        draw("Bank open", woodcutting.bank.isOpen());
+        draw("Walking", tracker.isWalking());
+        draw("Walking1000", tracker.isWalking(1000));
+        draw("Animation", tracker.getAnimation());
+        draw("LocalLocation: ", players.me().getLocalLocation());
+        draw("Ids: ", Arrays.toString(woodcutting.action.getGameObjectIds()));
+        draw("Animating: ", tracker.isAnimating());
+        try {
+            draw("Goal correct", woodcutting.isWalkingToCorrectGoal());
+        } catch (NullPointerException ignored) {
+        }
+
     }
 
 

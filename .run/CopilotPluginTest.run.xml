@@ -6,7 +6,7 @@
     <option name="VM_PARAMETERS" value="-ea" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="dev.jort.copilot.dtos.*" />
+        <option name="PATTERN" value="dev.jort.copilot.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

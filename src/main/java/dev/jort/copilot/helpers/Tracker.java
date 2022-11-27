@@ -67,7 +67,7 @@ public class Tracker {
     }
 
     public boolean isWalking() {
-        return isWalking(200);
+        return isWalking(1000);
     }
 
     public boolean isWalking(int ms) {

@@ -42,7 +42,9 @@ public abstract class Script {
     @Inject
     public Combat combat;
     @Inject
-    GroundItems groundItems;
+    public GroundItems groundItems;
+    @Inject
+    public Players players;
 
 
     //OVERLAYS

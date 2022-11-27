@@ -1,5 +1,7 @@
 package dev.jort.copilot;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Provides;
 import dev.jort.copilot.dtos.Run;
 import dev.jort.copilot.helpers.*;
@@ -8,10 +10,7 @@ import dev.jort.copilot.other.Script;
 import dev.jort.copilot.overlays.*;
 import dev.jort.copilot.panel.CopilotPanel;
 import dev.jort.copilot.panel.Icon;
-import dev.jort.copilot.priority_scripts.Hp;
-import dev.jort.copilot.priority_scripts.Kitten;
-import dev.jort.copilot.priority_scripts.Loot;
-import dev.jort.copilot.priority_scripts.SpecialAttack;
+import dev.jort.copilot.priority_scripts.*;
 import dev.jort.copilot.scripts.*;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -37,6 +36,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Predicates.alwaysTrue;
+import static com.google.common.base.Predicates.equalTo;
 
 @Slf4j
 @PluginDescriptor(
@@ -106,6 +110,8 @@ public class CopilotPlugin extends Plugin {
     Kitten kitten;
     @Inject
     Hp hp;
+    @Inject
+    PlayerWarning playerWarning;
 
 
     //SCRIPTS
@@ -139,6 +145,16 @@ public class CopilotPlugin extends Plugin {
         //thread which fires each second
     }
 
+    private void swap(String option, String target, String swappedOption, Supplier<Boolean> enabled) {
+        swap(option, equalTo(target), swappedOption, enabled);
+    }
+
+    private void swap(String option, Predicate<String> targetPredicate, String swappedOption, Supplier<Boolean> enabled) {
+        swaps.put(option, new Swap(alwaysTrue(), targetPredicate, swappedOption, enabled, true));
+    }
+
+    private final Multimap<String, Swap> swaps = LinkedHashMultimap.create();
+
     @Override
     protected void startUp() throws Exception {
         //overlays
@@ -149,7 +165,7 @@ public class CopilotPlugin extends Plugin {
         }
 
         //priority scripts
-        priorityScripts.addAll(Arrays.asList(loot, specialAttack, kitten, hp));
+        priorityScripts.addAll(Arrays.asList(playerWarning, hp, loot, specialAttack, kitten));
 
         //scripts
         scripts.addAll(Arrays.asList(fishingBarbarian, woodcutting, crafting, inactivity, giantsFoundry));
@@ -250,9 +266,6 @@ public class CopilotPlugin extends Plugin {
         log.info("Config changed: " + event);
         crafting.onConfigChanged(event);
         loot.onConfigChanged(event);
-
-        // because we disable it when no script is running, enable it when we may have enabled a script
-//        setOverlaysEnabled(true);
     }
 
     @Subscribe

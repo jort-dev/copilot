@@ -110,6 +110,10 @@ public class Alert {
         playSound(config.alternativeSoundId());
     }
 
+    public void playImportantAlert() {
+        playSound(config.importantAlertSoundId());
+    }
+
     public void playSound(int id) {
         Preferences preferences = client.getPreferences();
         int previousVolume = preferences.getSoundEffectVolume();

@@ -14,7 +14,6 @@ import java.awt.*;
 @Singleton
 public class NotificationOverlay extends Overlay implements CopilotOverlay {
 
-
     @Inject
     Client client;
 
@@ -26,8 +25,9 @@ public class NotificationOverlay extends Overlay implements CopilotOverlay {
 
     public NotificationOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
-        setLayer(OverlayLayer.ABOVE_WIDGETS);
-        setPriority(OverlayPriority.MED);
+        //it needs to be above everything, so the highlights all get the same color (mixed with red)
+        setLayer(OverlayLayer.ALWAYS_ON_TOP);
+        setPriority(OverlayPriority.HIGH);
     }
 
     @Override

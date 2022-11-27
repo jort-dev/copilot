@@ -22,16 +22,16 @@ public class Woodcutting extends ResourceBankScript {
 
     @Override
     public void onStart() {
-        IdHolder willowResource = new IdHolder("WILLOW", "WILLOW_TREE").setItemIds(ItemID.WILLOW_LOGS);
-        idHolders.add(new IdHolder("TREE", "EVERGREEN", "DEAD_TREE").setItemIds(ItemID.LOGS));
-        idHolders.add(new IdHolder("OAK").setItemIds(ItemID.OAK_LOGS));
+        IdHolder willowResource = new IdHolder("WILLOW", "WILLOW_TREE").setItemIds(ItemID.WILLOW_LOGS).setName("Willow");
+        idHolders.add(new IdHolder("TREE", "EVERGREEN", "DEAD_TREE").setItemIds(ItemID.LOGS).setName("Tree"));
+        idHolders.add(new IdHolder("OAK").setItemIds(ItemID.OAK_LOGS).setName("Oak"));
         idHolders.add(willowResource);
-        idHolders.add(new IdHolder("MAPLE_TREE").setItemIds(ItemID.MAPLE_LOGS));
-        idHolders.add(new IdHolder("YEW", "YEW_TREE").setItemIds(ItemID.YEW_LOGS));
-        idHolders.add(new IdHolder("MAGIC_TREE").setItemIds(ItemID.MAGIC_LOGS));
-        idHolders.add(new IdHolder("REDWOOD").setItemIds(ItemID.REDWOOD_LOGS));
-        idHolders.add(new IdHolder("TEAK").setItemIds(ItemID.TEAK_LOGS));
-        idHolders.add(new IdHolder("MAHOGANY").setItemIds(ItemID.MAHOGANY_LOGS));
+        idHolders.add(new IdHolder("MAPLE_TREE").setItemIds(ItemID.MAPLE_LOGS).setName("Maple"));
+        idHolders.add(new IdHolder("YEW", "YEW_TREE").setItemIds(ItemID.YEW_LOGS).setName("Yew"));
+        idHolders.add(new IdHolder("MAGIC_TREE").setItemIds(ItemID.MAGIC_LOGS).setName("Magic tree"));
+        idHolders.add(new IdHolder("REDWOOD").setItemIds(ItemID.REDWOOD_LOGS).setName("Redwood"));
+        idHolders.add(new IdHolder("TEAK").setItemIds(ItemID.TEAK_LOGS).setName("Teak"));
+        idHolders.add(new IdHolder("MAHOGANY").setItemIds(ItemID.MAHOGANY_LOGS).setName("Mahogany"));
         setResources(willowResource); //default
     }
 
