@@ -109,8 +109,9 @@ public class InfoOverlay extends OverlayPanel implements CopilotOverlay {
         draw("Walking1000", tracker.isWalking(1000));
         draw("Animation", tracker.getAnimation());
         draw("LocalLocation: ", players.me().getLocalLocation());
-        draw("Ids: ", Arrays.toString(woodcutting.action.getGameObjectIds()));
         draw("Animating: ", tracker.isAnimating());
+        draw("Action: ", woodcutting.action.getName());
+        draw("Ids: ", Arrays.toString(woodcutting.action.getGameObjectIds()));
         try {
             draw("Goal correct", woodcutting.isWalkingToCorrectGoal());
         } catch (NullPointerException ignored) {

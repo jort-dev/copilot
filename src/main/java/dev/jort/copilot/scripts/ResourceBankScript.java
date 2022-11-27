@@ -19,8 +19,8 @@ public abstract class ResourceBankScript extends Script {
     int[] toolIds;
     public IdHolder waitAction = new IdHolder().setName("Wait");
 
-//    //'static' idholder to remove entity highlight when tree is clicked, otherwise flashes because it kept switching to the wait action
-//    IdHolder clickResourceAction;
+    IdHolder clickResourceAction;
+    IdHolder openBankAction;
 
     /**
      * Required to call before use.
@@ -33,6 +33,15 @@ public abstract class ResourceBankScript extends Script {
             toolIds = null;
         }
         log.info("Initialized " + resources.getName());
+
+        clickResourceAction = new IdHolder()
+                .setName("Click resource")
+                .setGameObjectIds(resourceObjectIds);
+
+        openBankAction = new IdHolder()
+                .setName("Open bank")
+                //dont highlight banker npcs, pathing is bad
+                .setGameObjectIds(ids.BANK_OBJECT_IDS);
     }
 
 
@@ -69,9 +78,7 @@ public abstract class ResourceBankScript extends Script {
 
             //close bank when everything is deposited
             //if in resized mode or resource is behind bank interface, you have to close the bank first
-            action = new IdHolder()
-                    .setName("Close bank or click resource")
-                    .setGameObjectIds(resourceObjectIds);
+            action = clickResourceAction;
             entityOverlay.setOnlyHighlightClosest(true);
             Widget bankBarWidget = client.getWidget(12, 2);
             if (bankBarWidget != null) {
@@ -83,21 +90,16 @@ public abstract class ResourceBankScript extends Script {
             return action;
         }
 
-        if (inventory.isFull()) {
+        if (inventory.isFull() && !isWalkingToCorrectGoal()) {
             //open bank
-            action = new IdHolder()
-                    .setName("Open bank")
-                    //dont highlight banker npcs, pathing is bad
-                    .setGameObjectIds(ids.BANK_OBJECT_IDS);
+            action = openBankAction;
             entityOverlay.setOnlyHighlightClosest(false);
             return action;
         }
 
         if (!tracker.isAnimating() && !isWalkingToCorrectGoal()) {
             //click resource
-            action = new IdHolder()
-                    .setName("Click resource")
-                    .setGameObjectIds(resourceObjectIds);
+            action = clickResourceAction;
             entityOverlay.setOnlyHighlightClosest(true);
             return action;
         }
@@ -112,8 +114,10 @@ public abstract class ResourceBankScript extends Script {
 
     public boolean isWalkingToCorrectGoal() {
         //create fresh one, because if reusing one in script, it keeps switching to the wait one, which does not have ids
-        IdHolder ids = new IdHolder().setGameObjectIds(resourceObjectIds);
-        return tracker.isWalking() && ids.matchId(tracker.getLastClickedId());
+        boolean clickedResource = clickResourceAction.matchId(tracker.getLastClickedId());
+        boolean clickedBank = openBankAction.matchId(tracker.getLastClickedId());
+        boolean clickedAction = action.matchId(tracker.getLastClickedId());
+        return tracker.isWalking() && (clickedResource || clickedAction || clickedBank);
     }
 
     public boolean isAlertNeeded() {
